@@ -1,0 +1,83 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+use yii\db\ActiveRecord;
+use frontend\models\Goods;
+
+
+/**
+ * This is the model class for table "{{%brand}}".
+ *
+ * @property integer $brand_id
+ * @property integer $parent_id
+ * @property string $brand_name
+ * @property string $brand_logo
+ * @property string $brand_desc
+ * @property integer $sort_order
+ * @property integer $is_show
+ */
+class Cart extends ActiveRecord
+{
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%cart}}';
+    }
+    
+    /**
+     * 当前会员的购物车商品
+     * @return unknown
+     */
+    public function get_cat_info($cart_id=NULL){
+    	
+    	//$cart_con = !empty($cart_id) ? ' AND c.cart_id IN ('.$cart_id.')' : '';
+    	
+    	/*$sql = "SELECT c.cart_id,c.goods_number AS buy_number,c.add_time,g.goods_id,g.goods_price,g.goods_name,g.goods_img,
+    			g.goods_number,g.is_updown,g.cat_id,g.brand_id,b.brand_name
+    			FROM yl_cart AS c LEFT JOIN yl_goods AS g ON c.goods_id=g.goods_id LEFT JOIN yl_brand AS b ON g.brand_id=b.brand_id 
+    			WHERE c.user_id=".$_SESSION['frontend']['user_id'].$cart_con." ORDER BY c.add_time DESC";*/
+
+        $sql='SELECT c.cart_id cid,c.goods_id gid,c.goods_number num,c.is_shipping is_pp,g.goods_price price,g.goods_name gname,g.goods_img img FROM yl_cart c,yl_goods g WHERE user_id='.$_SESSION['frontend']['user_id'].' AND c.goods_id=g.goods_id ORDER BY c.add_time DESC';
+        $res = cart::findBySql($sql)->asArray()->all();	
+        return $res;
+    }
+    
+	/**
+	 * 添加商品到购物车
+	 * @return ActiveQuery
+	 */
+    public function add_cart($goods_id,$num,$uid){
+        /* 检查该会员的购物车是否已有此商品 */
+        $sql='SELECT cart_id cid,goods_number gnum FROM yl_cart WHERE user_id=:uid AND goods_id=:gid';
+        $cart= cart::findBySql($sql,array(':uid'=>$uid,':gid'=>$goods_id))->asArray()->all();
+        if(!empty($cart) && $cart['0']['cid']>0){
+    		// 累加数量
+    		$model = self::find()->where($cart['0']['cid'])->one();
+    		$model->goods_number = $num + $cart['0']['gnum'];
+            $model->add_time=time();
+    		$count = $model->save(false); 
+            $cart_id = $cart['0']['cid'];
+        }else{
+    		// 添加新纪录
+    		$model = new Cart();
+    		$model->goods_id = $goods_id;
+    		$model->goods_number = $num;
+    		$model->user_id = $_SESSION['frontend']['user_id'];
+    		$model->add_time = time();
+    		$count = $model->save(); 
+    		$cart_id = $model->primaryKey;
+    	}
+    	
+    	
+    	if($count > 0){
+    		return ['code'=>1,'error'=>'','id'=>$cart_id];	
+    	}
+    	return ['code'=>0, 'error'=>'添加购物车失败'];
+    }
+
+}

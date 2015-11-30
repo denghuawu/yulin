@@ -1,0 +1,159 @@
+<?php
+namespace frontend\controllers;
+
+use Yii;
+use yii\base\InvalidParamException;
+use yii\web\BadRequestHttpException;
+use yii\web\Controller;
+use yii\web\UploadedFile;
+use frontend\models\Activity;
+
+    /*
+    *活动申请
+    */
+
+
+	class ActivityController extends BaseController{
+		/*
+		*广告申请首页
+		*/
+		public function actionIndex(){
+
+			return $this->render('index');
+		}
+		/*
+		*错误提示
+		*/
+		public function Ask_message($str){
+			$msg['message'] = $str;
+	                $msg['error'] = 1;
+	                $msg['link'] = [
+	                ['title'=>'重新创建','href'=>'index.php?r=activity/index'],
+	            ];
+	            return $this->redirect(['/site/message', 'msg'=>$msg]);
+		}
+		/*
+		*接受提交数据
+		*/
+		public function actionGetdata(){
+				//接受参数，校验参数的合法性
+		        $request=\Yii::$app->request;
+		        $data=$request->post();
+		        
+	            //图片上传
+	            $upObj=new upload;
+	            $files=$upObj->getFiles();
+	            foreach ($files as $key => $value) {
+	               $reso[$key]=$upObj->uploadFile($value);
+	            }
+	            $imgStr='';
+	            foreach ($reso as $key => $value) {
+	                if (!empty($value['dest'])) {
+	                    $imgStr.=$value['newName'];
+	                }else{
+
+	                }
+	            }
+	            $data['img']=$imgStr;
+		        $newdata=$this->veri($data);
+		       
+		        //将数据添加到数据库
+		        $ad=new Activity;
+		        $re=$ad->create_adask($newdata);
+		        if ($re>0) {
+		        	$msg['message'] = '提交成功！';
+	                $msg['error'] = 1;
+	                $msg['link'] = [
+	                ['title'=>'继续申请','href'=>'index.php?r=activity/index'],
+	                ['title'=>'商城首页','href'=>'index.php?r=index/index'],
+		            ];
+		            return $this->redirect(['/site/message', 'msg'=>$msg]);
+		        }else{
+		        	return $this->Ask_message('提交失败！');
+		        }
+
+		        
+		}
+		public function veri($data){
+		    //验证手机号码
+	        if (empty($data['cellphone'])) {
+	        	return $this->Ask_message('手机号码不能为空！');
+	        }else if (!preg_match("/^(?:13\d|15\d|18\d)\d{5}(\d{3}|\*{3})$/",$data['cellphone'])) {
+	        	return $this->Ask_message('手机号码错误！');
+	        }
+
+	        //判断验证码
+	        if (empty($_SESSION[$data['cellphone']])) {
+	        	return $this->Ask_message('验证码错误！');
+	        }
+	        if (empty($data['verif']) || ($data['verif']!=$_SESSION[$data['cellphone']])) {
+	        	return $this->Ask_message('验证码错误！');
+	        }else{
+	        	unset($_SESSION[$data['cellphone']]);
+	        }
+	        //验证活动主题
+	        if (empty($data['title'])) {
+	        	return $this->Ask_message('请填写活动主题！');
+	        }
+	        //活动开始时间
+	        if (empty($data['start_time'])) {
+	        	return $this->Ask_message('请选择活动开始时间！');
+	        }else{
+	        	$data['start_time']=strtotime($datd['start_time']);
+	        }
+	        //活动结束时间
+	        if (empty($data['end_time'])) {
+	        	return $this->Ask_message('请选择活动结束时间！');
+	        }else{
+	        	$data['end_time']=strtotime($datd['end_time']);
+	        }
+	        //活动地点
+	        if (empty($data['site'])) {
+	        	return $this->Ask_message('请填写活动地点！');
+	        }
+	        //活动角色
+	        switch ($data['role']) {
+	        	case '1':
+	        		$data['role']='自主';
+	        		break;
+	        	case '3':
+	        		$data['role']='赞助';
+	        		break;
+	        	case '4':
+	        		if (!empty($data['newRole'])) {
+	        			$data['role']=$data['newRole'];
+	        		}else{
+	        			return $this->Ask_message('请选择角色');
+	        		}
+	        		break;
+	        	default:
+	        		return $this->Ask_message('请选择角色');
+	        		break;
+	        }
+	        //提交申请的时间
+	        $data['addtime']=time();
+	        //校验费用
+	        if (empty($data['expenditure'])) {
+	        	return $this->Ask_message('请填写活动经费！');
+	        }
+	        switch ($data['expenditure']) {
+	        	case '1':
+	        		$data['expenditure']='自费';
+	        		break;
+	        	case '4':
+	        		if (!empty($data['exp'])) {
+	        			$data['expenditure']='申请补助:'.$data['exp'].'元';
+	        		}else{
+	        			return $this->Ask_message('请填写申请费用');
+	        		}
+	        		break;
+	        	default:
+	        		return $this->Ask_message('费用方式未填写');
+	        		break;
+	        }
+	        return $data;
+		}
+
+		
+		
+	}

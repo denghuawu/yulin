@@ -1,0 +1,76 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use backend\models\Brand;
+use backend\models\Category;
+
+/* @var $this yii\web\View */
+/* @var $searchModel backend\models\BrandSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = '品牌列表';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
+<?= $this->render('../layouts/common'); ?>
+
+<div class="brand-index">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+    <?php  //echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?= Html::a('添加品牌', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'brand_id',
+        	[
+        		'attribute'=>'brand_logo',
+        		'format' => 'html',
+        		'value' => function($m){
+        			if($m->brand_logo)
+        				return Html::img(COMMON_PATH.'upload/brand/'.$m->brand_logo,
+        						['width' => '50px','height'=>'50px']);
+        			else
+        				return Html::img(COMMON_PATH.'upload/figure/default.png',
+        						['width' => '50px','height'=>'50px']);
+        		}
+        	],
+        	'brand_name',
+            [
+            	'attribute'=>'cat_id',
+            	'value' => 	function($m){return Category::get_cat_name($m->cat_id);}
+    		],
+
+            // 'sort_order',
+             [
+	             'attribute'=>'is_show',
+	             'format' => 'html',
+	             'value' => function($m){
+	             	return Html::img(COMMON_PATH.'upload/others/'.$m->is_show.'.png',
+	             			['width' => '20px','height'=>'20px']);
+	             }
+             ],
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+</div>
+
+
+<?php if(yii::$app->session->getFlash('failed')):?>
+    <div style='color:red'>
+    <script>
+		alert("<?= yii::$app->session->getFlash('failed'); ?>");
+    </script>
+        <?php  yii::$app->session->setFlash('failed',null); ?>
+    </div>
+<?php endif; ?>

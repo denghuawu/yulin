@@ -1,0 +1,80 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use backend\models\Rank;
+use backend\models\User;
+use backend\models\Admin;
+use common\models\Region;
+
+
+/* @var $this yii\web\View */
+/* @var $searchModel backend\models\UserSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = '会员列表';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
+<?= $this->render('../layouts/common'); ?>
+
+<div class="user-index">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?= Html::a('添加会员', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            'user_id',
+        	[
+        		'attribute'=>'figure',
+        		'format' => 'html',
+        		'value' => function($m){
+        			if($m->figure) 
+        				return Html::img(COMMON_PATH.'upload/figure/'.$m->figure,
+        					['width' => '50px','height'=>'50px']);
+        			else 
+        			return Html::img(COMMON_PATH.'upload/figure/default.png',
+        				['width' => '50px','height'=>'50px']);
+        		}	
+        	],
+            'user_name',
+        	'mobile_phone',
+            [
+            	'attribute'=>'sex',
+            	'value' => function($m){if($m->sex =='1')return '男';else return '女';}	
+    		],
+            [
+            	'attribute'=>'area',
+            	'value' => function($m){return Region::region_name($m->province,$m->city);}	
+    		],
+        	[
+        		'attribute'=>'user_rank',
+        		'value'=>function($m){return Rank::get_rank_name($m->user_rank);}
+        	],
+            [
+            	'attribute' => 'parent_id',
+            	'value' => function($m){$real_name = User::findOne($m->parent_id)['real_name'];
+        					if($real_name){
+        						return $real_name;
+        					}						
+        					return '无';	
+        		}
+        	],
+        	[
+	        	'attribute' => 'admin_id',
+	        	'value' => function($m){return Admin::findOne($m->admin_id)['user_name'];}
+
+        	],
+          	
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+</div>

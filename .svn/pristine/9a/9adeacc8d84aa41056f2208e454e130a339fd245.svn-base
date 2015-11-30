@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>aa</title>
+</head>
+<body>
+<script type="text/javascript" src="jquery-1.8.1.min.js"></script>
+    <div class="form-group field-role-action_list required">
+    
+    行为分配<table class='xinwei'><tr><td><label class="label1"><input type="checkbox" name="Role[action_list][]" value="goods/view"> 商品管理</label></td><td><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="goods/index"> 商品列表</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="goods/create"> 添加商品</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="goods/update"> 编辑商品</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="goods/delete"> 删除商品</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="brand/index"> 品牌列表</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="brand/create"> 添加品牌</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="brand/update"> 编辑品牌</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="brand/delete"> 删除品牌</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="category/index"> 商品分类</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="category/create"> 添加分类</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="category/update"> 编辑分类</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="category/delete"> 删除分类</label></td><br/></tr><tr><td><label class="label1"><input type="checkbox" name="Role[action_list][]" value="admin"> 管理员选项</label></td><td><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="admin/create"> 添加管理员</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="admin/delete"> 删除管理员</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="admin/update"> 更改管理员</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="admin/index"> 管理员列表</label></td><br/></tr><tr><td><label class="label1"><input type="checkbox" name="Role[action_list][]" value="role/index"> 角色管理</label></td><td><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="role/create"> 添加角色</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="role/update"> 更改角色</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="role/delete"> 删除角色</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="role/index"> 角色列表</label></td><br/></tr><tr><td><label class="label1"><input type="checkbox" name="Role[action_list][]" value="rank/index"> 会员等级</label></td><td><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="rank/index"> 等级列表</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="rank/create"> 添加等级</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="rank/update"> 编辑等级</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="rank/delete"> 删除等级</label></td><br/></tr><tr><td><label class="label1"><input type="checkbox" name="Role[action_list][]" value="user/index"> 会员管理</label></td><td><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="user/index"> 会员列表</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="user/create"> 添加会员</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="user/update"> 编辑会员</label><label class="label2"><input type="checkbox" name="Role[action_list][]"  value="user/delete"> 删除会员</label></td><br/></tr></table>
+	</div>
+<script>
+$('table.xinwei input[type="checkbox"]').click(function(e){
+
+	if ($(e.target).parent().hasClass("label1")) {
+		if ($(e.target).is(":checked")) {
+			$(e.target).parents('tr').find('.label2 input[type="checkbox"]').attr("checked",true);
+			console.log($(e.target).parents('tr').find('.label2 input[type="checkbox"]'))
+			
+		}else{
+			console.log($(e.target).parents('tr').find('.label2 input[type="checkbox"]'))
+			$(e.target).parents('tr').find('.label2 input[type="checkbox"]').attr("checked",false);
+		}
+	}
+	/*else{
+		var k=0;
+		for (var i =0; i < $(e.target).parents('tr .label2').find('input[type="checkbox"]').length; i++) {
+			if ($(e.target).parents('tr .label2').find('input[type="checkbox"]').eq(i).is(":checked")) {
+				k++;
+				return;
+			}
+		}
+		if (k==0) {
+			$(e.target).parents('tr').find('input[type="checkbox"]').attr("checked","checked");
+		}
+	}*/
+
+});
+    
+</script>
+
+</body>
+</html>

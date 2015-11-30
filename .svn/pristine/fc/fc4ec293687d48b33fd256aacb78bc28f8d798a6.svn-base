@@ -1,0 +1,40 @@
+<?php
+use yii\helpers\Url;
+?>
+
+<div class="nav_top clearfix"><span class="re_left"></span>大茶源登陆</div>
+	<div class="wrap">
+		<div class="login fs35">
+			<form class="login_con" action='index.php?r=site/login' method='post'>
+				<p class="mt70"><span>账户</span><input type="text" placeholder='手机号码' name="User[mobile_phone]" length='11'  onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"></p>
+				<p><span>密码</span><input type="password" name='User[password]' placeholder='请输入密码'></p>
+				<p class="mt40"><input type="submit" value="登&nbsp;&nbsp;&nbsp;&nbsp;陆"></p>
+				
+				<div style='color:red'>
+				<!-- 错误信息的输出 -->
+					<?php
+						if($errors){
+							foreach ($errors as $val){
+								foreach($val as $v){
+									echo '&nbsp;'.$v.'<br/>';
+								}
+							}
+						}
+						
+						if(Yii::$app->session->hasFlash('failed')){
+							echo Yii::$app->session->getFlash('failed');
+						}
+					?>
+			    </div>
+    
+			</form>
+			<div class="login_nav mt40 fs25">
+				<p class="clearfix"><a href="index.php?r=site/signup" class="f_l">快速注册</a ><a href="<?= Url::to(['site/lost']) ?>" class="f_r">找回密码</a ></p>
+			</div>
+			<div class="login_foot">
+				
+			</div>
+		</div>
+	</div>
+	
+	

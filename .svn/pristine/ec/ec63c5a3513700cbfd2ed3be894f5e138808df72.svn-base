@@ -1,0 +1,307 @@
+<?php
+
+namespace frontend\controllers;
+
+use Yii;
+use yii\web\Controller;
+use frontend\models\UserAddress;
+use common\models\Region;
+use yii\helpers\Html;
+use frontend\models\frontend\models;
+
+class AddressController extends BaseController{
+	public $layout;
+ 	
+	/**
+	 * 地址列表
+	 * @return Ambigous <string, string>
+	 */
+	public function actionIndex(){
+		
+		$model = new UserAddress();
+		$data['data'] = $model->get_user_address();
+		return $this->render('index',$data);
+	}
+
+	/**
+	 * 收货地址(订单确认)
+	 */
+	public function actionOrderadd(){
+		$this->layout="header";
+		$model = new UserAddress();
+		$model->setScenario('create');
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$this->refresh();
+			
+			$address = new UserAddress();
+			$address->updateAll(['is_default'=>0],'address_id!='.$model->address_id);
+			
+			return $this->redirect(['index', 'goFrom'=>true]);
+		}else{
+			return $this->render('orderadd', [
+					'model' => $model,
+					'errors' => $model->errors,
+			]);
+		}
+	}
+	public function actionAddorder(){
+		$request=\Yii::$app->request;
+		$post=$request->post();
+		if (!$post['n']) {
+        	$str = '收货人不能为空！';
+        	$this->messag($str);
+        }
+        if (!$post['tel']) {
+        	$str = '收货人联系电话不能为空！';
+        	$this->messag($str);
+        }
+        if (!$post['province']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['city']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['district']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['site']) {
+        	$str = '请填写详细收货地址！';
+        	$this->messag($str);
+        }
+        $ressObj=new UserAddress;
+        $re=$ressObj->order_add_user($post);
+        if ($re) {
+        	return $this->redirect(['/order/verifyorder','orderid'=>$_SESSION['orderid']]);
+        }else{
+        	$str = '修改失败！';
+        	$this->Addmessag($str);
+        }
+	}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////   个人中心                     //////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/**
+	 * 新建收货(个人中心)
+	 */
+	public function actionCreate(){
+		$this->layout="header";
+		$model = new UserAddress();
+		$model->setScenario('create');
+		
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$this->refresh();
+			
+			$address = new UserAddress();
+			$address->updateAll(['is_default'=>0],'address_id!='.$model->address_id);
+			
+			return $this->redirect(['index', 'goFrom'=>true]);
+		}else{
+			return $this->render('create', [
+					'model' => $model,
+					'errors' => $model->errors,
+			]);
+		}
+		
+	}
+
+	/**
+	 * 添加收货地址
+	 */
+	public function actionAdd_user(){
+		$request=\Yii::$app->request;
+		$post=$request->post();
+		if (!$post['n']) {
+        	$str = '收货人不能为空！';
+        	$this->messag($str);
+        }
+        if (!$post['tel']) {
+        	$str = '收货人联系电话不能为空！';
+        	$this->messag($str);
+        }
+        if (!$post['province']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['city']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['district']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['site']) {
+        	$str = '请填写详细收货地址！';
+        	$this->messag($str);
+        }
+        $ressObj=new UserAddress;
+        $re=$ressObj->add_user($post);
+        if ($re) {
+        	return $this->redirect(['/address/index']);
+        }else{
+        	$str = '修改失败！';
+        	$this->Addmessag($str);
+        }
+	}
+
+	public function Addmessag($str){
+		$msg['message'] = $str;
+                $msg['error'] = 1;
+                $msg['link'] = [
+                ['title'=>'重新创建','href'=>'index.php?r=address/create'],
+            ];
+            return $this->redirect(['/site/message', 'msg'=>$msg]);
+	}
+
+	/**
+	 * 更新收货地址(新)
+	 */
+	public function actionUp(){
+		$request=\Yii::$app->request;
+		$id=$request->get('id');
+        $post=$request->post();
+        $post['id']=$id;
+		if (!$post['n']) {
+        	$str = '收货人不能为空！';
+        	$this->messag($str);
+        }
+        if (!$post['tel']) {
+        	$str = '收货人联系电话不能为空！';
+        	$this->messag($str);
+        }
+        if (!$post['province']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['city']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['district']) {
+        	$str = '请选择收货地址！';
+        	$this->messag($str);
+        }
+        if (!$post['sitet']) {
+        	$str = '请填写详细收货地址！';
+        	$this->messag($str);
+        }
+        $ressObj=new UserAddress;
+        $re=$ressObj->up_user($post);
+        if ($re) {
+        	$str = '操作成功！';
+        	$this->messag($str);
+        }else{
+        	$str = '操作失败！';
+        	$this->messag($str);
+        }
+        
+	}
+	/**
+	 * 错误提示(新)
+	 */
+	public function messag($str){
+		$msg['message'] = $str;
+                $msg['error'] = 1;
+                $msg['link'] = [
+                [''],
+                ['title'=>'返回个人中心','href'=>'index.php?r=/user/index'],
+            ];
+            return $this->redirect(['/site/message', 'msg'=>$msg]);
+	}
+
+
+
+	
+	/**
+	 * 收货地址
+	 */
+	public function actionUpdate(){
+		$request=\Yii::$app->request;
+        $id=$request->get('id');
+        $model = $this->findModel($id);
+        if(!$model){
+			return $this->redirect(['/index/index']);
+		}
+		
+		$address = $model->get_default_address($id);
+		$model->setScenario('update');
+		
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			
+			$this->refresh();
+			
+			return $this->redirect(['index','goFrom'=>true]);
+			
+		}else{
+			return $this->render('update', [
+					'model' => $model,
+					'address' => $address,
+					'errors' => $model->errors,
+			]);
+		}
+	}
+	/**
+	 * 设为默认收货地址
+	 */
+	public function actionSetdefault(){
+		$request=\Yii::$app->request;
+		$id=$request->get('id');
+		$id = intval($id);
+		if($id>0){
+			$address = new UserAddress();
+			$address->updateAll(['is_default'=>0],['user_id'=>$_SESSION['frontend']['user_id']]);
+			
+			$model = $this->findModel($id);
+			
+			if(!$model){
+				return $this->redirect(['/index/index']);
+			}
+			
+			$model->is_default = 1;
+			$model->update(false);
+			
+			return $this->redirect(['index']);
+		}
+	}
+
+	/**
+	 * 删除收货地址
+	 * @param unknown $id
+	 * @return boolean
+	 */
+	public function actionDelete(){
+		$request=\Yii::$app->request;
+		$id=$request->get('id');
+		$id = intval($id);
+		if($id>0){
+			$model = $this->findModel($id);
+			$model->delete();
+
+		}
+		return $this->redirect(['index']);
+	}
+	
+	// 地区联动
+	public function actionRegion($parent_id)
+	{
+	
+		$model = Region::region_list($parent_id);
+	
+		foreach($model as $value=>$name)
+		{
+			echo Html::tag('option',Html::encode($name),array('value'=>$value));
+		}
+		exit;
+	}
+	
+	protected function findModel($id)
+	{
+		if (($model = UserAddress::findOne($id)) !== null) {
+			return $model;
+		}
+	}
+}

@@ -1,0 +1,159 @@
+$(function(){
+	// 获取验证码
+	function code(obj){
+		if (obj.val() == '点击获取验证码') {
+			obj.css({"color":"#b4b2b2",'backgroundColor':'#ecebeb'});
+			shu(obj,60);
+
+		};
+	}
+	function shu(obj,m){
+		if (m>0) {
+			obj.val(m+'秒后重新获取');
+			m--;
+			setTimeout(function(){
+				shu(obj,m);
+			},1000);
+		}else if(m<=0){
+			obj.val('点击获取验证码');
+			obj.removeAttr('style');
+		}
+	}
+	$(".register .code input[type='button']").click(function(){
+		code($(this));
+	});
+
+	// swiper
+    if(typeof Swiper  != "undefined"){
+		var timer;
+		var mySwiper = new Swiper('.swiper-container', {
+			pagination: '.swiper_nav',
+			paginationClickable: true,
+			mode: 'horizontal',
+			loop: true,
+			speed: 1000,
+			//autoplay:2000,
+			// autoplayDisableOnInteraction:false,
+			grabCursor: true,
+			onSlideChangeStart: function() {
+				clearInterval(timer);
+				timer = setInterval(function() {
+					// mySwiper.swipeNext();
+				}, 2000);
+			}
+		});
+		clearInterval(timer);
+		timer = setInterval(function() {
+			mySwiper.swipeNext();
+		}, 2000);
+    }
+	// 搜索
+	$(".search span").click(function(){
+		document.body.style.overflowX=document.body.style.overflowY="hidden";
+		window.addEventListener('touchmove', scol, false);
+		if($('body').find('.search_wrap').length ==0){
+			var search_wrap=$('<div class="search_wrap"><div class="search clearfix"><p><s></s></p><div class="fs30 f_r">取消</div></div></div>');
+			search_wrap.find('.search>div:contains("取消")').click(function(){
+				$(this).parents('.search_wrap').hide();
+				document.body.style.overflowX=document.body.style.overflowY="auto"
+				window.removeEventListener('touchmove', scol, false);
+			});
+			$("body").append(search_wrap);
+		}else{
+			$(".search_wrap").show();
+		}
+		
+	});
+	$(".commodity_top .nav div:contains('筛选')").click(function(){
+		$('.commodity_top .nav div').removeClass('f6');
+		$('.commodity_top .nav s').removeClass('s2');
+		$('.commodity_top .nav s').addClass('s1');
+		$(this).addClass('f6');
+		$(this).children('s').addClass('s2');
+		$(this).children('s').removeClass('s1');
+		$(".commodity_top .h").removeClass('dn');
+		$(".commodity_top .z").addClass('dn');
+
+	});
+	$(".commodity_top .nav div:contains('综合排序')").click(function(){
+		$('.commodity_top .nav div').removeClass('f6');
+		$('.commodity_top .nav s').removeClass('s2');	
+		$('.commodity_top .nav s').addClass('s1');
+		$(this).addClass('f6');
+		$(this).children('s').addClass('s2');
+		$(this).children('s').removeClass('s1');
+		$(".commodity_top .h").addClass('dn');
+		$(".commodity_top .z").removeClass('dn');
+
+	});
+	$(".commodity_con").on('click',ctdn);
+	$(".commodity_con").on('touchstart',ctdn);
+	function ctdn(){
+		$('.commodity_top .nav div').removeClass('f6');
+		$('.commodity_top .nav s').removeClass('s2');	
+		$('.commodity_top .nav s').addClass('s1');
+		$(".commodity_top .h").addClass('dn');
+		$(".commodity_top .z").addClass('dn');
+	}
+	$(".commodity_top .z div").click(function(){
+		$(".commodity_top .z div").removeClass('f6');
+		$(this).addClass('f6');
+	});
+	$(".shop_info_nav div").click(function(){
+		$(".shop_info_nav div").removeClass('c');
+		$(this).addClass('c');
+	});
+	function scol(e) {
+		e.preventDefault && e.preventDefault();
+		e.returnValue = false;
+		e.stopPropagation && e.stopPropagation();
+		return false;
+	}
+
+	function alt(str){
+		if($('body').children('.alert').length ==0){
+			var alert=$('<div class="alert">'+str+'</div>');
+			$('body').append(alert);			
+		}else{
+			$('.alert').html(str);
+			$('.alert').show();
+		}
+		$(".alert").css({'transform':'scale(0,0)','opacity':'0.2'});
+		setTimeout(function(){			
+			$(".alert").css({'transform':'scale(1,1)','opacity':'1'});
+			setTimeout(function(){
+				$(".alert").css({'transform':'scale(0,0)','opacity':'0.2'});
+				
+			},1300);
+		},3);
+	}
+	$(".shop_btn .cat").click(function(){
+		alt('该商品已加入购物车');
+	});
+	$(".x1").click(function(e){
+		xin(e);		
+	});
+	$(".x2").click(function(e){
+		xin(e);
+	});
+	function xin(e){
+		var t = e.target;
+		if($(t).attr('class') == 'x1'){
+			alt('已收藏');
+			$(t).removeClass('x1');
+			$(t).addClass('x2');
+		}else{
+			alt('已取消收藏');
+			$(t).removeClass('x2');
+			$(t).addClass('x1');
+		}
+
+	}
+
+	$(".shop_info_nav>div").click(function(){
+		var val=$(this).attr("class");//这里获取class值
+		var arr=val.split(" ");
+		$(".shop_info_con>div").hide();
+		$(".shop_info_con ."+arr[0]).show();
+	});
+});

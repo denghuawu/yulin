@@ -1,0 +1,112 @@
+<?php
+
+namespace backend\models;
+
+use Yii;
+use yii\base\Model;
+use yii\data\ActiveDataProvider;
+use backend\models\Employee;
+
+/**
+ * EmployeeSearch represents the model behind the search form about `backend\models\Employee`.
+ */
+class EmployeeSearch extends Employee
+{
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['id', 'mobile_phone', 'birthday', 'ss_number', 'card_no', 'admin_id', 'qq', 'position_status', 'em_type', 'entry_time', 'leave_time', 'probation_time_start', 'probation_time_end', 'regular_time', 'engage_time_start', 'engage_time_end', 'depart_id', 'job_id', 'tp_type', 'join_work_time', 'graduate_time', 'education_level'], 'integer'],
+            [['em_sn', 'em_name', 'id_card', 'marriage', 'sex', 'native_place', 'domicile', 'nation', 'used_name', 'political_status', 'self_introduction', 'email', 'emergency_contact', 'emergency_phone', 'now_address', 'home_phone', 'has_probation', 'graduate_school', 'major', 'pro_certificate', 'education_exp', 'work_exp'], 'safe'],
+            [['height', 'weight', 'salary'], 'number'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        // bypass scenarios() implementation in the parent class
+        return Model::scenarios();
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $query = Employee::find();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere([
+            'id' => $this->id,
+            'mobile_phone' => $this->mobile_phone,
+            'birthday' => $this->birthday,
+            'ss_number' => $this->ss_number,
+            'card_no' => $this->card_no,
+            'admin_id' => $this->admin_id,
+            'height' => $this->height,
+            'weight' => $this->weight,
+            'qq' => $this->qq,
+            'position_status' => $this->position_status,
+            'em_type' => $this->em_type,
+            'entry_time' => $this->entry_time,
+            'leave_time' => $this->leave_time,
+            'probation_time_start' => $this->probation_time_start,
+            'probation_time_end' => $this->probation_time_end,
+            'regular_time' => $this->regular_time,
+            'engage_time_start' => $this->engage_time_start,
+            'engage_time_end' => $this->engage_time_end,
+            'depart_id' => $this->depart_id,
+            'job_id' => $this->job_id,
+            'salary' => $this->salary,
+            'tp_type' => $this->tp_type,
+            'join_work_time' => $this->join_work_time,
+            'graduate_time' => $this->graduate_time,
+            'education_level' => $this->education_level,
+        ]);
+
+        $query->andFilterWhere(['like', 'em_sn', $this->em_sn])
+            ->andFilterWhere(['like', 'em_name', $this->em_name])
+            ->andFilterWhere(['like', 'id_card', $this->id_card])
+            ->andFilterWhere(['like', 'marriage', $this->marriage])
+            ->andFilterWhere(['like', 'sex', $this->sex])
+            ->andFilterWhere(['like', 'native_place', $this->native_place])
+            ->andFilterWhere(['like', 'domicile', $this->domicile])
+            ->andFilterWhere(['like', 'nation', $this->nation])
+            ->andFilterWhere(['like', 'used_name', $this->used_name])
+            ->andFilterWhere(['like', 'political_status', $this->political_status])
+            ->andFilterWhere(['like', 'self_introduction', $this->self_introduction])
+            ->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['like', 'emergency_contact', $this->emergency_contact])
+            ->andFilterWhere(['like', 'emergency_phone', $this->emergency_phone])
+            ->andFilterWhere(['like', 'now_address', $this->now_address])
+            ->andFilterWhere(['like', 'home_phone', $this->home_phone])
+            ->andFilterWhere(['like', 'has_probation', $this->has_probation])
+            ->andFilterWhere(['like', 'graduate_school', $this->graduate_school])
+            ->andFilterWhere(['like', 'major', $this->major])
+            ->andFilterWhere(['like', 'pro_certificate', $this->pro_certificate])
+            ->andFilterWhere(['like', 'education_exp', $this->education_exp])
+            ->andFilterWhere(['like', 'work_exp', $this->work_exp]);
+
+        return $dataProvider;
+    }
+}

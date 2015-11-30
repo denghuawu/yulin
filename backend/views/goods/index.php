@@ -1,0 +1,290 @@
+<?php 
+use yii\helpers\Url;
+?>
+	<div class="container">
+		<div class="right">
+			<form action="index.php" class="form_elect clearfix">
+				<div class="">
+					<input type='hidden' name='r' value='goods/index'/>
+					<input type="text" name="GoodsSearch[goods_name]" class="control-text search-query">
+					<input type="submit" class="button" value="搜索">
+				</div>
+
+				<div class="controls_elect">
+					<span class="label label_elect">产品系列</span>
+					<?= make_con_option($data['variety'],  Url::to(['goods/index',
+            				'GoodsSearch[goods_name]' => $_REQUEST['GoodsSearch']['goods_name'],
+            				'GoodsSearch[goods_price]' => $_REQUEST['GoodsSearch']['goods_price'],
+            				'GoodsSearch[goods_number]' => $_REQUEST['GoodsSearch']['goods_number'],
+            				'GoodsSearch[goods_year]' => $_REQUEST['GoodsSearch']['goods_year'],
+            				'GoodsSearch[variety_id]' => ''
+            				])) ?>
+				</div>
+				<div class="controls_elect">
+					<span class="label label_elect">库存预警</span>
+					<?= make_con_option($GLOBALS['warehouse_warnning'],  Url::to(['goods/index',
+            				'GoodsSearch[goods_name]' => $_REQUEST['GoodsSearch']['goods_name'],
+            				'GoodsSearch[goods_price]' => $_REQUEST['GoodsSearch']['goods_price'],
+            				'GoodsSearch[goods_year]' => $_REQUEST['GoodsSearch']['goods_year'],
+            				'GoodsSearch[variety_id]' => $_REQUEST['GoodsSearch']['variety_id'],
+            				'GoodsSearch[goods_number]' => ''
+            				])) ?>
+				</div>
+				<div class="controls_elect">
+					<span class="label label_elect">产品年份</span>
+					<?= make_con_option($GLOBALS['goods_year'],  Url::to(['goods/index',
+            				'GoodsSearch[goods_name]' => $_REQUEST['GoodsSearch']['goods_name'],
+            				'GoodsSearch[goods_price]' => $_REQUEST['GoodsSearch']['goods_price'],
+            				'GoodsSearch[goods_number]' => $_REQUEST['GoodsSearch']['goods_number'],
+            				'GoodsSearch[variety_id]' => $_REQUEST['GoodsSearch']['variety_id'],
+            				'GoodsSearch[goods_year]' => ''
+            				])) ?>
+				</div>
+				<div class="controls_elect">
+					<span class="label label_elect">每件单价</span>
+					<a href="<?= Url::to(['goods/index']) ?>"><span>不限</span></a>
+            		<?= make_con_option($GLOBALS['goods_price'],  Url::to(['goods/index',
+            				'GoodsSearch[goods_name]' => $_REQUEST['GoodsSearch']['goods_name'],
+            				'GoodsSearch[goods_number]' => $_REQUEST['GoodsSearch']['goods_number'],
+            				'GoodsSearch[goods_year]' => $_REQUEST['GoodsSearch']['goods_year'],
+            				'GoodsSearch[variety_id]' => $_REQUEST['GoodsSearch']['variety_id'],
+            				'GoodsSearch[goods_price]' => ''
+            				])) ?>
+				</div>
+				<div class="nav_elect">
+					<span class="label_elect_title">筛选</span>
+					<?php 
+						if($_REQUEST['GoodsSearch']){
+						
+							foreach ($_REQUEST['GoodsSearch'] as $key=>$val){
+								if(empty($val))continue;
+								$tmp_request = $_REQUEST;
+								unset($tmp_request['GoodsSearch'][$key]); 
+					?>
+								<a href="<?= Url::to(['goods/index',
+								'GoodsSearch[goods_name]'=>$tmp_request['GoodsSearch']['goods_name'],
+								'GoodsSearch[goods_number]'=>$tmp_request['GoodsSearch']['goods_number'],
+								'GoodsSearch[goods_year]'=>$tmp_request['GoodsSearch']['goods_year'],
+								'GoodsSearch[variety_id]'=>$tmp_request['GoodsSearch']['variety_id'],
+								'GoodsSearch[goods_price]'=>$tmp_request['GoodsSearch']['goods_price'],
+								]) ?>" class="label_elect_nav">
+								<?= explode(',', $val)[1] ?></a>
+					<?php }} ?>
+					
+					<a href="" class="label_elect_title">清楚全部</a>            		
+				</div>
+			</form>
+			<div>
+				<div id="table_list"></div>
+				<div id="bar"></div>
+				
+				<?= $this->render('_form', ['data'=>$data]) ?>
+				
+			</div>
+		</div>
+	</div> 
+
+	<script type="text/javascript" src="../../web/assets/js/jquery-1.8.1.min.js"></script>
+	<script type="text/javascript" src="../../web/assets/js/bui-min.js"></script>
+	<script type="text/javascript" src="../../web/assets/js/config-min.js"></script>
+	<script type="text/javascript">
+
+		var data = [
+	    		<?php foreach ($dataProvider->getModels() as $value){
+	    			// 取出列表数据
+	    		?>
+	    			{
+		    			"Goods['id']":'<?= $value['id'] ?>',
+		    			"Goods['goods_sn']":'<?= $value['goods_sn'] ?>',
+		    			"Goods['goods_name']":'<?= $value['goods_name'] ?>',
+		    			"Goods['goods_price']":'<?= $value['goods_price'] ?>',
+		    			"Goods['factory_price']":'<?= $value['factory_price'] ?>',
+		    			"Goods['goods_year']":'<?= $value['goods_year'] ?>',
+		    			"Goods['cat_id']":'<?= $data['category'][$value['cat_id']] ?>',
+		    			"Goods['variety_id']":'<?= $data['variety'][$value['variety_id']] ?>',
+		    			"Goods['goods_number']":'<?= $value['goods_number'] ?>',
+		    			"Goods['goods_desc']":'<?= $value['goods_desc'] ?>',
+		    			"Goods['goods_img']":'<?= $value['goods_img'] ?>',
+		    			"Goods['unit_jian']":'<?= $value['unit_jian'] ?>',
+		    			"Goods['unit_ke']":'<?= $value['unit_ke'] ?>',
+		    			"Goods['warehouse_upper_limit']":'<?= $value['warehouse_upper_limit'] ?>',
+		    			"Goods['warehouse_down_limit']":'<?= $value['warehouse_down_limit'] ?>',
+		    			"Goods['add_time']":'<?= $value['add_time'] ?>',
+		    			"Goods['co_men']":'<?= $value['co_men'] ?>',
+		    			"Goods['yulin_shop']":'<?= $value['yulin_shop'] ?>',
+		    			"Goods['super_trader']":'<?= $value['super_trader'] ?>',
+		    			"Goods['level_1_trader']":'<?= $value['level_1_trader'] ?>',
+		    			"Goods['level_2_trader']":'<?= $value['level_2_trader'] ?>',
+		    			"Goods['level_3_trader']":'<?= $value['level_3_trader'] ?>',
+		    			"Goods['is_updown']":'<?= $value['is_updown'] ?>',
+	    			},
+	    		<?php } ?>
+	    		];
+	
+		BUI.use(['bui/grid','bui/data'],function(Grid,Data){
+		var Grid = Grid,
+		  Store = Data.Store,
+		  columns = [
+		             {title : 'id',dataIndex :"Goods['id']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '产品编号',dataIndex :"Goods['goods_sn']", width:100},
+		             {title : '产品名称',dataIndex :"Goods['goods_name']", width:100},
+		             {title : '产品系列',dataIndex :"Goods['variety_id']", width:100},
+		             {title : '年份',dataIndex :"Goods['goods_year']", width:100},
+		             {title : '产品分类',dataIndex :"Goods['cat_id']", width:100},
+		             {title : '标准价格',dataIndex :"Goods['goods_price']", width:100},
+		             {title : '出厂价',dataIndex :"Goods['factory_price']", width:100},
+		             {title : '当前库存',dataIndex :"Goods['goods_number']", width:100},
+		             {title : '产品描述',dataIndex :"Goods['goods_desc']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '产品图片',dataIndex :"Goods['goods_img']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '产品规格',dataIndex :"Goods['unit_jian']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '产品规格',dataIndex :"Goods['unit_ke']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '库存上限',dataIndex :"Goods['warehouse_upper_limit']", width:100},
+		             {title : '库存下限',dataIndex :"Goods['warehouse_down_limit']", width:100},
+		             {title : '录入时间',dataIndex :"Goods['add_time']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '合作商',dataIndex :"Goods['co_men']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '雨林馆',dataIndex :"Goods['yulin_shop']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '特级经销商',dataIndex :"Goods['super_trader']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '一级经销商',dataIndex :"Goods['level_1_trader']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '二级经销商',dataIndex :"Goods['level_2_trader']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '三级经销商',dataIndex :"Goods['level_3_trader']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		             {title : '上架',dataIndex :"Goods['is_updown']", width:0,elStyle:{'border-left':'none','border-top':'none','display':'none'}},
+		            ];
+		   //由于设置了数据跟状态的对应关系，此时状态会反映到Html上面
+		   //disabled的字段无法被选中 
+		   //selected 是否选中
+		  /*data = [{a:'123',selected : true},{a:'cdd',b:'edd',disabled:true},{a:'1333',c:'eee',d:2}];*/
+	 
+ 
+		var store = new Store({
+			data : data,
+			autoLoad:true
+		  }),
+		editing_a = new Grid.Plugins.DialogEditing({
+			contentId : 'content',
+			editor : {
+                  title : '添加产品',
+                  width : 900,
+                  focusable : false,
+                  listeners : {
+                    show : function(){
+                      var form = this.get('form');
+                    }
+                  }
+                }
+		}),
+		editing = new Grid.Plugins.DialogEditing({
+			contentId : 'content3',
+			triggerCls : 'btn-edit',
+			editor : {
+                  title : '查看产品',
+                  width : 900,
+                  focusable : false,
+                  listeners : {
+                    show : function(){
+                      var form = this.get('form');
+                      
+                    }
+                  }
+                }
+		}),
+		editing2 = new Grid.Plugins.DialogEditing({
+			contentId : 'content2',
+			triggerCls : 'btn-revamp',
+			editor : {
+					title : '编辑产品',
+	                width : 900,
+	                focusable : false,
+	                listeners : {
+	                    show : function(){
+	                      var form = this.get('form');
+	                      
+	                    }
+                    }
+			}
+		}),
+		grid = new Grid.Grid({
+			render:'#table_list',
+			columns : columns,
+			forceFit : true,
+			itemStatusFields : { //设置数据跟状态的对应关系
+			  selected : 'selected',
+			  disabled : 'disabled'
+			},
+			store : store,
+			plugins : [Grid.Plugins.CheckSelection,editing,editing2,editing_a],	// 插件形式引入多选表格
+			tbar:{
+				items : [{
+					btnCls : 'button button-small',
+					text : '<i class="icon-plus"></i>添加',	
+					// content : '<input type="button" name="" id="" class="" value="添加"/>',
+					listeners : {
+						'click' : addFunction
+					}},{
+					btnCls : 'button button-small',
+					text : '<i class="icon-remove"></i>删除',
+					listeners : {
+						'click' : delFunction
+					}},{
+						btnCls : 'button button-small',
+						text : '<i class="icon-zoom-in"></i>导出EXCEL',
+						listeners : {
+							'click' : printForm
+					}},{
+						btnCls : 'button button-small',
+						text : '<i class="icon-zoom-in"></i>上架',
+						listeners : {
+							'click' : delFunction
+					}},{
+						btnCls : 'button button-small',
+						text : '<i class="icon-zoom-in"></i>下架',
+						listeners : {
+							'click' : delFunction
+						}
+				}]
+			}
+		  });
+		grid.render();
+
+		//点击操作
+		grid.on('itemclick',function(ev){
+		  var sender = $(ev.domTarget),
+			itemEl = $(ev.element),
+			item = ev.item;
+			if(sender.hasClass('btn-remove')){ //点击删除操作
+				delFunctionEl(item,itemEl);
+			}
+		});
+		//删除选中的记录
+        function delFunctionEl(item,itemEl){        	
+          BUI.Message.Confirm('确认删除记录？',function(){
+            var input = itemEl.find('input'),
+              name = itemEl.attr('name');
+              console.log(name);
+            if(name){
+              form.getField(name).remove();
+            }
+
+            $.post("index.php?r=goods/delete&id="+item["Goods[id]"],{'id':item["Goods[id]"]},function(str){
+				alert(str);
+          	});
+
+            store.remove(item);
+          },'question');
+        } 
+		/*添加*/
+		function addFunction(){
+			var newData = {b : 0};
+          	editing_a.add(newData,'a'); //添加记录后，直接编辑
+		}
+		/*刪除*/
+		function delFunction(){
+			var selections = grid.getSelection();
+			store.remove(selections);
+		}
+		// 打印
+		function printForm(){
+			location.href = 'index.php?r=goods/print&data=<?= serialize($_REQUEST); ?>';
+		}
+
+	});
+	</script>

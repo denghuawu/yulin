@@ -1,0 +1,33 @@
+<?php
+
+include("../functions/constants.php");
+include("wx_function.php");
+
+$url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={$appid}&redirect_uri=http://object.yulintea.com/frontend/web/index.php?r=weixin/login&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+$postmenu = <<<menu
+  {
+     "button":[
+     {	
+          "type":"view",
+          "name":"进入商城",
+          "url":"$url"
+      }
+	]
+ }
+menu;
+
+//var_dump($postmenu);die;
+// 获取access_token
+$access_token = getToken();
+
+/*	删除自定义菜单
+$url = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token={$access_token}";
+
+http_request($url);
+*/
+$url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={$access_token}";
+
+$result = https_request($url,$postmenu);
+echo '<br>';
+var_dump($result);
+?>

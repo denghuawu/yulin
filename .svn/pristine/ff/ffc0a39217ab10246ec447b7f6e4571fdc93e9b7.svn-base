@@ -1,0 +1,148 @@
+<?php
+
+namespace frontend\controllers;
+
+use Yii;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use frontend\models\Goods;
+use frontend\models\Collect;
+use frontend\models\History;
+use frontend\models\Comment;
+use frontend\models\frontend\models;
+
+/**
+ * UserController implements the CRUD actions for User model.
+ */
+class GoodsController extends Controller
+{
+
+    /**
+     * 根据商品ID 查询商品的详细信息
+     * 
+     * @return array
+     */
+    public function actionIndex()
+    {
+        /*if($_SESSION['frontend']['user_id']>0){ 
+                // 取出当前用户是否收藏此商品
+                $data['is_collect'] = Collect::is_collect($data['goods_id']);
+                // 添加浏览历史记录
+                $scan = new History();
+                $scan->add_history($id);
+        }*/
+        //接受校验数据的合法性
+        $request=\Yii::$app->request;
+        $id=is_numeric($request->get('id'))?$request->get('id'):0;
+    	if($id > 0){
+            //获取商品的详细信息
+    		$goods = new Goods();
+    		$data['data'] = $goods->get_goods_info($id);
+    		if (empty($data['data'])) {
+            $eData['error']='没有找到你要搜索的内容';
+            }else{
+             $eData['error']=200;   
+            }
+    		
+    	}else{
+            $eData['error']='参数不合法';
+        }
+        //对输出信息进行校验
+        if ($eData['error']==200) {
+           foreach ($data as $key=>$value) {
+                if ($key=='data') {
+                    $eData=array();
+                    //商品图片轮播图
+                    if (!empty($value["goods_gallery"])) {
+                        //检测图片是否存在不存在设置为默认图片
+                        foreach ($value["goods_gallery"] as $k => $v) {
+                            if (!empty($v)) {
+                                $file='../../common/upload/goods/'.$v;
+                                //判断图片是否存在
+                                //$file='../../common/upload/goods/'.$v;
+                                if (file_exists($file)){
+                                    $image[]=$v;
+                                }else{
+                                    $image[]='good_info_dafult.png';
+                                }
+                            }
+                        }
+                        $eData['data']['goods_gallery']=$image;
+                    }else{
+                       $eData['data']['goods_gallery']=array('good_info_dafult.png');
+                    }
+
+                    //商品名称
+                    $eData['data']['goods_name']=!empty($value['goods_name'])?mb_substr($value['goods_name'], 0,38,'UTF-8'):'';
+                    //商品价格
+                    $re=floatval($value['goods_price']);
+                    if (!empty($re)) {
+                      $eData['data']['goods_price']= $re;
+                    }else{
+                       $eData['data']['goods_price']=0;
+                    }
+                    
+                    //商品邮费
+                    $re=floatval($value['shipping_fee']);
+                    if (!empty($re)) {
+                      $eData['data']['shipping_fee']= $re;
+                    }else{
+                      $eData['data']['shipping_fee']=0;
+                    }
+                    //商品库存
+                    $re=floatval($value['goods_number']);
+                    if (!empty($re)) {
+                      $eData['data']['goods_number']= $re;
+                    }else{
+                      $eData['data']['goods_number']=0;
+                    }
+                    //商品单位
+                   $eData['data']['goods_unit']=!empty($value['goods_unit'])?$value['goods_unit']:'';
+
+
+                    //商品参数
+                    if(!empty($value['goods_attr'])){
+                       $eData['data']['goods_attr']=$value['goods_attr'];
+                    }
+                 }
+             }
+        }
+        return $this->render('index',  $eData);
+    }
+
+    /**
+     * ajax获取指定分类下的品牌
+     * @param unknown $cat_id
+     * @return string
+     */
+    public function actionGetbrand($cat_id){
+    	
+    	if($cat_id > 0){
+    		
+    		$res = Brand::get_cat_brand($cat_id);
+    		return json_encode($res);
+    	}
+    }
+    
+    /**
+     * ajax收藏或取消收藏商品
+     * @param unknown $id
+     */
+    public function actionCollectgoods($goods_id){
+    	$goods_id = intval($goods_id);
+    	if($goods_id > 0 && $_SESSION['frontend']['user_id'] >0){
+    		$model = new Collect();
+    		if($model->collect_goods($goods_id)){
+    			echo 1;
+    			exit;
+    		}
+    	}else{
+    		echo '收藏商品失败';
+    		exit;
+    	}
+    	echo '';
+    	exit;
+    }
+
+    
+}

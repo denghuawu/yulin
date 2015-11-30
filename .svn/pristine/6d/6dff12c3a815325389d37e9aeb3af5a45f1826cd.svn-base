@@ -1,0 +1,20 @@
+<?php 
+use yii\helpers\Url;
+?>
+
+	<div class="nav_top clearfix"></div>
+	<div class="wrap">
+		<div class="register_over fs30 ">
+			<div class="<?= $msg['error'] ? 'error' : 'over'; ?>"></div>
+			<div class="text"><?= $msg['message'] ?></div>
+			<?php if($msg['link']){
+					foreach ($msg['link'] as $val){
+			?>
+			
+			<a href="<?= $val['href'] ?>"><div class="btn"><?= $val['title'] ?></div></a><br/>
+			
+			<?php }}  ?>
+			
+			<a href="index.php?r=index"><div class="btn">返回首页</div></a>
+		</div>
+	</div>

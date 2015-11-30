@@ -1,0 +1,102 @@
+a:2:{i:0;a:2:{i:0;s:4092:"<!DOCTYPE html>
+<html lang="en">
+<head>
+	<Meta http-equiv="Pragma" Content="No-cach">
+	<Meta name="Keywords" Content="">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no">
+	<meta name="MobileOptimized" content="320">
+	<meta http-equiv="cleartype" content="on">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta charset="UTF-8">
+	<title>大茶源</title>
+	<link rel="stylesheet" type="text/css" href="assets/css/style2.css">
+	<link rel="stylesheet" href="assets/css/swiper.css">
+	<script type="text/javascript" src="assets/js/jquery.js"></script>
+	<script type="text/javascript" src="assets/js/public.js"></script>
+	<script type="text/javascript" src="assets/js/swiper.js"></script>
+
+</head>
+<body>
+        
+
+	<div class="nav_top clearfix"><span class="re_left"></span>
+		<div class="search">
+			<span><s></s></span>
+	</div></div>
+	<div class="wrap">
+		<div class="commodity fs25">
+			<div class="commodity_top">
+				<div class="nav clearfix">
+					<div class="f_l"><a href="/frontend/web/index.php?r=category%2Findex&sell=1&price=0&price_min=0&is_hot=0&is_recommend=0&is_new=0&price_max=0&cat_id=83&brand_id=0">销量优先</a></div>
+					<div class="f_l">综合排序<s></s></div>
+					<div class="f_l">筛选<s></s></div>
+				</div>
+				<div class="h dn">
+				<form action="index.php" method='get'>
+					<input type='hidden' name='r' value='category/index'>
+					<div class="s">
+						价格区间（元）<input name='price_min' type="text"> — <input name='price_max' type="text">
+					</div>
+					<br>
+					<div class="f dn">
+						<span>所有分类:</span><br>
+						<div class="clearfix">
+						  							<input type="hidden" name="cat_id" value="83">
+						</div>
+					</div>
+					<br>
+					<div class="b">
+						<span>品牌:</span><br>
+						<div class="clearfix">
+						 							<input type="hidden" name="brand_id" value="0">
+						</div>
+					</div>
+					<br>
+					<div class="btn cen">
+						<input type="hidden" name="is_hot" value="0">
+						<input type="hidden" name="is_recommend" value="0">
+						<input type="hidden" name="is_new" value="0">
+						<input type="submit" name='submit' value="确&nbsp;&nbsp;&nbsp;&nbsp;认">
+					</div>
+					</form>
+				</div>
+				<div class="z dn">
+					<a href="/frontend/web/index.php?r=category%2Findex&sell=0&price=0&is_hot=0&is_recommend=0&is_new=0&price_min=0&price_max=0&cat_id=83&brand_id=0"><div class="c">综合排序</div></a>    
+					<a href="/frontend/web/index.php?r=category%2Findex&sell=0&price=1&is_hot=0&is_recommend=0&is_new=0&price_min=0&price_max=0&cat_id=83&brand_id=0"><div>价格从低到高</div></a>
+					<a href="/frontend/web/index.php?r=category%2Findex&sell=0&price=2&is_hot=0&is_recommend=0&is_new=0&price_min=0&price_max=0&cat_id=83&brand_id=0"><div>价格从高到低</div></a>
+				</div>
+			</div>
+
+			
+				<div class="commodity_con bcf7">
+				 					<div style="width:100%" class="cen fs30">
+						暂无商品信息
+					</div>
+					
+				</div>
+		</div>
+	</div>
+	
+	
+<script type="text/javascript">
+	var page = 1;
+	window.onload=function(){
+		loadS('http://chamei.com/frontend/web/index.php?r=category/index&ajax=1'+location.search.replace('?r=category%2Findex',''),function(d){
+			var d=$('<div><a href="index.php?category/index&'+d['goods_id']+'"><img Lsrc="/common/upload/goods/'+d['goods_img']+'" alt=""><p class="t">'+d['brand_name']+'</p></a><p class="b"><span class="f1"><span class="ff">￥</span> '+d['goods_price']+'</span><span class="f_r f3">'+d['goods_price']+'人已付款</span></p></div>');
+			onlo(d.find('img'));
+			$('.commodity_con').append(d);
+		});
+	}
+	$(".commodity_top .b div div,.commodity_top .f div div").click(function(){
+		$(this).parent().children('div').removeClass('c');
+		$(this).addClass('c');
+		$(this).siblings('input').val($(this).attr('c_id'));
+	});
+</script>
+	        
+       
+</body>
+</html>
+";i:1;N;}i:1;N;}

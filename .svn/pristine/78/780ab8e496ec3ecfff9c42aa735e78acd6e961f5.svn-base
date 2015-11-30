@@ -1,0 +1,80 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+
+/* @var $this yii\web\View */
+/* @var $searchModel backend\models\EmployeeSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = 'Employees';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="employee-index">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+    <p>
+        <?= Html::a('Create Employee', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'id',
+            'em_sn',
+            'em_name',
+            'mobile_phone',
+            'id_card',
+            // 'birthday',
+            // 'marriage',
+            // 'sex',
+            // 'ss_number',
+            // 'native_place',
+            // 'domicile',
+            // 'card_no',
+            // 'nation',
+            // 'admin_id',
+            // 'used_name',
+            // 'political_status',
+            // 'height',
+            // 'weight',
+            // 'self_introduction:ntext',
+            // 'qq',
+            // 'email:email',
+            // 'emergency_contact',
+            // 'emergency_phone',
+            // 'now_address',
+            // 'home_phone',
+            // 'position_status',
+            // 'em_type',
+            // 'entry_time:datetime',
+            // 'leave_time:datetime',
+            // 'has_probation',
+            // 'probation_time_start:datetime',
+            // 'probation_time_end:datetime',
+            // 'regular_time:datetime',
+            // 'engage_time_start:datetime',
+            // 'engage_time_end:datetime',
+            // 'depart_id',
+            // 'job_id',
+            // 'salary',
+            // 'tp_type',
+            // 'join_work_time:datetime',
+            // 'graduate_school',
+            // 'graduate_time:datetime',
+            // 'major',
+            // 'education_level',
+            // 'pro_certificate',
+            // 'education_exp:ntext',
+            // 'work_exp:ntext',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+</div>

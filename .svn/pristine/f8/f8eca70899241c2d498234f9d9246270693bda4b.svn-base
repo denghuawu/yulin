@@ -1,0 +1,18 @@
+<?php 
+use yii\helpers\Url;
+?>
+
+<div class="nav_foot clearfix">
+	<div>
+		<a href="<?= Url::to(['index/index']); ?>" class="home<?= Yii::$app->controller->id=='index' ? '_n':''; ?>"></a>
+	</div>
+	<div>
+	<a href="<?= Url::to(['collect/index']); ?>" class="collect<?= Yii::$app->controller->id=='collect' ? '_n':''; ?>"></a>
+	</div>
+	<div>
+	<a href="<?= Url::to(['cart/index']) ?>" class="shopping<?= Yii::$app->controller->id=='cart' ? '_n':''; ?>"></a>
+	</div>
+	<div>
+	<a href="<?= Url::to(['user/index']) ?>"class="personal<?= Yii::$app->controller->id=='user' ? '_n':''; ?>"></a>
+	</div>
+</div>

@@ -1,0 +1,120 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use backend\models\Category;
+use backend\models\Brand;
+
+/* @var $this yii\web\View */
+/* @var $searchModel backend\models\GoodsSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = '商品列表';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
+ <?= $this->render('../layouts/common'); ?>
+
+<div class="goods-index">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+    <?php  echo $this->render('_search', ['model' => $searchModel, 'cat_list'=>$cat_list,'brand_arr'=>$brand_arr]); ?>
+
+    <p>
+        <?= Html::a('添加商品', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'goods_id',
+        	[
+        		'attribute'=>'goods_img',
+        		'format' => 'html',
+        		'value' => function($m){
+        			if($m->goods_img)
+        				return Html::img(COMMON_PATH.'upload/goods/'.$m->goods_img,
+        						['width' => '50px','height'=>'50px']);
+        			else
+        				return Html::img(COMMON_PATH.'upload/goods/default.png',
+        						['width' => '50px','height'=>'50px']);
+        		}
+        	],
+            'goods_name',
+            'goods_price',
+            'goods_number',
+            'goods_unit',
+            'goods_year',
+            [
+            	'attribute'=>'cat_id',
+            	'value'=>function($m){return Category::get_cat_name($m->cat_id);}
+            ],
+            [
+            	'attribute'=>'brand_id',
+            	'value'=>function($m){return Brand::get_brand_name($m->brand_id);}
+            ],
+
+            [
+	            'attribute'=>'is_updown',
+	            'format' => 'html',
+	            'value' => function($m){
+	            	return Html::img(COMMON_PATH.'upload/others/'.$m->is_updown.'.png',
+	            			['width' => '20px','height'=>'20px']);
+	            }
+            ],
+            
+            [
+        		'attribute'=>'is_new',
+        		'format' => 'html',
+        		'value' => function($m){
+        				return Html::img(COMMON_PATH.'upload/others/'.$m->is_new.'.png',
+        						['width' => '20px','height'=>'20px']);
+        		}
+        	],
+            [
+	            'attribute'=>'is_recommend',
+	            'format' => 'html',
+	            'value' => function($m){
+	            	return Html::img(COMMON_PATH.'upload/others/'.$m->is_recommend.'.png',
+	            			['width' => '20px','height'=>'20px']);
+	            }
+            ],
+            [
+	            'attribute'=>'is_hot',
+	            'format' => 'html',
+	            'value' => function($m){
+	            	return Html::img(COMMON_PATH.'upload/others/'.$m->is_hot.'.png',
+	            			['width' => '20px','height'=>'20px']);
+	            }
+            ],
+            // 'shipping_fee',
+            // 'free_shipping',
+            // 'goods_attr',
+            ['class' => 'yii\grid\ActionColumn','template' => '{add} {update} {delete}',
+            'buttons' => [
+            		'add' => function ($url, $model, $key) {
+            			return  Html::a('<span class="glyphicon glyphicon-plus  btn btn-warning btn-sm"></span>', yii::$app->urlManager->createUrl('goods/plupload').'&id='.$model->goods_id, ['title' => '添加轮播图'] ) ;
+            		},
+            		],
+            		'headerOptions' => ['width' => '100']
+            ],
+
+        ],
+    ]); ?>
+
+</div>
+
+<?php if(yii::$app->session->getFlash('failed')):?>
+    <div style='color:red'>
+    <script>
+		alert("<?= yii::$app->session->getFlash('failed'); ?>");
+    </script>
+        <?php  yii::$app->session->setFlash('failed',null); ?>
+    </div>
+<?php endif; ?>
+
+
+
+

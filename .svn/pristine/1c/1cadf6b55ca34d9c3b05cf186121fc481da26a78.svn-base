@@ -1,0 +1,224 @@
+<?php
+
+namespace frontend\controllers;
+
+use Yii;
+use frontend\models\User;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use frontend\models\OrderInfo;
+
+
+/**
+ * UserController implements the CRUD actions for User model.
+ */
+class UserController extends BaseController
+{
+    public $layout;
+    /**
+     * 个人中心首页
+     * 
+     */
+    public function actionIndex(){
+        //获取当前用户的基本信息
+        $data ['user']= User::userInfo($_SESSION['frontend']['user_id']);
+        //校验处理输出信息
+        if (!empty($data['user'])) {
+            $newData['error']=200;
+            foreach ($data['user'] as $key => $value) {
+                //用户名称
+                $arr[$key]['name']=!empty($data['user'][$key]['name'])?mb_substr($data['user'][$key]['name'], 0,10,'UTF-8'):''; 
+                //检测图片是否存在不存在设置为默认图片
+                if (!empty($data['user'][$key]['img'])) {
+                    $file='../../common/upload/figure/'.$data['user'][$key]['img'];
+                    //判断图片是否存在
+                    if (file_exists($file)){
+                        $arr[$key]['img']=$data['user'][$key]['img'];
+                    }else{
+                        $arr[$key]['img']='user_dafult.png';
+                    }
+                }
+            }
+            $newData['data']=$arr;
+        }else{
+            return $this->redirect(['/login/index']);
+        }
+        $this->layout="header";
+        return $this->render('index',$newData);
+    }
+
+    /**
+     * 个人中心个人资料
+     */
+    public function actionUserdata(){
+        $this->layout="header";
+        return $this->render('update');
+    }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 个人中心全部订单
+     * 
+     */
+    public function actionOrderinfo(){
+        if (isset($_REQUEST['page'])) {
+            if (($_REQUEST['page'] > 1) && (is_numeric($_REQUEST['page']))) {
+                $page=$_REQUEST['page'];
+            }else{
+               $page=1; 
+            }
+        }else{
+           $page=1; 
+        }
+        //查询当前会员的全部订单信息
+        $model = new OrderInfo();
+        $order= $model->get_order_all($_SESSION['frontend']['user_id']);
+        var_dump($data);
+        exit();
+        return $this->render('orderinfo');
+    }
+
+    /**
+     * 个人中心根据条件查询相应订单
+     * 
+     */
+    public function actionGetorder(){
+        //接受参数，校验参数的合法性
+        $request=\Yii::$app->request;
+        $get_page=$request->get('page');
+        $post_page=$request->post('page');
+        $get_ask=$request->get('ask');
+        $post_ask=$request->post('ask');
+        if ($get_ask!=null) {
+           $newAsk=is_numeric($get_ask)?$get_ask:0;
+        }else if($post_ask!=null){
+           $newAsk=is_numeric($post_ask)?$post_ask:0; 
+        }else{
+            $newAsk=0;
+        };
+        if ($get_page!=null) {
+           $page=is_numeric($get_page)?$get_page:1;
+        }else if($ask!=null){
+           $page=is_numeric($post_page)?$post_page:1; 
+        }else{
+           $page=1;
+        };
+        //查询当前会员的全部订单信息
+        $model = new OrderInfo();
+        $order= $model->get_order_all($_SESSION['frontend']['user_id']);
+        //var_dump($data);
+        return $this->render('orderinfo');
+    }
+
+    /**
+     * 用户组册
+     * 
+     */
+
+    public function actionAdduser(){
+
+        return $this->render('adduser');
+    }
+    
+
+    /**
+     * Displays a single User model.
+     * @param string $id
+     * @return mixed
+     */
+    public function actionPersonal()
+    {	
+    	if($_SESSION['frontend']['user_id'] < 1){
+    		return $this->redirect(['/site/login']);
+    	}
+    	
+    	$model = new User();
+    	$type = Yii::$app->request->post('type');
+    	$model->setScenario($type);
+    	
+    	if($model->load(Yii::$app->request->post())){
+    		
+    		$this->refresh();
+    		
+    		// 执行验证
+    		if($model->validate()){	
+    		
+    			$fm = $model->findOne($_SESSION['frontend']['user_id']);
+    			
+    			if($type == 'mod_name')
+    			{	// 修改昵称
+    				$fm->user_name = $model->user_name;
+    			}
+    			elseif($type == 'mod_pass')
+    			{	// 修改密码
+    				$fm->password = md5($model->confirm_password);
+    			}
+    			$fm->update(false);
+    			
+    			return $this->redirect(['user/personal']);
+    		}
+    	}
+    	
+    	// 取出用户信息
+    	$user = $model->user_info($_SESSION['frontend']['user_id']);
+
+       return $this->render('personal', ['user'=>$user, 'model'=>$model]);
+    }
+    
+    /**
+     * 修改头像
+     * @return \yii\web\Response
+     */
+    public function actionFigure(){
+    	
+    	if($_FILES['photo']['name']){
+
+    		$filename = time().substr($_FILES['photo']['name'], strrpos($_FILES['photo']['name'],'.'));
+    		$dir = '../../common/upload/figure/';
+    		// 上传
+    		if(move_uploaded_file($_FILES['photo']['tmp_name'], $dir.$filename)){
+    			
+    			$model = $this->findModel($_SESSION['frontend']['user_id']);
+    			$old_img = $model->figure;
+    			$model->figure = $filename;
+    			$model->update(false);
+    			if(!empty($old_img) && file_exists($dir.$old_img)){
+    				unlink($dir.$old_img);
+    			}
+    			echo json_encode(['success'=>1,'name'=>$filename]);
+    			exit;
+    		}
+    	}
+    }
+    
+    public function actionSetsex(){
+    	$model = User::findOne($_SESSION['frontend']['user_id']);
+    	$model->sex = $model->sex == '1' ? 0 : 1;
+    	$model->update(false);
+    	echo 1;
+    	exit;
+    }
+    
+
+    /**
+     * Finds the User model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return User the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = User::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+}

@@ -1,0 +1,82 @@
+<?php
+namespace frontend\controllers;
+
+use Yii;
+use common\org\Wechat;
+use yii\web\Controller;
+use frontend\models\User;
+
+
+/**
+ * Site controller
+ */
+class WeixinController extends Controller
+{
+	/**
+	 * 响应微信发送的Token验证
+	 */
+	public function actionVerification(){
+		
+		define("TOKEN", "yulin");
+		$wechatObj = new Wechat();
+		return $wechatObj->valid();
+	}
+
+	/**
+	 * 生成自定义菜单
+	 */
+    public function actionMenu(){
+    	makeMenu();
+    	echo 'it is over!';
+    }
+
+    /**
+     * 微信登录
+     * @param string $url
+     * @param string $param
+     * @return \yii\web\Response
+     */
+	public function actionWeiLogin($url=null,$param=null){
+		
+		$url = $url ? '/'.$url : '/index/index';
+
+		define('CODE', $_GET['code']);
+		echo 'it is OK!';die;
+		// 使用code换取access_token
+		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".APPID."&secret=".SECRET."&code=".CODE."&grant_type=authorization_code";
+	
+		$jsonStr = https_request($url);
+		$jsonStr = json_decode($jsonStr, true);
+	
+		// 获取用户信息
+		$url = "https://api.weixin.qq.com/sns/userinfo?access_token=".$jsonStr['access_token']."&openid=".$jsonStr['openid']."&lang=zh_CN";
+		$userStr = https_request($url);
+		$userStr = json_decode($userStr, true);
+	
+		if(!empty($userStr)){
+
+			
+			// 如果不存在，则注册
+			$user_id = User::find()->where(['weixin_id'=>$userStr['openid']])->one()->user_id;
+			if(!$user_id){
+				$user = new User();
+				$user->sex = $userStr['sex']=='男' ? 1 : 0;
+				$user->weixin_id = $userStr['openid'];
+				$user->reg_time = time();
+				$user->nickname = trim($userStr['nickname']);
+				$user->figure = $userStr['figure'];
+				$user->save(false);
+				$user_id = $user->primaryKey;
+			}else{
+				$user = User::findOne($user_id);
+				$user->nickname = trim($userStr['nickname']);
+				$user->figure = $userStr['figure'];
+				$user->update(false);
+			}
+		}
+		// 跳转
+		return $this->redirect(['/index/index']);
+		
+	}
+
+}

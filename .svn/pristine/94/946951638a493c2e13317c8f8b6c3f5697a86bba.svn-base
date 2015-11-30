@@ -1,0 +1,133 @@
+<?php
+use yii\helpers\Url;
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Pragma" Content="No-cach">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="width=device-width,initial-scale=0.5,maximum-scale=0.5,minimum-scale=0.5,user-scalable=no">
+	<meta name="MobileOptimized" content="320">
+	<meta http-equiv="cleartype" content="on">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta charset="UTF-8">
+	<title>确认订单</title>
+	<link rel="stylesheet" type="text/css" href="./yulin_home/css/style.css?a=2">
+	<script type="text/javascript" src="./yulin_home/js/jquery.js"></script>
+	<script type="text/javascript" src="./yulin_home/js/public.js"></script>
+	<script type="text/javascript">
+
+
+	</script>
+</head>
+<body>
+	<div class="nav_top clearfix"><div class="nav_top_con"><a href="javascript:history.go(-1);" class="re_left"></a>确认订单</div></div>
+	<div class="wrap">
+		<div class="order">
+			<form action="" method="">
+			<div class="site_l clearfix fs30 dn">
+				<div class="site_l_top">选择地址</div>
+				<div class="f_l"></div>
+				<div class="f_r">
+					<?php if (is_array($userInfo)) :?>
+						<?php foreach ($userInfo as $key => $value) :?>
+							<div class="site_list <?php if ($key==0):echo 'now';else:echo '';endif;?>" site_id="<?php echo $userInfo[$key]['address_id']?>">
+								<p class="clearfix">
+									<span class="f_l"><?php echo $userInfo[$key]['address_name'];?></span>
+									<span class="f_r"><?php echo $userInfo[$key]['mobile'];?></span>
+								</p>
+								<p class="f7">收货地址 ：
+									<?php if ($userInfo[$key]['province']==$userInfo[$key]['city']):?>
+										<?php echo $userInfo[$key]['city'].'市'.$userInfo[$key]['district'].'&nbsp;'.$userInfo[$key]['address'];?>
+									<?php else:?>
+										<?php echo $userInfo[$key]['province'].'省'.$userInfo[$key]['city'].'市'.$userInfo[$key]['district'].'&nbsp;'.$userInfo[$key]['address'];?>
+									<?php endif;?>
+								</p>						
+							</div>
+						<?php endforeach;?>
+					<?php endif;?>
+
+				</div>
+			</div>
+			<div class="site fs30 clearfix">
+				<div class="l f_l"><span></span></div>
+				<?php if (is_array($userDefalut)) :?>
+					<div class="i f_l">
+						<p class="clearfix">
+							<span class="f_l">收货人 ：<?php echo $userDefalut['address_name'];?></span>
+							<span class="f_r"><?php echo $userDefalut['mobile'];?></span>
+						</p>
+						<p>收货地址 ：
+							<?php if ($userDefalut['province']==$userDefalut['city']):?>
+								<?php echo $userDefalut['city'].'市'.$userDefalut['district'].'&nbsp;'.$userDefalut['address'];?>
+							<?php else:?>
+								<?php echo $userDefalut['province'].'省'.$userDefalut['city'].'市'.$userDefalut['district'].'&nbsp;'.$userDefalut['address'];?>
+							<?php endif;?>
+						</p>
+					</div>
+				<?php else:?>
+					<div class="i f_l">
+						<p class="clearfix">
+							<span class="f_l">收货人 ：</span>
+							<span class="f_r"></span>
+						</p>
+						<p>收货地址 ：</p>
+					</div>
+				<?php endif;?>
+				<div class="r f_r" id="dizhi"><span></span></div>
+			</div>
+			<ul class="order_l fs28">
+				<?php if (is_array($goodInfo)):?>
+					<?php foreach ($goodInfo as $key => $value):?>
+					<li weight="">
+						<div class="n pm10">分类 ： <span><?php echo $value['cname']?></span></div>
+						<div class="spa1"></div>
+						<div class="clearfix i pm10">
+							<p class="f_l p"><img src="../../common/upload/goods/<?php echo $value['img']?>" alt=""></p>
+							<p class="f_l ml20 n"><?php echo $value['gname']?></p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span><span class="pr_n"><?php echo $value['price']?></span><br /><span class="f7">x<?php echo $value['num']?></span>
+							</p>
+
+						</div>
+						<div class="spa1"></div>
+						<div class="buy_num clearfix pm10">
+							<p class="plural f_r"><input type="button" value="-" name="-"><input type="text" name="num[]" value="<?php echo $value['num']?>" min="1"><input type="button" value="+" name="+"></p>
+							<p>购买数量</p>
+						</div>
+					</li>
+					<?php endforeach;?>
+				<?php endif;?>
+				
+			</ul>
+			<div class="order_foot fs30">
+				<p class="clearfix express">
+					<span class="f_l f7">快递</span>
+					<span class="f_r">德邦卡航<span class="f1 express_fee">￥<?php if($db_jingzhun==null): echo '请更换收货地址'; else: echo $db_jingzhun; endif?></span><span class="right_ico"><s></s></span></span>
+				</p>
+				<div class="express_list_fixed">
+					<div class="express_list_con">
+						<p class="clearfix"><span class="f_r mr20">完成</span></p>
+						<ul>
+							<li class="clearfix">
+								<p class="f_r mr20"><span class="true_ico"><s></s></span></p>
+								<p>德邦汽运<span class="f1 ml10">￥<?php if($db_jingzhun==null): echo '请更换收货地址'; else: echo $db_jingzhun; endif?></span></p>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="order_fix">
+				<div class="order_fix_con fs30 clearfix">
+					<div class="total f_l">合计：<span class="f1">￥<?php echo $sum_money?></span></div>
+					<a href="" class="f_r"><div class="f_r">提交订单</div></a>
+				</div>
+				
+			</div>
+			</form>
+		</div>
+	</div>
+	
+</body>
+</html>

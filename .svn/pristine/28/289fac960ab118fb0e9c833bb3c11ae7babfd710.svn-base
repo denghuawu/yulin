@@ -1,0 +1,129 @@
+a:2:{i:0;a:2:{i:0;s:5720:"<!DOCTYPE html>
+<html lang="en">
+<head>
+	<Meta http-equiv="Pragma" Content="No-cach">
+	<Meta name="Keywords" Content="大茶源，茶交易">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no">
+	<meta name="MobileOptimized" content="320">
+	<meta http-equiv="cleartype" content="on">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta charset="UTF-8">
+	<title>大茶源</title>
+	<link rel="stylesheet" type="text/css" href="assets/css/style2.css">
+	<link rel="stylesheet" href="assets/css/swiper.css">
+	<script type="text/javascript" src="assets/js/jquery.js"></script>
+	<script type="text/javascript" src="assets/js/public.js"></script>
+	<script type="text/javascript" src="assets/js/swiper.js"></script>
+	
+
+</head>
+<body>
+        
+
+	<div class="nav_top clearfix"><span class="re_left"></span>
+		<div class="search">
+			<span><s></s></span>
+	</div></div>
+	<div class="wrap">
+		<div class="commodity fs25">
+			<div class="commodity_top">
+				<div class="nav clearfix">
+					<div class="f_l"><a href="/frontend/web/index.php?r=category%2Findex&sell=1&price=0&price_min=0&is_hot=0&is_recommend=0&is_new=0&price_max=0&cat_id=88&brand_id=0">销量优先</a></div>
+					<div class="f_l">综合排序<s></s></div>
+					<div class="f_l">筛选<s></s></div>
+				</div>
+				<div class="h dn">
+				<form action="index.php" method='get'>
+					<input type='hidden' name='r' value='category/index'>
+					<div class="s">
+						价格区间（元）<input name='price_min' type="text"> — <input name='price_max' type="text">
+					</div>
+					<br>
+					<div class="f ">
+						<span>所有分类:</span><br>
+						<div class="clearfix">
+						  															<div c_id="105">小种红茶</div>
+														<input type="hidden" name="cat_id" value="88">
+						</div>
+					</div>
+					<br>
+					<div class="b">
+						<span>品牌:</span><br>
+						<div class="clearfix">
+						 															<div c_id="32">金骏眉</div>
+															<div c_id="35">正山小种</div>
+														<input type="hidden" name="brand_id" value="0">
+						</div>
+					</div>
+					<br>
+					<div class="btn cen">
+						<input type="hidden" name="is_hot" value="0">
+						<input type="hidden" name="is_recommend" value="0">
+						<input type="hidden" name="is_new" value="0">
+						<input type="submit" name='submit' value="确&nbsp;&nbsp;&nbsp;&nbsp;认">
+					</div>
+					</form>
+				</div>
+				<div class="z dn">
+					<a href="/frontend/web/index.php?r=category%2Findex&sell=0&price=0&is_hot=0&is_recommend=0&is_new=0&price_min=0&price_max=0&cat_id=88&brand_id=0"><div class="c">综合排序</div></a>    
+					<a href="/frontend/web/index.php?r=category%2Findex&sell=0&price=1&is_hot=0&is_recommend=0&is_new=0&price_min=0&price_max=0&cat_id=88&brand_id=0"><div>价格从低到高</div></a>
+					<a href="/frontend/web/index.php?r=category%2Findex&sell=0&price=2&is_hot=0&is_recommend=0&is_new=0&price_min=0&price_max=0&cat_id=88&brand_id=0"><div>价格从高到低</div></a>
+				</div>
+			</div>
+
+			
+				<div class="commodity_con bcf7">
+				 				 							<div>
+							<a href="/frontend/web/index.php?r=goods%2Findex&id=1381">
+								<img src="/common/upload/goods/223.jpg" alt="">
+								<p class="t">醉然香 买一送金骏眉 武夷山散装红茶特级金俊眉茶叶</p>
+							</a>
+							<p class="b"><span class="f1"><span class="ff">￥</span> 200</span><span class="f_r f3">4人已付款</span></p>
+						</div>
+											<div>
+							<a href="/frontend/web/index.php?r=goods%2Findex&id=1386">
+								<img src="/common/upload/goods/489.jpg" alt="">
+								<p class="t">正山小种 红茶 茶叶 尚客茶品 武夷山 桐木关 小</p>
+							</a>
+							<p class="b"><span class="f1"><span class="ff">￥</span> 88</span><span class="f_r f3">4人已付款</span></p>
+						</div>
+											<div>
+							<a href="/frontend/web/index.php?r=goods%2Findex&id=1387">
+								<img src="/common/upload/goods/496.jpg" alt="">
+								<p class="t">【买一送一】正山堂 元正雅度正山小种红茶礼盒装共1</p>
+							</a>
+							<p class="b"><span class="f1"><span class="ff">￥</span> 588</span><span class="f_r f3">3人已付款</span></p>
+						</div>
+											<div>
+							<a href="/frontend/web/index.php?r=goods%2Findex&id=1388">
+								<img src="/common/upload/goods/184.jpg" alt="">
+								<p class="t">【必抢】 红茶 金骏眉 茶叶 尚客茶品武夷山桐木关</p>
+							</a>
+							<p class="b"><span class="f1"><span class="ff">￥</span> 328</span><span class="f_r f3">4人已付款</span></p>
+						</div>
+										
+				</div>
+		</div>
+	</div>
+	
+	
+<script type="text/javascript">
+	var page = 1;
+	window.onload=function(){
+		loadS('http://chamei.com/frontend/web/index.php?r=category/index&ajax=1'+location.search.replace('?r=category%2Findex',''),function(d){
+			var d=$('<div><a href="index.php?category/index&'+d['goods_id']+'"><img Lsrc="/common/upload/goods/'+d['goods_img']+'" alt=""><p class="t">'+d['brand_name']+'</p></a><p class="b"><span class="f1"><span class="ff">￥</span> '+d['goods_price']+'</span><span class="f_r f3">'+d['goods_price']+'人已付款</span></p></div>');
+			onlo(d.find('img'));
+			$('.commodity_con').append(d);
+		});
+	}
+	$(".commodity_top .b div div,.commodity_top .f div div").click(function(){
+		$(this).parent().children('div').removeClass('c');
+		$(this).addClass('c');
+		$(this).siblings('input').val($(this).attr('c_id'));
+	});
+</script>
+	</body>
+</html>
+";i:1;N;}i:1;N;}

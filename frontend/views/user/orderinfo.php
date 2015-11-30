@@ -1,0 +1,209 @@
+<?php 
+use yii\helpers\Url;
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Pragma" Content="No-cach">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="width=device-width,initial-scale=0.5,maximum-scale=0.5,minimum-scale=0.5,user-scalable=no">
+	<meta name="MobileOptimized" content="320">
+	<meta http-equiv="cleartype" content="on">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta charset="UTF-8">
+	<title>订单</title>
+	<link rel="stylesheet" type="text/css" href="./yulin_home/css/style.css">
+	<script type="text/javascript" src="./yulin_home/js/jquery.js"></script>
+	<script type="text/javascript" src="./yulin_home/js/public.js"></script>
+</head>
+<body>
+	<div class="nav_top"><div class="nav_top_con clearfix"><a href="javascript:history.go(-1);" class="re_left"></a>我的订单</div></div>
+	<div class="wrap">
+		<div class="indent fs25">
+			<div class="indent_top clearfix">
+				<div class="all cl1">全部</div>
+				<div class="d" >待付款</div>
+				<div class="f" >待发货</div>
+				<div class="s" >待收货</div>
+				<div class="t" >退款</div>
+			</div>
+			<div class="indent_con">
+				<ul class="all">
+					<li>
+						<div class="clearfix">
+							<p class="f_l"></p>
+							<p class="f_r f1">卖家已发货</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="b clearfix">
+							<form action="">
+								<input type="hidden">
+								<p class="f7">订单号 : 2015082429604</p>
+								<p class="f_l">实付：<span><span class="ff">￥</span>1777</span></p>
+								<p class="f_r"><span class="btn">确认收货</span></p>
+								
+							</form>
+						</div>		
+					</li>			
+					<li>
+						<div class="clearfix">
+							<p class="f_l"></p>
+							<p class="f_r f1">买家未付款</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="b clearfix">
+							<form action="">
+								<input type="hidden">
+								<p class="f7">订单号 : 2015082429604</p>
+								<p class="f_l">实付：<span><span class="ff">￥</span>1777</span></p>
+								<p class="f_r"><span class="btn">付款</span></p>
+								
+							</form>
+						</div>		
+					</li>
+					<li>
+						<div class="clearfix">
+							<p class="f_l"></p>
+							<p class="f_r f1">卖家未发货</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="b clearfix">
+							<form action="">
+								<input type="hidden">
+								<p class="f7">订单号 : 2015082429604</p>
+								<p class="f_l">实付：<span><span class="ff">￥</span>1777</span></p>
+								<p class="f_r dn"><span class="btn">付款</span></p>
+								
+							</form>
+						</div>		
+					</li>
+				</ul><!-- 
+				<ul class="d dn">
+					<li>
+						<div class="clearfix">
+							<p class="f_l"></p>
+							<p class="f_r f1">买家未付款</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="b clearfix">
+							<form action="">
+								<input type="hidden">
+								<p class="f7">订单号 : 2015082429604</p>
+								<p class="f_l">实付：<span><span class="ff">￥</span>1777</span></p>
+								<p class="f_r"><span class="btn">付款</span></p>
+								
+							</form>
+						</div>		
+					</li>
+				</ul>
+				<ul class="f dn">
+					<li>
+						<div class="clearfix">
+							<p class="f_l"></p>
+							<p class="f_r f1">卖家未发货</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="b clearfix">
+							<form action="">
+								<input type="hidden">
+								<p class="f7">订单号 : 2015082429604</p>
+								<p class="f_l">实付：<span><span class="ff">￥</span>1777</span></p>
+								<p class="f_r dn"><span class="btn">付款</span></p>
+								
+							</form>
+						</div>		
+					</li>
+				</ul>
+				<ul class="s dn">
+					<li>
+						<div class="clearfix">
+							<p class="f_l"></p>
+							<p class="f_r f1">卖家已发货</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="b clearfix">
+							<form action="">
+								<input type="hidden">
+								<p class="f7">订单号 : 2015082429604</p>
+								<p class="f_l">实付：<span><span class="ff">￥</span>1777</span></p>
+								<p class="f_r"><span class="btn">确认收货</span></p>
+								
+							</form>
+						</div>
+		
+					</li>
+				</ul>
+				<ul class="p dn">
+					<li>
+						<div class="clearfix">
+							<p class="f_l"></p>
+							<p class="f_r f1">交易成功</p>
+						</div>
+						<div class="clearfix i">
+							<p class="f_l p"><img src="./yulin_home/images/shopping.jpg" alt=""></p>
+							<p class="f_l ml20 n">201大益之恋美好时光特价01大益之恋美好时光特价！</p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span>1008<br /><span class="f7">x2</span>
+							</p>
+						</div>
+						<div class="b clearfix">
+							<form action="">
+								<input type="hidden">
+								<p class="f7">订单号 : 2015082429604</p>
+								<p class="f_l">实付：<span><span class="ff">￥</span>1777</span></p>
+								<p class="f_r"><span class="btn">评价</span></p>
+								
+							</form>
+						</div>		
+					</li>
+				</ul> -->
+	
+			</div>
+		</div>
+	</div>
+</body>
+</html>

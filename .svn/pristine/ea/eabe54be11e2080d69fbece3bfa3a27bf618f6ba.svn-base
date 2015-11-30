@@ -1,0 +1,1 @@
+open_basedir="D:\upupw\vhosts\chamei.com\;D:\upupw\memcached\;D:\upupw\phpmyadmin\;D:\upupw\temp\;C:\Windows\Temp\"

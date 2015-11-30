@@ -1,0 +1,142 @@
+<?php
+
+namespace backend\controllers;
+
+use Yii;
+use backend\models\Employee;
+use backend\models\EmployeeSearch;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use backend\models\Department;
+use backend\models\Job;
+
+/**
+ * 员工管理
+ */
+class EmployeeController extends BaseController
+{
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all Employee models.
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+    	// 接收关键词检索
+    	$_REQUEST['EmployeeSearch']['em_name'] = $_REQUEST['EmployeeSearch']['em_name'] ? $_REQUEST['EmployeeSearch']['em_name'].','.$_REQUEST['EmployeeSearch']['em_name'] : '';
+    	$EmployeeSearch = [];
+        $searchModel = new EmployeeSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+     
+        // 取出部门列表
+        $data['depart'] = Department::get_departments();
+       
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        	'data' => $data,
+        ]);
+    }
+
+    /**
+     * Displays a single Employee model.
+     * @param string $id
+     * @return mixed
+     */
+    public function actionView($id)
+    {
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * Creates a new Employee model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {	
+        $model = new Employee();
+        $model->setScenario('create');
+// 		p($_REQUEST);die;
+        $_POST['Employee']['birthday'] = $_POST['Employee']['birthday'] ? strtotime($_POST['Employee']['birthday']) : null;
+        $_POST['Employee']['entry_time'] = $_POST['Employee']['entry_time'] ? strtotime($_POST['Employee']['entry_time']) : null;
+        $_POST['Employee']['leave_time'] = $_POST['Employee']['leave_time'] ? strtotime($_POST['Employee']['leave_time']) : null;
+        $_POST['Employee']['probation_time_start'] = $_POST['Employee']['probation_time_start'] ? strtotime($_POST['Employee']['probation_time_start']) : null;
+        $_POST['Employee']['probation_time_end'] = $_POST['Employee']['probation_time_end'] ? strtotime($_POST['Employee']['probation_time_end']) : null;
+        $_POST['Employee']['regular_time'] = $_POST['Employee']['regular_time'] ? strtotime($_POST['Employee']['regular_time']) : null;
+        $_POST['Employee']['engage_time_start'] = $_POST['Employee']['engage_time_start'] ? strtotime($_POST['Employee']['engage_time_start']) : null;
+        $_POST['Employee']['engage_time_end'] = $_POST['Employee']['engage_time_end'] ? strtotime($_POST['Employee']['engage_time_end']) : null;
+        $_POST['Employee']['join_work_time'] = $_POST['Employee']['join_work_time'] ? strtotime($_POST['Employee']['join_work_time']) : null;
+        $_POST['Employee']['graduate_time'] = $_POST['Employee']['graduate_time'] ? strtotime($_POST['Employee']['graduate_time']) : null;
+       
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        } else {
+            return $this->redirect(['index','msg'=>$model->getErrors()]);
+        }
+    }
+
+    /**
+     * Updates an existing Employee model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param string $id
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        } else {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Deletes an existing Employee model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param string $id
+     * @return mixed
+     */
+    public function actionDelete($id)
+    {
+        if($this->findModel($id)->delete()){
+        	return json_encode(['msg'=>'删除成功','success'=>1]);
+        }
+        
+        return json_encode(['msg'=>'操作失败','error'=>1]);
+    }
+
+    /**
+     * Finds the Employee model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return Employee the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Employee::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+}

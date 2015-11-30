@@ -1,0 +1,159 @@
+<?php
+
+namespace backend\models;
+
+use Yii;
+use yii\helpers\ArrayHelper;
+
+/**
+ * This is the model class for table "{{%category}}".
+ *
+ * @property integer $cat_id
+ * @property string $cat_name
+ * @property string $cat_desc
+ * @property integer $parent_id
+ * @property integer $sort_order
+ * @property integer $is_hot
+ * @property integer $is_show
+ * @property string $category_img
+ */
+class Category extends \yii\db\ActiveRecord
+{
+	
+	public $tmp_img;
+	public $flag;
+	static public $treeList = array();
+	
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%category}}';
+    }
+    
+    public function scenarios(){
+
+		return [
+			'create' => ['parent_id', 'sort_order', 'is_hot', 'is_show', 'cat_name', 'cat_desc', 'category_img', 'is_hot'],
+			'update' => ['parent_id', 'sort_order', 'is_hot', 'is_show', 'cat_name', 'cat_desc', 'category_img', 'is_hot'],	
+		];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['parent_id', 'sort_order', 'is_hot', 'is_show'], 'integer','on'=>['create','update']],
+            [['cat_name'], 'required'],'on'=>['create','update'],
+            [['cat_name'], 'string', 'max' => 90,'on'=>['create','update']],
+            [['cat_desc', 'category_img'], 'string', 'max' => 255,'on'=>['create','update']],
+            [['parent_id'], 'default', 'value' =>0,'on'=>['create','update']],
+            [['sort_order'], 'default', 'value' =>0,'on'=>['create','update']],
+        	[['category_img'], 'file', 'extensions' => 'jpg, png', 'mimeTypes' => 'image/jpeg, image/png','on'=>['create','update']],
+        	[['cat_name'], 'valideUnique','on'=>['create','update']],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'cat_id' => '商品分类id',
+            'cat_name' => '分类名称',
+            'cat_desc' => '描述',
+            'parent_id' => '上级分类',
+            'sort_order' => '排序',
+            'is_hot' => '是否热门',
+            'is_show' => '是否显示',
+            'category_img' => '分类图片',
+        ];
+    }
+    
+    /**
+     * 验证品牌是否唯一
+     */
+    public function valideUnique(){
+    	$res = Category::find()->where(['parent_id'=>$this->parent_id,'cat_name'=>$this->cat_name])->count();
+    	if($this->isNewRecord && $res > 0){
+    		$this->addError('cat_name','当前分类等级下已存在这个品牌名~！');
+    		return false;
+    	}
+    	 
+    	return true;
+    }
+    
+    /**
+     * 数据插入前处理
+     * @param unknown $insert
+     * @return boolean
+     */
+    public function beforeSave($insert)
+    {
+    	if(parent::beforeSave($insert)){
+    		if(!$this->isNewRecord){
+    			if($this->flag){
+    				// 避免空的值覆盖
+    				$this->category_img = $this->category_img ? $this->category_img : $this->tmp_img;
+    			}
+    		}
+    		return true;
+    	}else{
+    		return false;
+    	}
+    }
+    
+    /**
+     * 获得递归分类列表
+     * @param number $parent_id
+     * @param string $prefix
+     * @return unknown
+     */
+    /* public static function cat_list(&$data,$parent_id=0, $top=false,$count=0){
+    	
+    	if($top){
+    		self::$treeList[0] = '顶级分类';
+    	}
+    	if($data){	
+    		foreach ($data as $key => $value){
+    			if($value['parent_id']==$parent_id){
+    				$input = strlen($value['cat_name'])+$count;		// 计算填充长度
+    				$cat_name =  str_pad($value['cat_name'], $input, "--", STR_PAD_LEFT); // 填充前缀
+    				self::$treeList [$value['cat_id']] =  $cat_name;
+    				unset($data[$key]);
+    				self::cat_list($data,$value['cat_id'],false,$count+2);
+    			}
+    		}
+    	}
+        return self::$treeList;
+    }
+    
+    public static function get_all_cat(){
+    	return Category::find(['select'=>'cat_id,parent_id,cat_name'])->orderBy(['parent_id'=>'ASC','cat_id'=>'ASC'])->asArray()->all();
+    } */
+    
+    /**
+     * 获取有id和分类名称组成 的一维数组
+     */
+    public static function get_cat_list(){
+    	$model = self::find()->orderBy('sort_order DESC')->all();
+    	return ArrayHelper::map($model, 'cat_id', 'cat_name');
+    }
+    
+    /**
+     * 返回分类名
+     * @param unknown $id
+     * @return string
+     */
+    public static function get_cat_name($id){
+    	if($id < 1)
+    		return '无';
+    	
+    	return Category::find()->where(['cat_id'=>$id])->one()->cat_name;
+    }
+
+}

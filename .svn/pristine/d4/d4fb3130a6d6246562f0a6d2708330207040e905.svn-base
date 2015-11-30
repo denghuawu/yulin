@@ -1,0 +1,38 @@
+<?php
+
+
+include("token.php");
+
+$postmenu = <<<menu
+	{
+    "button": [
+    	{
+                    "type": "view",
+                    "name": "首页",
+                    "url":"http://ceshi.donghetea.com/Wxpay/index.php"
+        }
+        {
+                    "type": "view",
+                    "name": "我要支付",
+                    "url":"http://ceshi.donghetea.com/Wxpay/index.php"
+        }
+
+
+    ]
+}
+menu;
+
+$access_token = getToken();
+
+$url = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token={$access_token}";
+
+http_request($url);
+
+$url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token={$access_token}";
+
+//$data = json_encode($postmenu);
+//var_dump($postmenu);
+$result = https_request($url,$postmenu);
+//echo '<br>';
+//var_dump($result);
+?>

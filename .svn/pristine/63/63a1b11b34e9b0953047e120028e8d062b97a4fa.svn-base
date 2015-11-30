@@ -1,0 +1,70 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;  
+use wenyuan\ueditor\Ueditor;
+/* @var $this yii\web\View */
+/* @var $model backend\models\Goods */
+/* @var $form yii\widgets\ActiveForm */
+?>
+
+    
+    <script type="text/javascript" charset="utf-8" src="../../ext/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../../ext/ueditor/ueditor.all.min.js"> </script>
+    <script type="text/javascript" charset="utf-8" src="../../ext/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+<div class="goods-form">
+
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+    
+    <?php //echo  $form->field($model, 'cat_id')->dropDownList($cat_list) ?>
+    
+    <?= $form->field($model,'cat_id')->dropDownList($cat_list,
+    [
+        'prompt'=>'--请选择--',
+        'onchange'=>'
+            $.post("'.yii::$app->urlManager->createUrl('goods/linkcat').'&cat_id="+$(this).val(),function(data){
+                $("select#goods-brand_id").html(data);
+            });',
+    ]) ?>
+    
+    <?= $form->field($model, 'brand_id')->dropDownList($brand_arr) ?>
+
+    <?= $form->field($model, 'goods_name')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'goods_price')->textInput() ?>
+    
+    <?= $form->field($model, 'goods_unit')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'goods_number')->textInput() ?>
+
+    <?= $form->field($model, 'goods_year')->textInput() ?>
+
+    <? echo  "<b>商品描述</b><textarea name='Goods[goods_desc]' id='goods-goods_desc'>".$model->goods_desc."</textarea>" ?>
+    
+    <?= $form->field($model, 'free_shipping')->radioList([1=>'包邮',0=>'不包邮']) ?>
+    
+    <?= $form->field($model, 'shipping_fee')->textInput() ?>
+
+    <?= $form->field($model, 'goods_attr')->textarea(['rows' => 6]) ?>
+
+     <?= $form->field($model, 'goods_img')->fileInput() ?>
+
+    <?= $form->field($model, 'is_new')->radioList([1=>'是',0=>否]) ?>
+
+    <?= $form->field($model, 'is_recommend')->radioList([1=>'是',0=>否]) ?>
+
+    <?= $form->field($model, 'is_hot')->radioList([1=>'是',0=>否]) ?>
+    <?= $form->field($model, 'is_updown')->radioList([1=>'是',0=>否]) ?>
+
+    <div class="form-group">
+        <?= Html::submitButton($model->isNewRecord ? '添加' : '更新', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+
+</div>
+<script>
+var ue = UE.getEditor('goods-goods_desc');
+
+</script>

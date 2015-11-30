@@ -1,0 +1,80 @@
+<?php
+
+namespace backend\models;
+
+use Yii;
+use yii\base\Model;
+use yii\data\ActiveDataProvider;
+use backend\models\User;
+
+/**
+ * UserSearch represents the model behind the search form about `backend\models\User`.
+ */
+class UserSearch extends User
+{
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['user_id', 'sex', 'address_id', 'reg_time', 'last_login', 'user_rank', 'parent_id'], 'integer'],
+            [['email', 'user_name', 'figure', 'password', 'mobile_phone', 'real_name', 'weixin'], 'safe'],
+            [['user_money'], 'number'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        // bypass scenarios() implementation in the parent class
+        return Model::scenarios();
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $query = User::find();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere([
+            'user_id' => $this->user_id,
+            'sex' => $this->sex,
+            'user_money' => $this->user_money,
+            'address_id' => $this->address_id,
+            'reg_time' => $this->reg_time,
+            'last_login' => $this->last_login,
+            'user_rank' => $this->user_rank,
+            'parent_id' => $this->parent_id,
+        ]);
+
+        $query->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['like', 'user_name', $this->user_name])
+            ->andFilterWhere(['like', 'figure', $this->figure])
+            ->andFilterWhere(['like', 'password', $this->password])
+            ->andFilterWhere(['like', 'mobile_phone', $this->mobile_phone])
+            ->andFilterWhere(['like', 'real_name', $this->real_name])
+            ->andFilterWhere(['like', 'weixin', $this->weixin]);
+
+        return $dataProvider;
+    }
+}

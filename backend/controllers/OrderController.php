@@ -1,0 +1,175 @@
+<?php
+
+namespace backend\controllers;
+
+use Yii;
+use backend\models\Order;
+use backend\models\OrderSearch;
+use backend\models\OrderGoods;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
+use common\models\Shipping;
+
+/**
+ * OrderController implements the CRUD actions for Order model.
+ */
+class OrderController extends Controller
+{
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Lists all Order models.
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+    	
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->renderPartial('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Updates an existing Order model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param string $id
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+    	if($id>0){
+    		$orderModel = \frontend\models\OrderInfo::findOne($id);
+    			
+    		if(Yii::$app->request->post()){
+    			// 发货
+    			$ship['id'] = $id;
+    			$ship['company'] = trim(Yii::$app->request->post('company'));
+    			$ship['express'] = trim(Yii::$app->request->post('express'));
+    			if(!isset($ship['company']) || empty($ship['express'])){
+    				
+    				yii::$app->session->setFlash('failed','输入错误');
+    				
+    			}		
+    			list($ship['shipping_name'],$ship['shipping_code']) = $ship['company'] ?  explode('-', $ship['company']) : '';
+    			
+    			// 发货
+    			$model = new Shipping();
+    			if(!$model->Doshipping($ship)){
+    				yii::$app->session->setFlash('failed','发货失败');
+    			}
+    		}	
+    		return $this->renderPartial('update', [
+    				'order' => $orderModel->get_order_info($id),
+    		]);
+
+    	}
+    }
+    
+    /**
+     * 处理退款
+     */
+   	public function actionRefund(){
+   		if(Yii::$app->request->post()){
+   			$data['refund_money'] = floatval(Yii::$app->request->post('refund_money'));
+   			$data['trade_no'] = trim(Yii::$app->request->post('trade_no'));
+   			$data['id'] = intval(Yii::$app->request->post('id'));
+   			$data['refund_id'] = intval(Yii::$app->request->post('refund_id'));
+   			
+   			if($data['id'] < 1 && $data['trade_no'] < 1){
+   				return $this->redirect(Yii::$app->request->referrer);
+   			}
+   			if($data['refund_money'] < 0 || empty($data['trade_no'])){
+   				return $this->redirect(Yii::$app->request->referrer);
+   			}
+   			
+   			$model = new Order();
+   			$model->doRefund($data);
+   		}
+   		return $this->redirect(Yii::$app->request->referrer);
+   	}
+    
+    /**
+     * 修改订单状态
+     * @param unknown $id
+     */
+    public function actionChange(){
+    	
+    	if(Yii::$app->request->post()){
+    		$id = intval(Yii::$app->request->post('id'));
+    		$status = intval(Yii::$app->request->post('status'));
+    		
+    		if($id < 1 && $status < 1){
+    			yii::$app->session->setFlash('failed','操作异常，请重试');
+    		}
+    		
+    		$model = $this->findModel($id);
+    		$model->order_status = $status;
+    		$model->update(false);
+    		
+    		return $this->redirect(Yii::$app->request->referrer);
+    	}
+    }
+    
+    /**
+     * 导出excel出库单
+     */
+	public function actionExportExcel(){
+
+		
+		$user_info=array(
+				0=>array("uid"=>"12","name"=>"zhangsan"),
+				1=>array("uid"=>"132","name"=>"zhangsanddd"),
+		);
+		$key_name=array(
+				"uid"=>"用户ID",
+				"name"=>"姓名",
+		);
+		down_xls($user_info,$key_name,"用户信息表");
+	}
+    
+    /**
+     * Deletes an existing Order model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param string $id
+     * @return mixed
+     */
+    public function actionDelete($id)
+    {
+        $this->findModel($id)->delete();
+        
+        OrderGoods::deleteAll(['order_id'=>$id]);
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Finds the Order model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return Order the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Order::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+}

@@ -1,0 +1,165 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+use yii\db\ActiveRecord;
+use frontend\models\Goods;
+use frontend\models\OrderGoods;
+
+
+/**
+ * This is the model class for table "{{%brand}}".
+ *
+ * @property integer $brand_id
+ * @property integer $parent_id
+ * @property string $brand_name
+ * @property string $brand_logo
+ * @property string $brand_desc
+ * @property integer $sort_order
+ * @property integer $is_show
+ */
+class Cart extends ActiveRecord {
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%cart}}';
+    }
+    
+    /**
+     * 当前会员的购物车商品
+     * @return unknown
+     */
+    public function get_cat_info($cart_id){
+    	  	
+        $sql='SELECT c.cart_id cid,c.goods_id gid,c.goods_number num,c.is_shipping is_pp,g.goods_price price,g.goods_name gname,g.goods_img img FROM yl_cart c,yl_goods g WHERE user_id='.$cart_id.' AND c.goods_id=g.goods_id ORDER BY c.add_time DESC';
+        $res = cart::findBySql($sql)->asArray()->all();	
+        return $res;
+    }
+    
+	/**
+	 * 添加商品到购物车
+	 * @return ActiveQuery
+	 */
+    public function add_cart($goods_id,$num,$uid){
+        /* 检查该会员的购物车是否已有此商品 */
+        $sql='SELECT cart_id cid,goods_number gnum FROM yl_cart WHERE user_id=:uid AND goods_id=:gid';
+        $cart= cart::findBySql($sql,array(':uid'=>$uid,':gid'=>$goods_id))->asArray()->all();
+        if(!empty($cart) && $cart['0']['cid']>0){
+    		// 累加数量
+    		$model = self::find()->where($cart['0']['cid'])->one();
+    		$model->goods_number = $num + $cart['0']['gnum'];
+            $model->add_time=time();
+    		$count = $model->save(false); 
+            $cart_id = $cart['0']['cid'];
+        }else{
+    		// 添加新纪录
+    		$model = new Cart();
+    		$model->goods_id = $goods_id;
+    		$model->goods_number = $num;
+    		$model->user_id = $_SESSION['frontend']['user_id'];
+    		$model->add_time = time();
+    		$count = $model->save(); 
+    		$cart_id = $model->primaryKey;
+    	}
+    	if($count > 0){
+    		return ['code'=>1,'error'=>'','id'=>$cart_id];	
+    	}
+    	return ['code'=>0, 'error'=>'添加购物车失败'];
+    }
+
+
+    /**
+     * 删除购物车商品
+     * @return ActiveQuery
+     */
+    public function del($id){
+       $connection=Yii::$app->db;
+       $sql="delete FROM yl_cart where cart_id='{$id}'";
+       $rows=$connection->createCommand($sql)->query();
+       return $rows;
+    }
+
+
+    /**
+     * 立即购买（生成订单）
+     * 
+     * @return ActiveQuery
+     */
+    public function verifyGoods($orderNew,$orderNum){
+        $connection=Yii::$app->db;
+        try{
+            foreach ($orderNew as $key => $value) {
+                $transaction=$connection->beginTransaction();
+                $sql1 = "INSERT INTO yl_order_goods(order_id,goods_id,cat_id,goods_number,goods_price,unit,sum_quality) VALUES(:oid,:gid,:cid,:gnum,:price,:unit,:zl)";
+                $command = $connection->createCommand($sql1);
+                $command->bindParam(":oid",$orderNum);//订单号
+                $command->bindParam(":gid",$value['gid']);//商品Id
+                $command->bindParam(":cid",$value['cat_id']);//分类Id
+                $command->bindParam(":gnum",$value['num']);//购买数量
+                $command->bindParam(":price",$value['pri']);//商品价格
+                $command->bindParam(":unit",$value['unit']);//单位
+                $command->bindParam(":zl",$value['sum_quality']);//该商品的总质量
+                $re=$command->execute();
+                //更新库存
+                $num=$value['gnum']-$value['num'];
+                $sql = "UPDATE yl_goods SET goods_number=:number WHERE goods_id=:id";
+                unset($command);
+                $command = $connection->createCommand($sql);
+                $command->bindParam(":number",$num);
+                $command->bindParam(":id",$value['gid']);
+                $res=$command->execute();
+                $transaction->commit();
+             }
+        }catch(Exception $e){
+            $transaction->rollBack();
+            return false; 
+        }
+        return true;
+    }
+    /**
+     * 购物车购买（生成订单）
+     * 
+     * @return ActiveQuery
+     */
+    public function cartGoods($orderNew,$orderNum){
+        $connection=Yii::$app->db;
+        try{
+            foreach ($orderNew as $key => $value) {
+                $transaction=$connection->beginTransaction();
+                $sql1 = "INSERT INTO yl_order_goods(order_id,goods_id,cat_id,goods_number,goods_price,unit,sum_quality) VALUES(:oid,:gid,:cid,:gnum,:price,:unit,:zl)";
+                unset($command);
+                $command = $connection->createCommand($sql1);
+                $command->bindParam(":oid",$orderNum);//订单号
+                $command->bindParam(":gid",$value['gid']);//商品Id
+                $command->bindParam(":cid",$value['cat_id']);//分类Id
+                $command->bindParam(":gnum",$value['num']);//购买数量
+                $command->bindParam(":price",$value['pri']);//商品价格
+                $command->bindParam(":unit",$value['unit']);//单位
+                $command->bindParam(":zl",$value['sum_quality']);//该商品的总质量
+                $re=$command->execute();
+                //更新库存
+                $num=$value['gnum']-$value['num'];
+                $sql = "UPDATE yl_goods SET goods_number=:number WHERE goods_id=:id";
+                unset($command);
+                $command = $connection->createCommand($sql);
+                $command->bindParam(":number",$num);
+                $command->bindParam(":id",$value['gid']);
+                $res=$command->execute();
+                //删除购物车订单信息
+                $sqlD="DELETE FROM yl_cart where cart_id=:cartid";
+                unset($command);
+                $command = $connection->createCommand($sqlD);
+                $command->bindParam(":cartid",$value['cart_id']);
+                $delete=$command->execute();
+                $transaction->commit();
+             }
+        }catch(Exception $e){
+            $transaction->rollBack();
+            return false; 
+        }
+        return true;
+    }
+}

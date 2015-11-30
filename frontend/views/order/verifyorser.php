@@ -1,0 +1,137 @@
+<?php
+use yii\helpers\Url;
+?>
+	<title>确认订单</title>
+	<link rel="stylesheet" type="text/css" href="./yulin_home/css/style.css?a=2">
+
+</head>
+<body>
+	<div class="nav_top clearfix"><div class="nav_top_con"><a href="javascript:history.go(-1);" class="re_left"></a>确认订单</div></div>
+	<div class="wrap">
+		<div class="order" >
+		<form action="<?= Url::to(['order/get-order']) ?>" method="post">
+			<input type="hidden" value="<?php echo $goodInfo[0]['oid'];?>" name="order_id">
+			<input type="hidden" value="<?php echo $userDefalut['address_id'];?>" name="address_id">
+			<div class="site_l clearfix fs30 dn">
+				<div class="site_l_top">选择地址</div>
+				<div class="f_l"></div>
+				<div class="f_r">
+					<?php if (!empty($userInfo)):?>
+						<?php foreach ($userInfo as $key => $value):?>
+							<div class="site_list <?php if($value['address_id']==$userDefalut['address_id']): echo 'now'; else: echo '';endif;?>"  site_id="<?php echo $value['address_id'];?>">
+								<p class="clearfix">
+									<span class="f_l"><?php echo $value['address_name'];?></span>
+									<span class="f_r"><?php echo $value['mobile'];?></span>
+								</p>
+								<p class="f7">
+									<?php 
+										if ($value['province']==$value['city']):
+											echo $value['city'].$value['district'].'&nbsp;'.$value['address'];
+										else:
+											echo $value['province'].$value['city'].$value['district'].'&nbsp;'.$value['address'];
+										endif;
+									?>
+								</p>						
+							</div>
+						<?php endforeach;?>
+					<?php endif?>
+				</div>
+			</div>
+			<div class="site fs30 clearfix">
+				<input type="hidden" value="0" name="site_id">
+				<div class="l f_l"><span></span></div>
+				<div class="i f_l">
+					<p class="clearfix">
+						<span class="f_l">收货人 ：<?php echo $userDefalut['address_name'];?></span>
+						<span class="f_r"><?php echo $userDefalut['mobile'];?></span>
+					</p>
+					<p>收货地址 ：
+					<?php 
+						if ($userDefalut['province']==$userDefalut['city']):
+							echo $userDefalut['city'].$userDefalut['district'].'&nbsp;'.$userDefalut['address'];
+						else:
+							echo $userDefalut['province'].$userDefalut['city'].$userDefalut['district'].'&nbsp;'.$userDefalut['address'];
+						endif;
+					?>
+					</p>
+				</div>
+				<div class="r f_r"><span></span></div>
+			</div>
+			<ul class="order_l fs28">
+				
+				<?php if (!empty($goodInfo)):?>
+					<?php foreach ($goodInfo as $key => $value):?>
+						<li weight="<?php echo $value['fee'];?>">
+							<div class="n pm10">分类 ： <span><?php echo $value['cname']?></span></div>
+							<div class="spa1"></div>
+							<div class="clearfix i pm10">
+								<p class="f_l p"><img src="../../common/upload/goods/<?php echo $value['img']?>" alt=""></p>
+								<p class="f_l ml20 n"><?php echo $value['gname']?></p>
+								<p class="f_r f1 price">
+									<span class="ff">￥</span><span class="pr_n"><?php echo $value['price']?></span><br /><span class="f7">x<?php echo $value['num']?></span>
+								</p>
+							</div>
+							<div class="spa1"></div>
+							<div class="buy_num clearfix pm10">
+								<p class="plural f_r"><input type="button" value="-" name="-"><input type="text" name="num[]" value="<?php echo $value['num']?>" min="1"><input type="button" value="+" name="+"></p>
+								<p>购买数量</p>
+							</div>
+							<input type="hidden" name="goodsid[]" value="<?php echo $goodInfo[$key]['gid']?>">
+						</li>
+					<?php endforeach;?>
+				<?php endif;?>
+			</ul>
+			<div class="order_foot fs30">
+				<p class="clearfix express">
+					<input type="hidden" value="1" name="express_id" id="express_id">
+					<span class="f_l f7">快递</span>
+					<span class="f_r"><span class="express_fee"><span class="f1  price">￥0</span></span><span class="right_ico"><s></s></span></span>
+				</p>
+				<div class="express_list_fixed">
+					<div class="express_list_con">
+						<p class="clearfix"><span class="f_r mr20">完成</span></p>
+						<ul>
+							
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			
+
+			<div class="t">发票选项：</div>
+			<div class="c">
+				<p class="f_l"><span class="radio_list_c1"><span></span><input type="radio"  name="bill" value="1" checked="checked"></span><span class="mr20">否</span></p><br/>
+				<p><span class="radio_list_c1"><span></span><input type="radio"  name="bill" value="4" ></span><span class="mr20">是</span><span class="i_txt"><br/><input type="text" name="rise" value="发票抬头" placeholder=""></span></p>
+			</div>
+
+
+
+			<div class="order_fix">
+				<div class="order_fix_con fs30 clearfix">
+					<div class="total f_l">合计：<span class="f1">￥</span></div>
+					<a class="f_r"><div class="f_r"><input class="f_r" type="submit" value="提交订单"></div></a>
+				</div>
+			</div>
+			
+		</form>
+		</div>
+	</div>
+	<script type="text/javascript">
+		var par=[<?php echo $dbwl;?>];
+		$('.order .site_l .site_list').click(function(){
+		$("input[name='address_id']").val($(this).attr('site_id'));
+		$.post('index.php?r=order/get-base&id='+$('input[name="address_id"]').val(),{},function(str){
+			var data=eval('('+str+')');
+			if (data['error']) {
+				par= [];
+				par.error=data['error'];				
+			}else{
+				par = data['data'];
+			}
+			myobj.input_money_total1($('.order_l li'),$('.order .total .f1'));
+		});
+	});
+	</script>
+</body>
+</html>

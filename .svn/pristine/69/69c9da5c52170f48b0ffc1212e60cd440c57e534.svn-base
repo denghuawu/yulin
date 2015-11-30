@@ -1,0 +1,61 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+use yii\db\ActiveRecord;
+use frontend\models\Goods;
+
+
+/**
+ * This is the model class for table "{{%brand}}".
+ *
+ * @property integer $brand_id
+ * @property integer $parent_id
+ * @property string $brand_name
+ * @property string $brand_logo
+ * @property string $brand_desc
+ * @property integer $sort_order
+ * @property integer $is_show
+ */
+class OrderGoods extends ActiveRecord
+{
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%order_goods}}';
+    }
+    /**
+     * 数据验证
+     */
+    public function rules(){
+        return [
+            ['rec_id','compare'],//id唯一
+            [['order_id','goods_id','cat_id','goods_number','goods_price','unit','sum_quality'],'required'],//字段不能为空
+        ];
+    }
+
+
+    /**
+     * 取出当前会员的购物车商品
+     * @return unknown
+     */
+    public function get_order_info(){
+    	$sql = "SELECT c.cart_id,c.goods_number AS buy_number,c.add_time,g.goods_id,g.goods_price,g.goods_name,g.goods_img,
+    			g.goods_number,b.brand_name
+    			FROM cm_cart AS c LEFT JOIN cm_goods AS g ON c.goods_id=g.goods_id LEFT JOIN cm_brand AS b ON g.brand_id=b.brand_id 
+    			WHERE c.user_id=".$_SESSION['frontend']['user_id'];
+    	$res = self::findBySql($sql)->asArray()->all();
+    	return $res;
+    }
+    
+    public function add_orderGoods($order){
+    	
+    	$model = new OrderGoods();
+    	
+    }
+
+}

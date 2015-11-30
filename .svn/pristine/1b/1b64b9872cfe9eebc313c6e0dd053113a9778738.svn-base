@@ -1,0 +1,82 @@
+<?php
+use yii\helpers\Url;
+?>
+	<div class="nav_top clearfix"><span class="re_left"></span>我的订单</div>
+	<div class="wrap">
+		<div class="indent fs25">
+			<div class="indent_top clearfix">
+				<a href="<?= Url::to(['order/index']) ?>"><div class="all <?= $status < 1 ? 'cl1' :''; ?> ">全部</div></a>
+				<a href="<?= Url::to(['order/index', 'status'=>UNPAYED]) ?>"><div class="d <?= $status == UNPAYED ? 'cl1' :''; ?>">待付款</div></a>
+				<a href="<?= Url::to(['order/index', 'status'=>PAYED]) ?>"><div class="f <?= $status == PAYED ? 'cl1' :''; ?>">待发货</div></a>
+				<a href="<?= Url::to(['order/index', 'status'=>SHIPPED]) ?>"><div class="s <?= $status == SHIPPED ? 'cl1' :''; ?>">待收货</div></a>
+				<a href="<?= Url::to(['order/index', 'status'=>FINISHED]) ?>"><div class="p <?= $status == FINISHED ? 'cl1' :''; ?>">待评价</div></a>
+			</div>
+			<div class="indent_con">
+			
+			   <!-- 全部订单 start -->
+				<ul class="all">
+					<?php if($order){
+							foreach ($order as $val){	// 订单信息
+								if($val['order_id']<1)continue;
+					?>
+					
+						<li>
+							<div class="clearfix">
+								<p class="f_l"><span class="fwb"></span></p>
+								<p class="f_r f1"><?= $val['status']['name'] ?></p>
+							</div>
+							<?php foreach ($val['order_goods'] as $v){ 	// 订单商品
+									if($v['goods_id']<1)continue;
+							?>
+							<a href="<?= Url::to(['order/detail', 'id'=>$val['order_id']]) ?>">
+								<div class="clearfix i">
+									<p class="f_l p"><img src="/common/upload/goods/<?= $v['goods_img'] ? $v['goods_img'] : 'default.png' ?>" alt=""></p>
+									<p class="f_l ml20 n"><?= mb_substr($val['goods_name'],0,25,'utf-8'); ?></p>
+									<p class="f_r f1 price">
+										<span class="ff">￥</span><?= $v['goods_price'] ?><br /><span class="f7">x<?= $v['goods_number'] ?></span>
+									</p>
+								</div>
+							</a>
+							<?php } ?>
+							<div class="b clearfix">
+									<p class="f7">订单号 : <?= $val['order_sn'] ?></p>
+									<p class="f_l">实付：<span><span class="ff">￥</span><?= $val['order_amount'] ?></span></p>
+									
+									<?php if($val['status']['action']){		//取出订单动作
+									
+									?>
+									<p class="f_r" style="margin-right:5px ">
+									<?php 
+											foreach ($val['status']['action'] as $val){
+									?>
+										<span class="btn" ><?= $val ?></span> 
+									<?php }} ?>
+									</p>
+							</div>		
+						</li>
+					
+					<?php }} ?>
+				</ul>
+				<!-- 全部订单 end -->
+	
+			</div>
+		</div>
+	</div>
+	
+<script type="text/javascript">
+	var page = 1;
+	window.onload=function(){
+		loadS('http://chamei.com/frontend/web/index.php?r=order/index&ajax=1'+location.search.replace('?r=order/index',''),function(d){
+			var li='<li><div class="clearfix"><p class="f_l"><span class="fwb"></span></p><p class="f_r f1">'+d['status']['name']+'</p></div>';
+			for (var g = 0; g < d['order_goods'].length; g++) {				
+				li+='<a href="/frontend/web/index.php?r=order%2Fdetail&amp;id='+d['order_id']+'"><div class="clearfix i"><p class="f_l p"><img src="/common/upload/goods/'+d['order_goods'][g]['goods_img']+'" alt=""></p><p class="f_l ml20 n">'+d['order_goods'][g]['goods_name']+'</p><p class="f_r f1 price"><span class="ff">￥</span>'+d['order_goods'][g]['goods_price']+'<br><span class="f7">x'+d['order_goods'][g]['goods_number']+'</span></p></div></a>';
+			};
+			li+='<div class="b clearfix"><p class="f7">订单号 : '+d['order_sn']+'</p><p class="f_l">实付：<span><span class="ff">￥</span> '+d['order_amount']+'</span></p><p class="f_r" style="margin-right:5px ">'
+			for (var act = 0; act < d['status']['action'].length; act++) {
+				li+='<span class="btn">'+ d['status']['action'][act]+'</span> ';
+			};
+			li+="</p></div></li>";
+			$('ul.all').append(li);
+		});
+	}
+</script>

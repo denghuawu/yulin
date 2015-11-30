@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>表单</title>
+	<link href="../../web/assets/css/dpl-min.css" rel="stylesheet" type="text/css">
+    <link href="../../web/assets/css/bui-min.css" rel="stylesheet" type="text/css">
+    <link href="../../web/assets/css/page-min.css" rel="stylesheet" type="text/css">
+    <link href="../../web/assets/css/main_i.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+    	body{font-family:microsoft yahei;}
+		.label_elect{min-width: 68px;line-height: 16px;background-color: #74ad5c;text-align: center;}
+		.form_elect>div{height: 40px;}
+		.form_elect .controls_elect{float: left;display: inline;width: 50%;}
+		.form_elect .controls_elect a{margin: 0 5px;}
+		.nav_elect{display: inline-block;}
+		.label_elect_title{border: 1px solid #e2e2e2;background-color: #f1f1f1;width: 76px;height: 22px;line-height: 22px;text-align: center;display: inline-block;}
+		.label_elect_nav{border: 1px solid #e2e2e2;background-color:#fff;width: 52px;height: 22px;line-height: 22px;text-align: center;display: inline-block;position: relative;margin-left: 5px;margin-right: 17px;}
+		.label_elect_nav:after{content:"x";border: 1px solid #e2e2e2;background-color:#fff;border-left-color:#fff;width: 12px;font-size: 6px;line-height: 9px;height: 12px;position:absolute;left: 100%;top:-1px;cursor: pointer;}
+		#table_list .bui-grid-tbar{background-image:-webkit-linear-gradient(top,#fff,#ebebe5);line-height: 40px;height: 40px;padding-left: 20px;border:1px solid #ddd;}
+		.bui-grid-table .bui-grid-hd-inner{background-image: -webkit-linear-gradient(top,#fff,#f6f6f2);}
+		#table_list .bui-grid-tbar [class^="icon-"],#table_list .bui-grid-tbar  [class*=" icon-"]{vertical-align: middle;}
+		#table_list .bui-grid-table .bui-grid-hd-inner{line-height: 35px;height: 35px;text-align: center;}
+		#table_list .bui-grid-table .bui-grid-cell-text{line-height: 30px;height: 30px;text-align: center;}
+		.bui-simple-grid .bui-grid-table .bui-grid-row-hover,.bui-grid .bui-grid-table .bui-grid-row-hover{background-color:#ffffcc;}
+		.bui-grid-table .bui-grid-hd-hover .bui-grid-hd-inner,.bui-grid-table .bui-grid-hd-open .bui-grid-hd-inner{background-color:#ffffcc;background-image:-moz-linear-gradient(top,#ffffcc,#ffffcc);background-image:-ms-linear-gradient(top,#ffffcc,#ffffcc);background-image:-webkit-gradient(linear,0 0,0 100%,from(#ffffcc),to(#ffffcc));background-image:-webkit-linear-gradient(top,#ffffcc,#ffffcc);background-image:-o-linear-gradient(top,#ffffcc,#ffffcc);background-image:linear-gradient(top,#ffffcc,#ffffcc);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffcc',endColorstr='#ffffcc',GradientType=0);}
+		.bui-simple-grid .bui-grid-table .bui-grid-row-selected,.bui-grid .bui-grid-table .bui-grid-row-selected{background-color:#ffffcc;}
+		.bui-grid-table .bui-grid-cell{border-top: 1px solid #d3d3d3;}
+		.bui-grid-border .bui-grid-hd,.bui-grid-border .bui-grid-cell,.bui-grid-border .bui-grid-header-row td{border-left:1px solid #d3d3d3;}
+		.bui-grid-row-selected .x-grid-checkbox, .checked .x-grid-checkbox{background-position: 0 -17px;}
+    </style>
+</head>
+<body>
+	<div class="container">
+		<div class="left"></div>	
+		<div class="right">
+			<form action="" method="" class="form_elect clearfix">
+				<div class="">
+					<input type="text" class="control-text search-query">
+            		<input type="submit" class="button" value="搜索">
+            	</div>
+
+            	<div class="controls_elect">
+            		<span class="label label_elect">学&nbsp;&nbsp;&nbsp;&nbsp;历</span>
+            		<a href="javascript:void(0)"><span>不限</span></a>
+            		<a href="javascript:void(0)"><span>中专</span></a>
+            		<a href="javascript:void(0)"><span>大专</span></a>
+            		<a href="javascript:void(0)"><span>本科</span></a>
+            		<a href="javascript:void(0)"><span>研究生</span></a>
+            		<a href="javascript:void(0)"><span>硕士</span></a>
+            		<a href="javascript:void(0)"><span>博士</span></a>
+            		<a href="javascript:void(0)"><span>无</span></a>
+            	</div>
+            	<div class="controls_elect">
+            		<span class="label label_elect">学&nbsp;&nbsp;&nbsp;&nbsp;历</span>
+            		<a href="javascript:void(0)"><span>不限</span></a>
+            		<a href="javascript:void(0)"><span>中专</span></a>
+            		<a href="javascript:void(0)"><span>大专</span></a>
+            		<a href="javascript:void(0)"><span>本科</span></a>
+            		<a href="javascript:void(0)"><span>研究生</span></a>
+            		<a href="javascript:void(0)"><span>硕士</span></a>
+            		<a href="javascript:void(0)"><span>博士</span></a>
+            		<a href="javascript:void(0)"><span>无</span></a>
+            	</div>
+            	<div class="controls_elect">
+            		<span class="label label_elect">学&nbsp;&nbsp;&nbsp;&nbsp;历</span>
+            		<a href="javascript:void(0)"><span>不限</span></a>
+            		<a href="javascript:void(0)"><span>中专</span></a>
+            		<a href="javascript:void(0)"><span>大专</span></a>
+            		<a href="javascript:void(0)"><span>本科</span></a>
+            		<a href="javascript:void(0)"><span>研究生</span></a>
+            		<a href="javascript:void(0)"><span>硕士</span></a>
+            		<a href="javascript:void(0)"><span>博士</span></a>
+            		<a href="javascript:void(0)"><span>无</span></a>
+            	</div>
+            	<div class="controls_elect">
+            		<span class="label label_elect">学&nbsp;&nbsp;&nbsp;&nbsp;历</span>
+            		<a href="javascript:void(0)"><span>不限</span></a>
+            		<a href="javascript:void(0)"><span>中专</span></a>
+            		<a href="javascript:void(0)"><span>大专</span></a>
+            		<a href="javascript:void(0)"><span>本科</span></a>
+            		<a href="javascript:void(0)"><span>研究生</span></a>
+            		<a href="javascript:void(0)"><span>硕士</span></a>
+            		<a href="javascript:void(0)"><span>博士</span></a>
+            		<a href="javascript:void(0)"><span>无</span></a>
+            	</div>
+            	<div class="nav_elect">
+            		<span class="label_elect_title">筛选</span>
+            		<a href="" class="label_elect_nav">筛选</a>
+            		<a href="" class="label_elect_title">清楚全部</a>            		
+            	</div>
+			</form>
+			<div>
+				<div id="table_list"></div>
+				<div id="bar"></div>
+				 <div id="content" class="hide">
+				      <form id="J_Form" class="form-horizontal">
+				        <div class="row">
+				          <div class="control-group span8">
+				            <label class="control-label"><s>*</s>学校名称：</label>
+				            <div class="controls">
+				              <input name="school" type="text" data-rules="{required:true}" class="input-normal control-text">
+				            </div>
+				          </div>
+				          <div class="control-group span8">
+				            <label class="control-label"><s>*</s>学生类型：</label>
+				            <div class="controls">
+				              <select  data-rules="{required:true}"  name="type" class="input-normal"> 
+				                <option value="">请选择</option>
+				                <option value="zou">走读</option>
+				                <option value="zhu">住校</option>
+				              </select>
+				            </div>
+				          </div>
+				        </div>
+				        <div class="row">
+				          <div class="control-group span15 ">
+				            <label class="control-label">在校日期：</label>
+				            <div id="range" class="controls bui-form-group" data-rules="{dateRange : true}">
+				              <input name="enter" class="calendar" type="text"><label>&nbsp;-&nbsp;</label><input name="outter" class="calendar" type="text">
+				            </div>
+				          </div>
+				        </div>
+				        <div class="row">
+				          <div class="control-group span15">
+				            <label class="control-label">备注：</label>
+				            <div class="controls control-row4">
+				              <textarea name="memo" class="input-large" type="text"></textarea>
+				            </div>
+				          </div>
+				        </div>
+				      </form>
+			    </div>
+			</div>
+		</div>
+	</div> 
+
+	<script type="text/javascript" src="../../web/assets/js/jquery-1.8.1.min.js"></script>
+	<script type="text/javascript" src="../../web/assets/js/bui-min.js"></script>
+	<script type="text/javascript" src="../../web/assets/js/config-min.js"></script>
+	<script type="text/javascript">
+		var data = [{a:'1333',c:'eee',d:'2'},{a:'1333',c:'eee',d:'2'},{a:'1333',c:'eee',d:'2'}];
+		BUI.use(['bui/grid','bui/data','bui/form'],function(Grid,Data,Form){
+       	var Grid = Grid,
+          Store = Data.Store,
+          columns = [{title : '部门名称',dataIndex :'a', width:100},
+            {title : '部门人数',dataIndex :'b', width:100}, 
+            {title : '部门职位',dataIndex :'c', width:200}, 
+            {title : '录入时间',dataIndex : 'd', width:130},
+            {title : '操作',dataIndex : 'e', width:130,renderer : function(){
+              return '<span class="grid-command btn-edit">查看</span>';
+            }} 
+           ];
+           //由于设置了数据跟状态的对应关系，此时状态会反映到Html上面
+           //disabled的字段无法被选中 
+           //selected 是否选中
+          /*data = [{a:'123',selected : true},{a:'cdd',b:'edd',disabled:true},{a:'1333',c:'eee',d:2}];*/
+     
+ 
+        var store = new Store({
+            data : data,
+            autoLoad:true
+          }),
+        editing = new Grid.Plugins.DialogEditing({
+        	contentId : 'content',
+        	triggerCls : 'btn-edit',
+        	eidtor : {
+        	  focusable : false
+        	}
+      	}),
+          grid = new Grid.Grid({
+            render:'#table_list',
+            columns : columns,
+            forceFit : true,
+            itemStatusFields : { //设置数据跟状态的对应关系
+              selected : 'selected',
+              disabled : 'disabled'
+            },
+            store : store,
+			plugins : [Grid.Plugins.CheckSelection,editing],	// 插件形式引入多选表格
+			tbar:{
+                items : [{
+                    text : '<i class="icon-plus"></i>添加',	
+                    // content : '<input type="button" name="" id="" class="" value="添加"/>',
+                    listeners : {
+                        'click' : addFunction
+                    }
+                    },{
+		            btnCls : 'button button-small',
+                    text : '<i class="icon-remove"></i>删除',
+                    listeners : {
+                        'click' : delFunction
+                    }
+                }]
+            }
+			//multiSelect: true  // 控制表格是否可以多选，但是这种方式没有前面的复选框 默认为false
+          });
+        grid.render();
+
+ 	     var form = new Form.HForm({
+		      srcNode : '#J_Form'
+	    });
+
+	    form.render();
+	    var field = form.getField('eduation');
+	    form.on('beforesubmit',function(){
+	    var records = store.getResult();
+	    	field.set('value',BUI.JSON.stringify(records));
+	    });
+        /*添加*/
+        function addFunction(){
+            var newData = {school :'请输入学校名称'};
+            store.add(newData);
+        }
+        /*刪除*/
+        function delFunction(){
+            var selections = grid.getSelection();
+            store.remove(selections);
+        }              
+    });
+	</script>
+</body>
+</html>

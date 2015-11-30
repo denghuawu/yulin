@@ -1,0 +1,28 @@
+<?php 
+use yii\helpers\Url;
+?>
+	<div class="nav_top clearfix"><span class="re_left"></span>收货地址</div>
+	<div class="wrap">
+		<div class="site fs30">
+			<div class="site_l">
+				<?php if($address){
+						foreach ($address as $val){					
+				 ?>
+				<a href="<?= Url::to(['address/update', 'id'=>$val['address_id']]); ?>">	
+				<div class="site_list <?php if($val['is_default'] == '1')echo 'now'; ?>">
+					<p class="clearfix">
+						<span class="f_l"><?= $val['consignee'] ?></span>
+						<span class="f_r"><?= $val['mobile'] ?></span>
+					</p>
+					<p class="f7"><?= $val['province'] ?> <?= $val['city'] ?> <?= $val['district'] ?> <?= $val['address'] ?></p>
+				</div>
+				</a>
+				
+			    <?php 
+						}}
+			    ?>
+			</div>
+			<div class="site_add"><a href="<?= Url::to(['address/create']) ?>"><div>添加新地址</div></a></div>
+			
+		</div>
+	</div>

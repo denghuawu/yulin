@@ -1,0 +1,706 @@
+<!-- 初始隐藏 新建 -->
+				<div id="content" class="hide">
+					<form action="index.php?r=employee/create" method='post' class="form-horizontal">
+						<div id="tab">
+							<ul>
+								<li class="bui-tab-panel-item active">
+									<a href="#">档案信息</a>
+								</li>
+								<li class="bui-tab-panel-item">
+									<a href="#">工作信息</a>
+								</li>
+								<li class="bui-tab-panel-item">
+									<a href="#">教育及工作经历</a>
+								</li>
+							</ul>
+						</div>
+						<div id="panel" class="pt20">
+							<div id="record">
+								<div class="row">	<input type="submit" value='tijiao'>
+									<div class="control-group span10">
+										<label class="control-label">员工编号：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" name="Employee[em_sn]"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">社保号：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" name="Employee[ss_number]"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">关联后台账号：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" name="Employee[admin_id]"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">工资银行卡号：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" name="Employee[domicile]" : '<?= $val['domicile'] ?>',
+		    				"Employee[card_no]"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">姓名：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" name="Employee[em_name]"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">性别：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<label class="radio" for=""><input type="radio" checked value='1' name="Employee['sex']">男</label>&nbsp;&nbsp;&nbsp;
+											<label class="radio" for=""><input type="radio" value='0' name="Employee['sex']">女</label>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">出生日期：</label>
+										<div class="controls">
+											<input class="calendar" name="Employee['birthday']" data-rules="{date:true}" type="text">
+										</div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">籍贯：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" name="Employee['native_place']"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">身份证号：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" name=Employee[id_card]"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">户籍户籍所在地：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">曾用名：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">政治面貌：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<select name="face">
+												<option value="0">群众</option>
+												<option value="1">团员</option>
+												<option value="2">党员</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">婚姻状况：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<label class="radio" for=""><input type="radio" name="marriage" value="0">未婚</label>&nbsp;&nbsp;&nbsp;
+											<label class="radio" for=""><input type="radio" name="marriage" value="1">已婚</label>&nbsp;&nbsp;&nbsp;
+											<label class="radio" for=""><input type="radio" name="marriage" value="2">离异</label>											
+										</div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">民族：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<select name="nation">
+												<option value="0">群众</option>
+												<option value="1">团员</option>
+												<option value="2">党员员</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">身高：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">体重：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span19">
+										<label class="control-label">自我介绍：</label>
+										<div class="controls control-row4">
+											<textarea name="f" class="input-large bui-form-field" type="text" aria-disabled="false" aria-pressed="false"></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">联系手机：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" name="Employee[mobile_phone]"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">个人QQ：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">Email：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">紧急联系人：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">紧急联系电话：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">现住址：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">家庭电话：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text"></div>
+									</div>
+								</div>
+							</div>
+							<div id="work">
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">在职状态：</label>
+										<div class="controls">
+											<select name="job">
+												<option value="0">在职试用</option>
+												<option value="1">在职正式</option>
+												<option value="2">离职</option>
+												<option value="3">退休</option>
+											</select>
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">											
+											员工类型：
+										</label>
+										<div class="controls">
+											<select name="job">
+												<option value="0">在职试用</option>
+												<option value="1">在职正式</option>
+												<option value="2">离职</option>
+												<option value="3">退休</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">入职时间：</label>
+										<div class="controls">
+											<input type="text" class="calendar calendar-time" />
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">离职时间：</label>
+										<div class="controls">
+											<input type="text" class="calendar calendar-time" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">有无试用期：</label>
+										<div class="controls">
+											<label class="radio" for=""><input type="radio" name="试用期">有</label>&nbsp;&nbsp;&nbsp;
+											<label class="radio" for=""><input type="radio" name="试用期">无</label>
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">试用期：</label>
+										<div class="controls">
+ 											<input name="start" class="calendar" type="text"><label> - </label><input name="end" class="calendar" type="text">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">部门：</label>
+										<div class="controls">
+											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">正式聘用期：</label>
+										<div class="controls">
+ 											<input name="start" class="calendar" type="text"><label> - </label><input name="end" class="calendar" type="text">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">职位：</label>
+										<div class="controls">
+											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">直属上级职位：</label>
+										<div class="controls">
+ 											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="experience">
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">人才类型：</label>
+										<div class="controls">
+											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">参加时间：</label>
+										<div class="controls">
+ 											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">毕业院校：</label>
+										<div class="controls">
+											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">毕业时间：</label>
+										<div class="controls">
+ 											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">专业：</label>
+										<div class="controls">
+											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">学历：</label>
+										<div class="controls">
+ 											<select name="">
+												<option value="0">开发</option>
+												<option value="1">后期</option>
+												<option value="2">漫画</option>
+												<option value="3">财务</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="row">								
+									<div class="control-group span16">
+										<label class="control-label">职业资格证书：</label>
+										<div class="controls">
+											<input name="c" type="text" class="span8 span-width control-text">
+										</div>
+									</div>									
+								</div>
+								<div class="row">								
+									<div class="control-group span16">
+										<label class="control-label">教育及培训经历：</label>
+										<div class="controls control-row-auto">
+											
+										</div>
+									</div>									
+								</div>
+								<div class="row">								
+									<div class="control-group span16">
+										<label class="control-label">工作经历&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>(及奖励与处罚)：</label>
+										<div class="controls control-row-auto">
+											
+										</div>
+									</div>									
+								</div>
+
+							</div>
+						</div>
+					</form>
+				</div>
+
+
+
+
+<!-- 初始隐藏  查看 -->				
+				<div id="content1" class="hide none_border">
+					<form action="" class="form-horizontal">
+						<div id="tab2">
+							<ul>
+								<li class="bui-tab-panel-item active">
+									<a href="#">档案信息</a>
+								</li>
+								<li class="bui-tab-panel-item">
+									<a href="#">工作信息</a>
+								</li>
+								<li class="bui-tab-panel-item">
+									<a href="#">教育及工作经历</a>
+								</li>
+							</ul>
+						</div>
+						<div id="panel2" class="pt20">
+							<div id="record_look">
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">员工编号：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">社保号：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">关联后台账号：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">工资银行卡号：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">姓名：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">性别：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">出生日期：</label>
+										<div class="controls">
+											<input class="calendar" name="h" data-rules="{date:true}" type="text" readonly="">
+										</div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">籍贯：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">身份证号：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">户籍户籍所在地：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">曾用名：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">政治面貌：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">婚姻状况：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly="">						
+										</div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">民族：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">身高：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">体重：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span19">
+										<label class="control-label">自我介绍：</label>
+										<div class="controls control-row4">
+											<textarea name="f" class="input-large bui-form-field" type="text" readonly="" aria-disabled="false" aria-pressed="false" style="resize:none"></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">联系手机：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">个人QQ：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">Email：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">紧急联系人：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">紧急联系电话：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">现住址：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+									<div class="control-group span10">
+										<label class="control-label">家庭电话：</label>
+										<div class="controls bui-form-field-plain" data-cfg="{renderer:planFormat}">
+											<input class="input-normal control-text" type="text" readonly=""></div>
+									</div>
+								</div>
+							</div>
+							<div id="work_look">
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">在职状态：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">											
+											员工类型：
+										</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">入职时间：</label>
+										<div class="controls">
+											<input type="text" readonly="" class="calendar calendar-time" />
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">离职时间：</label>
+										<div class="controls">
+											<input type="text" readonly="" class="calendar calendar-time" />
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">有无试用期：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">试用期：</label>
+										<div class="controls">
+ 											<input name="start" class="calendar" type="text" readonly=""><label> - </label><input name="end" class="calendar" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">部门：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">正式聘用期：</label>
+										<div class="controls">
+ 											<input name="start" class="calendar" type="text" readonly=""><label> - </label><input name="end" class="calendar" type="text">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">职位：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">直属上级职位：</label>
+										<div class="controls">
+ 											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="experience_look">
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">人才类型：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">参加时间：</label>
+										<div class="controls">
+ 											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">毕业院校：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">毕业时间：</label>
+										<div class="controls">
+ 											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="control-group span10">
+										<label class="control-label">专业：</label>
+										<div class="controls">
+											<input class="input-normal control-text" type="text" readonly="">	
+										</div>
+									</div>
+									<div class="control-group12 span10">
+										<label class="control-label">学历：</label>
+										<div class="controls">
+ 											<input class="input-normal control-text" type="text" readonly="">
+										</div>
+									</div>
+								</div>
+								<div class="row">								
+									<div class="control-group span16">
+										<label class="control-label">职业资格证书：</label>
+										<div class="controls">
+											<input name="address" type="text" class="span8 span-width control-text" readonly="">
+										</div>
+									</div>									
+								</div>
+								<div class="row">								
+									<div class="control-group span16">
+										<label class="control-label">教育及培训经历：</label>
+										<div class="controls control-row-auto">
+											
+										</div>
+									</div>									
+								</div>
+								<div class="row">								
+									<div class="control-group span16">
+										<label class="control-label">工作经历&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>(及奖励与处罚)：</label>
+										<div class="controls control-row-auto">
+											
+										</div>
+									</div>									
+								</div>
+
+							</div>
+						</div>
+					</form>
+				</div>

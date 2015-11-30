@@ -1,0 +1,686 @@
+$(function(){
+if (!navigator.userAgent.match(/(iPhone|iPod|Android|ios|Windows Phone)/i)) {
+	$('html').css({'font-size': '16px'});
+	$('.wrap').css({'width':'720px','margin':'0px auto'});
+	$('.nav_top,.nav_top_con,.nav_foot_con,.shop_btn_con,.shopcat_total_con,.order_fix_con,.refund_f_con,.personal_foot,.express_list_fixed').css({'width':'720px','left':"0",'right':0,'margin':'auto'});
+
+}else if (window.innerWidth < window.innerHeight){
+	$('html').css('fontSize', Math.round(window.innerWidth/720*16*10000)/10000);
+	window.onresize=function(){
+		$('html').css('fontSize', Math.round(window.innerWidth/720*16*10000)/10000);
+	}
+}else if (window.innerWidth > window.innerHeight){
+	$('html').css('fontSize',Math.round(window.innerWidth/720*8*10000)/10000);
+	window.onresize=function(){
+		$('html').css('fontSize', Math.round(window.innerWidth/720*8*10000)/10000);		
+	}
+}
+$('input[type="text"],input[type="password"]').focus(function(){
+	$('.nav_top_con,.evaluate_f,.order_fix_con,.refund_f_con,.express_list_fixed').css('position','absolute');
+});
+$('input[type="text"],input[type="password"]').blur(function(){
+	$('.nav_top_con,.evaluate_f,.order_fix_con,.refund_f_con,.express_list_fixed').css('position','fixed');
+});
+$(".register .code input[type='button']").click(function(){
+	code($(this));
+});
+	// swiper
+if(typeof Swiper  != "undefined" && $('.swiper-container').length == 1 ){
+	var timer;
+	var mySwiper = new Swiper('.swiper-container', {
+		pagination: '.swiper_nav',
+		paginationClickable: true,
+		mode: 'horizontal',
+		loop: true,
+		speed: 500,
+		autoplay:2000,
+		// autoplayDisableOnInteraction:false,
+		grabCursor: true,
+		onSlideChangeStart: function(){
+			
+		}
+	});
+	if ($('.swiper_nav').children().length ==1) {
+		$('.swiper_nav').empty();
+		mySwiper.stopAutoplay();
+	};
+}
+});
+/*
+$(".x1").click(function(e){
+	xin(e);		
+});
+$(".x2").click(function(e){
+	xin(e);
+});
+function xin(e){
+	var t = e.target;
+	if($(t).attr('class') == 'x1'){
+		$.post('index.php?r=goods/collectgoods&goods_id='+$('.shop_n').attr('goods_id'),{goods_id:$('.shop_n').attr('goods_id')},function($m){
+			if($m == 1){
+				alt('已收藏');
+				$(t).removeClass('x1');
+				$(t).addClass('x2');
+			}else{
+				alt($m);
+			}
+		});
+		
+	}else{
+		$.post('index.php?r=goods/collectgoods&goods_id='+$('.shop_n').attr('goods_id'),{goods_id:$('.shop_n').attr('goods_id')},function($m){
+			if($m){
+				alt('已取消收藏');
+				$(t).removeClass('x2');
+				$(t).addClass('x1');
+			}
+		});
+	}
+}
+
+	$(".shop_info_nav>div").click(function(){
+		var val=$(this).attr("class");//这里获取class值
+		var arr=val.split(" ");
+		$(".shop_info_con>div").hide();
+		$(".shop_info_con ."+arr[0]).show();
+	});
+	$('.product_n input[type="button"]').click(function(){
+		var num=isNaN(parseInt($(this).siblings('input[type="text"]').val())) ? 1 :parseInt($(this).siblings('input[type="text"]').val());
+		var max=isNaN(parseInt($(this).siblings('input[type="text"]').attr('max'))) ? 9999 : parseInt($(this).siblings('input[type="text"]').attr('max'));
+		if (this.value == '-') {
+			$(this).siblings('input[type="text"]').val(num <= 1 ? 1 :num- 1);			
+		}else if(this.value == '+'){
+			$(this).siblings('input[type="text"]').val(num >=max ? max : num+ 1);
+		};		
+	});
+	$('.shop_btn input[type="button"]').click(function(){
+		var num=isNaN(parseInt($(this).siblings('input[type="text"]').val())) ? 1 :parseInt($(this).siblings('input[type="text"]').val());
+		var max=isNaN(parseInt($(this).siblings('input[type="text"]').attr('max'))) ? 9999 : parseInt($(this).siblings('input[type="text"]').attr('max'));
+		if (this.value == '-') {
+			$(this).siblings('input[type="text"]').val(num <= 1 ? 1 :num- 1);			
+		}else if(this.value == '+'){
+			$(this).siblings('input[type="text"]').val(num >=max ? max : num+ 1);
+		};
+	});
+	// 购物车
+
+	$(".shopping .c .b").click(function(){
+		if(this.innerText == '编辑'){
+			var n=$(this).parents('li').find(".n .s .f_r").html().substr(1);
+			$(this).parents('li').find('input[type="text"]').val(n);
+			$(".shopping .accounts").hide();
+			$(this).parents('li').find(".n").hide();
+			$(this).parents('li').find(".r").show();		
+			this.innerText = '完成';
+		}else{
+			if (isNaN(parseInt($(this).parents('li').find('input[type="text"]').val()))) {
+				$(this).parents('li').find(".n .s .f_r").html('x1');
+			}else{
+				$(this).parents('li').find(".n .s .f_r").html('x'+parseInt($(this).parents('li').find('input[type="text"]').val()));
+			}
+			$(this).parents('li').find(".r").hide();
+			$(this).parents('li').find(".n").show();
+			this.innerText = '编辑';
+			if($(".shopping .c .b:contains('完成')").length == 0 ){
+
+				$(".shopping .accounts").show();
+			}
+		}		
+		var li=$(this).parents('li');
+		$.post('index.php?r=cart/addcart&goods_id='+li.children('div.n').attr('goods_id')+'&num='+li.find('.buy_n').html().substr(1),{goods_id:li.children('div.n').attr('goods_id')+'&num='+li.find('.buy_n').html().substr(1)},function($m){
+			var $m=eval("("+$m+")");
+			if($m){
+				if($m.code<1){
+					alt($m.error);
+				}
+			}
+		});
+		statistics();
+	});
+	$(".shopping .list_n input[type='button']").click(function(e){
+		var num=isNaN(parseInt($(this).siblings('input[type="text"]').val())) ? 1 :parseInt($(this).siblings('input[type="text"]').val());
+		var max=isNaN(parseInt($(this).siblings('input[type="text"]').attr('max'))) ? 9999 : parseInt($(this).siblings('input[type="text"]').attr('max'));
+		if ($(this).val() == '-') {
+			$(this).siblings('input[type="text"]').val(num <= 1 ? 1 :num- 1);
+
+		}else{
+			$(this).siblings('input[type="text"]').val(num >=max ? max : num+ 1);
+		}
+		statistics();
+	});
+	$(".shopping .accounts_btn").click(function(){
+		var now=$('.shopping li .c .t .now');
+		if (now.length<1) {return;};
+		var list='';
+		for (var i = 0; i < now.length; i++) {
+			list+=now.eq(i).parents('li').children('.n').attr('cart_id')+',';
+		};
+		
+		location.href='index.php?r=cart/suborder&cart_id='+list;
+	});
+	function statistics(){
+		var arr=$(".shopping .c .t .now");
+		var total=0;
+		for (var i = 0; i < arr.length; i++) {
+			var num= parseInt($(arr[i]).parents('li').find('input[type="text"]').val());
+			if (isNaN(num)) {
+				num = parseInt($(arr[i]).parents('li').find('.n .s .f_r').html().substr(1));
+			}
+			total += parseInt($(arr[i]).parents('li').find('.n .s .f_l').html().substr(1)) * num;
+		}
+		$(".shopping .total").html('￥'+total);
+	}
+	$(".collect_top div").click(function(){
+		$(".collect_top div").removeClass('cl1');
+		$(this).addClass('cl1');
+		$(".collect_con ul").hide();
+		$(".collect_con ul").eq($(this).index()).show();
+	});
+	$('.r1,.r2').click(function(){
+		if (this.className == 'r1') {
+			$(this).attr('class','r2');
+		}else if (this.className == 'r2'){
+			$(this).attr('class','r1');
+		}
+	});
+	$(".collect_remove .handle>div").click(function(){
+		if($(".collect_remove .handle>div").parents('ul').find('.r2').length <= 0)return;
+		affirm('确定','您确定删除？',function(){
+			var re= $(".collect_remove .handle>div").parents('ul').find('.r2');
+			var str='';
+			for (var i = 0; i < re.length; i++) {
+				str+=re.eq(i).parents('li').attr('collect_id')+',';
+			};
+			location.href='index.php?r=collect/delcollect&id='+str;
+		});
+	});
+	$(".collect_out .handle>div").click(function(){
+		
+	});
+	
+
+	$('.order .site .r a').click(function(){
+		$('.order .site_l').show();
+		$('.nav_top , .order_fix ').hide();
+		$("html").css({'position':'relative','left':'-90%','height':'100%','overflow':'hidden'});
+	});
+	$('.order .site_l .f_l').click(function(){
+		$('.order .site_l').hide();
+		$('.nav_top , .order_fix ').show();
+		$("html").css({'position':'relative','left':'0%','height':'100%','overflow':'auto'});
+	});
+	$('.order .site_l .site_list').click(function(){
+		$('.order .site_l .site_list').removeClass('now');
+		$(this).addClass('now');
+		$('.order .site .i .f_l').html($(this).find('.f_l').html());
+		$('.order .site .i .f_r').html($(this).find('.f_r').html());
+		$('.order .site .i p').eq(1).html($(this).children('p').eq(1).html());
+		$("input[name='address_id']").val($(this).attr('aid'));
+		$('.order .site_l').hide();
+		$('.nav_top , .order_fix ').show();
+		$("html").css({'position':'relative','left':'0%','height':'100%','overflow':'auto'});
+	});
+	$(".n_t_r").click(function(){
+		$("#add").submit();
+	});
+	$(".indent .indent_top div").click(function(){
+		$(".indent .indent_top div").removeClass('cl1');
+		$('.indent .indent_con ul').hide();
+		$('.indent .indent_con ul.'+this.className).show();
+		$(this).addClass('cl1');
+	});
+	$(".evaluate_e .e div").click(function(){
+		$(this).parents(".evaluate_e").find(".e div").removeClass('n');
+		$(this).parents('div.evaluate_e').find('input[name="score[]"]').val($(this).index()+1);
+		$(this).addClass('n');
+	});
+	$(".refund div.l:first-child .clearfix").click(function(){
+		$(this).parents('.l').find('.r span').removeClass('r3');
+		$(this).parents('.l').find('.r span').addClass('r4');
+		$(this).find('.r span').removeClass('r4');
+		$(this).find('.r span').addClass('r3');
+		$(this).siblings('input').val($(this).index());
+	});	
+	$(".refund div.l div.yy p:first-child").click(function(){
+		$(".refund div.l div.yy p").show(100);
+	});
+	$(".refund div.l div.yy p.dn").click(function(){
+		$(".refund div.l div.yy p.dn").hide(100);
+		$(".refund div.l div.yy p:first-child span.yy").html(this.innerText);
+		$(this).parent().siblings('input').val(this.innerText);
+	});
+	$(".personal ul li.re_s").click(function(){
+		$(".revamp_sex").parent().show();
+		 $(".revamp_sex").click(function(){
+		 	$(".revamp_sex").parent().hide();
+		 });
+	});
+	$(".personal ul li.re_n,.personal ul li.re_t,.personal ul li.re_p").click(function(){
+		var cl=this.className.replace('clearfix ','');
+		$('.personal ul.i').hide();
+		$('.personal ul.z li.'+cl).show();
+		$('.re_t .btn').click(function(){
+			$('.personal ul.z .re_t').hide();
+			$('.personal ul.z li.re_tel').show();
+		});
+	})
+	$(".personal .revamp_sex p").click(function(e){
+	 	e.stopPropagation();
+		if (this.innerText == '取消') {
+		 	$(".revamp_sex").parent().hide();			
+		}else{
+			if ( $(".personal ul li.re_s span.f7").html() != this.innerText) {
+				$(".personal ul li.re_s span.f7").html(this.innerText);
+				$.post("index.php?r=user/setsex","",function(){});
+			};
+		 	$(".revamp_sex").parent().hide();
+		}			
+
+	})
+	$(".admin_user .n_tow p").click(function(){
+		$(".admin_user .con_list ul").hide();
+		$(".admin_user .con_list ul."+this.className.substr(4)).show();
+	});
+
+
+});
+
+function loadS(url,add){
+	window.onscroll=function(){
+		var ch=document.documentElement.clientHeight;
+		var sh= document.body.scrollHeight;
+		var st=document.body.scrollTop;
+		// console.log(ch+st+","+sh)
+		if (sh <= ch + st +sh*0.05 &&goin) {		
+			page++;
+			goin=false;
+			$.ajax({
+				type:'get',
+				url:url+'&page='+page,
+				data:'',
+				dataType:'json',
+				success:function(str){
+					if(page <= str.con.page_count){
+						var d = str['goods_data'] || str['order'];
+						for (var i in d) {
+							add(d[i]);
+						};
+						goin=true;
+					};
+				},
+				error:function(){
+
+
+				}
+
+
+			});
+		};
+	}
+
+}
+*/
+
+
+function affirm(t,c,fn){
+	var h=$('<div class="affirm_w fs35"><div class="affirm_c"><p class="t">'+t+'</p><p class="c">'+c+'</p><p class="i"><span class="false">取消</span><span class="true">确定</span></p></div></div>');
+	h.find('.true').click(function(){
+		fn();
+	});
+	h.find('.false').click(function(){
+		h.hide();
+	});
+	h.get(0).addEventListener('touchstart',function(){
+		h.hide();
+	},false);
+	h.on('click',function(){
+		h.hide();
+	});
+	h.find('div').get(0).addEventListener('touchstart',function(e){
+		e.stopPropagation();
+	},false);
+	h.find('div').get(0).addEventListener('click',function(e){
+		e.stopPropagation();
+	},false);
+	$('body').append(h);
+}
+function alt(str){
+	if($('body').children('.alert').length ==0){
+		var alert=$('<div class="alert">'+str+'</div>');
+		$('body').append(alert);
+	}else{
+		$('.alert').html(str);
+		$('.alert').show();
+	}
+	$(".alert").css({'transform':'scale(0,0)','opacity':'0.2'});
+	setTimeout(function(){			
+		$(".alert").css({'transform':'scale(1,1)','opacity':'1'});
+		setTimeout(function(){
+			$(".alert").css({'transform':'scale(0,0)','opacity':'0.2'});
+			
+		},1700);
+	},3);
+}
+function submitForm(obj){
+	for (var i = 0; i < $(obj).find('input').length; i++) {		
+		if ($(obj).find('input').eq(i).val() == ""){
+			alt('收件人信息不能为空！');
+			return false;
+		}
+	};
+	for (var i = 0; i < $(obj).find('select').length; i++) {
+		if($(obj).find('select').eq(i).val() == "请选择" ||  $(obj).find('select').eq(i).val() == ""  ){
+			alt('请选择收货地址！');
+			return false;
+		}
+	};
+	for (var i = 0; i < $(obj).find('textarea').length; i++) {
+		if( $(obj).find('textarea').eq(i).val() == "" ){
+			alt('详细地址不能为空！');
+			return false;
+		}
+		console.log($(obj).find('textarea').eq(i).val())
+	};
+	$(obj).submit();
+}
+function doFinish(id){
+	if(id > 0){		
+		affirm('确定','确认要收货？',function(){
+			location.href = "index.php?r=order/dofinish&id="+id;
+		})
+	}
+}
+	// 获取验证码
+function code(obj){
+	if (obj.val() == '获取验证码') {
+		obj.css({"color":"#b4b2b2",'backgroundColor':'#ecebeb'});
+		shu(obj,5);
+
+	};
+}
+function shu(obj,m){
+	if (m>0) {
+		obj.val(m+'秒后重新获取');
+		m--;
+		setTimeout(function(){
+			shu(obj,m);
+		},1000);
+	}else if(m<=0){
+		obj.val('获取验证码');
+		obj.removeAttr('style');
+	}
+}
+function onlo(obj){
+	var i=new Image();
+	i.src=obj.attr("Lsrc");
+	i.onload=function(){
+		obj.attr('src',obj.attr("Lsrc"));
+		return;
+	}
+	obj.attr('src','/common/upload/goods/default.png');
+	// i.error=function(){
+		
+	// }
+}
+function locat(t){
+	location.href=$(t).attr('hre');
+}
+function loca_alert(t,str){
+	affirm(str,'',function(){
+		location.href=$(t).attr('hre');
+		
+	})
+}
+
+
+/*yulinwz*/
+var myobj={
+	myajax:function(type,url,data,fn,dataType,async){
+		type = type ||'get' ,
+		url = url || '',
+		data = data || {},
+		fn = fn || function(){},
+		dataType = dataType || 'JSON',
+		async = async || 'true',
+		$.ajax({
+				type:type,				
+				url:url,
+				data:data,
+				dataType:dataType,
+				async : true,
+				success:fn,
+				error:function(){}
+		})
+		console.log(type+","+url+","+data+","+fn+","+dataType+","+async);
+	},
+	/*滚动*/
+	touch_stop:function(){
+		window.ontouchmove=function(e){
+	        e.preventDefault && e.preventDefault();
+	        e.returnValue=false;
+	        e.stopPropagation && e.stopPropagation();
+	        return false;
+		}
+	},
+	touch_true:function(){
+		window.ontouchmove=function(e){
+	       
+		}
+	},
+	/*加减框*/
+	input_num:function(obj){
+		$(obj).children('input[value="-"],input[value="+"]').click(this.input_add_subtract);
+		$(obj).children('input[name="num"]').keyup(function(){this.value=this.value.replace(/[^\d]/g,'');});
+		$(obj).children('input[name="num"]').change(function(){this.value=this.value.replace(/[^\d]/g,'');})
+	},
+	input_add_subtract:function (event){
+		var num = ($(event.target).siblings('input[name="num"]').val() == "")? 1 : Number($(event.target).siblings('input[name="num"]').val().match(/\d+/g).join().replace(',',''));
+		if (event.target.value == '-' && num >1) {
+			num--;
+		}else if (event.target.value == '+') {
+			num++;
+		};
+		$(event.target).siblings('input[name="num"]').val(num);
+	},
+	input_num2:function(obj){
+		$(obj).children('input[value="-"],input[value="+"]').click(this.input_add_subtract2);
+		$(obj).children('input[name^="num"]').keyup(function(){this.value=this.value.replace(/[^\d]/g,'');$(this).parents('.n').find('.s span.f_r').html('x'+this.value);myobj.shopcat_total($('.shopcat li'),$('.shopcat_total_con .total'));});
+		$(obj).children('input[name^="num"]').change(function(){this.value=this.value.replace(/[^\d]/g,'');myobj.shopcat_total($('.shopcat li'),$('.shopcat_total_con .total'));})
+	},
+	input_add_subtract2:function (event){
+		var num = ($(event.target).siblings('input[name^="num"]').val() == "")? 1 : Number($(event.target).siblings('input[name^="num"]').val().match(/\d+/g).join().replace(',',''));
+		if (event.target.value == '-' && num >1) {
+			num--;
+		}else if (event.target.value == '+') {
+			num++;
+		};
+		$(event.target).siblings('input[name^="num"]').val(num);
+		if ($('.shopcat li').length >=1) {
+			$(event.target).parents('.n').find('.s span.f_r').html('x'+num);
+			myobj.input_money_total2($('.shopcat li'),$('.shopcat .total'));
+		}else if ($('.order_l li').length >=1){
+			$(event.target).parents('li').eq(0).find('.price .f7').html('x'+num);
+			myobj.input_money_total1($('.order_l li'),$('.order .total .f1'));
+
+		};
+	},
+	input_money_total2:function(all,obj){
+		var t=0;
+		for (var i = 0; i < all.length; i++) {
+			if ($(all).eq(i).find('.c .t span').hasClass('opt')) {
+				t += $(all).eq(i).find('.n .s .f_l').html().replace(/[^\d\.]/g,'') * $(all).eq(i).find('input[name^="num"]').val();
+			};
+		};
+		obj.html('￥'+t.toFixed(2));
+	},
+	input_money_total1:function(all,obj){
+		var t=0;
+		for (var i = 0; i < all.length; i++) {
+				t += $(all).eq(i).find('.pr_n').html().replace(/[^\d\.]/g,'') * $(all).eq(i).find('input[name^="num"]').val();
+		};
+		obj.html('￥'+t.toFixed(2));
+	}
+}
+$(function(){
+if ($('.nav_foot_con').length == 1 ) {
+	$('.nav_foot_con').click(function(event){
+		event.stopPropagation();
+	})
+}
+if ($('.shopcat').length == 1 ) {
+	myobj.input_num2($('.plural'));
+	$('.remove .all').click(function(e){
+		if($(this).find('span').hasClass('opt')){
+			$('.shopcat .t span').removeClass('opt');
+			$(this).find('span').removeClass('opt');
+			$('input[name="opt[]"]').val(0);
+
+		}else{
+			$('.shopcat .t span').addClass('opt');
+			$(this).find('span').addClass('opt');
+			$('input[name="opt[]"]').val(1);
+		}
+	});	
+	$('.re_txt').click(function(){
+		if ($('.shopcat_total .submit').hasClass('dn')) {
+			this.innerText='编辑';
+			$('.shopcat_total .submit').removeClass('dn');
+			$('.shopcat_total .remove').addClass('dn');
+		}else{
+			this.innerText='完成';
+			$('.shopcat_total .submit').addClass('dn');
+			$('.shopcat_total .remove').removeClass('dn');
+		};
+	});
+	$('.shopcat li .t span').click(function(){
+		if ($(this).hasClass('opt')) {
+			$(this).removeClass('opt');
+			$('.shopcat_total_con .remove  .t span').removeClass('opt');
+			$(this).siblings('input[name^="opt"]').val(0);
+
+		}else{
+			$(this).addClass('opt');
+			$(this).siblings('input[name^="opt"]').val(1);
+			if ($('.shopcat li .t').length == $('.shopcat li .t .opt').length) {
+				$('.shopcat_total_con .remove  .t span').addClass('opt');
+			};
+		}
+		myobj.input_money_total2($('.shopcat li'),$('.shopcat_total_con .total'));
+	})
+	/*删除*/
+	$('.remove .f_r').click(function(){
+		if ($('.shopcat li .opt').length<=0)return false;
+		$('#shopcat').attr('action',$('#shopcat').attr('resrcr'));
+		$('#shopcat').submit();
+	});
+	/*确认购买*/
+	$('.submit .f_r').click(function(){
+		if ($('.shopcat li .opt').length<=0)return false;
+		$('#shopcat').attr('action',$('#shopcat').attr('subsrc'));
+		$('#shopcat').submit();
+	});
+};
+/*提交订单*/
+if ($('.order').length == 1 ) {
+	myobj.input_num2($('.plural'));
+	$('.order .site .r span').click(function(){
+		// $('.order .site_l').css({'top':window.scrollY+'px'});
+		$('.order .site_l').width($('.nav_top_con').width())
+		$('.order .site_l .site_l_top').css({'padding-top':window.scrollY+'px'});
+		$('.order .site_l').show();
+		$('.nav_top , .order_fix ').hide();
+		$('.wrap').css({'height':window.innerHeight + window.scrollY  + 'px','overflow':'hidden'});
+		$("html").css({'position':'relative','left':'-90%'});
+		$('.order .site_l>.f_r').height(window.innerHeight - $('.order .site_l .site_l_top').height());		
+	});
+		$('.order .site_l .f_l').click(function(){
+		$('.order .site_l').hide();
+		$('.nav_top , .order_fix ').show();
+		$("html").css({'position':'relative','left':'0%','height':'100%','overflow':'auto'});
+	});
+	$('.order .site_l .site_list').click(function(){
+		$('.order .site_l .site_list').removeClass('now');
+		$(this).addClass('now');
+		$('.order .site .i .f_l').html($(this).find('.f_l').html());
+		$('.order .site .i .f_r').html($(this).find('.f_r').html());
+		$('.order .site .i p').eq(1).html($(this).children('p').eq(1).html());
+		$("input[name='address_id']").val($(this).attr('aid'));
+		$('.order .site_l').hide();
+		$('.nav_top , .order_fix ').show();
+		$("html").css({'position':'relative','left':'0%','height':'100%','overflow':'auto'});
+	});
+	/*快递选择层*/
+	$(".express").click(function(){
+		$(".express_list_fixed").show();
+		myobj.touch_stop();
+	});
+	$(".express_list_fixed,.express_list_con>p .f_r").click(function(event){
+		event.stopPropagation();
+		$(".express_list_fixed").hide();
+		myobj.touch_true();
+	});
+	$(".express_list_con").click(function(event){
+		event.stopPropagation();
+	});
+	$('.express_list_con li').click(function(){
+		
+	})
+}
+/*商品内容页*/
+if ($('.shop_con').length ==1) {
+		myobj.input_num2($('.input'));
+	/*加入购物车*/
+	$(".shop_btn .cat").click(function(){
+		$.post('index.php?r=cart/addcart&goods_id='+$('input[name="goods_id"]').val()+'&num='+$('input[name="num"]').val(),{goods_id:$('input[name="goods_id"]').val(),num:$('input[name="num"]').val()},function($m){
+			var $m=eval("("+$m+")");
+			if($m){
+				if($m.code>0){
+					alt('加入成功！');
+				}else{
+					alt($m.error);
+				}
+			}
+		});
+	});
+};
+/*注册验证*/
+if ($('.refund').length ==1) {
+	$(".refund div.l:first-child .clearfix").click(function(){
+		$(this).parents('.l').find('.r span').removeClass('r3');
+		$(this).parents('.l').find('.r span').addClass('r4');
+		$(this).find('.r span').removeClass('r4');
+		$(this).find('.r span').addClass('r3');
+		$(this).siblings('input').val($(this).index());
+	});
+}
+if ($('.ad').length ==1) {
+	$('span.date').click(function(){
+		if($(this).children(".placeholder").is(":visible")){$(this).children(".placeholder").hide();}
+	});
+	$('p:has(span.radio_list_c1)').click(function(e){
+		console.log(this.children[0])
+		if(e.target.localName == 'p')return;
+		$(this).find('input[type="radio"]').get(0).checked=true;
+		$(this).parents('.c').children('p').removeClass('on');
+		$(this).addClass('on');
+	});
+	function addfile(ev){
+		var t = this;
+		var name=this.name;		
+		var fr=new FileReader();
+		fr.readAsDataURL(t.files[0]);
+		fr.onload=function(){
+			// 表示解析完成
+			// alert(fr.result);
+			$(t).parents('div').eq(0).css({"background-image":" url("+fr.result+")"});
+			var div_l=$('<div class="l"><input accept="image/*" type="file" name="'+name+'"></div>');
+			div_l.children('input').change(addfile);
+			$(t).parents('.c').append(div_l);
+		}
+	}
+	$("input[type='file']").change(addfile);
+	$('.tel input[type="button"]').click(function(){
+		this.style.fontSize="0.8em";
+		code($(this));
+	});
+};
+});

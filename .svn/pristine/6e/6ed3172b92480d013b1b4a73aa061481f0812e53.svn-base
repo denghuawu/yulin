@@ -1,0 +1,268 @@
+<?php
+
+namespace frontend\controllers;
+ 
+use Yii;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use frontend\models\Cart;
+use frontend\models\OrderInfo;
+use frontend\models\OrderGoods;
+use frontend\models\UserAddress; 
+use frontend\models\Comment; 
+use frontend\models\Refund; 
+
+ 
+/**
+ * UserController implements the CRUD actions for User model.
+ */
+class OrderController extends BaseController
+{
+
+    /**
+     * 用户订单详情
+     * @return mixed
+     */
+    public function actionIndex($status=0)
+    {	
+    	$page = $_REQUEST['page']>1 ? $_REQUEST['page'] : 1;
+    	
+    	$model = new OrderInfo();
+    	$data = $model->get_order_list($status,$page);
+    	$con['status'] = $status;
+    	$con['page_count'] = $data['page_count'];
+    	unset($data['page_count']);
+    	
+    	if($_REQUEST['ajax'] == '1'){
+    		echo json_encode(['order'=>$data,'status'=>$status,'con'=>$con]);
+    		exit;
+    	}
+    	
+        return $this->render('index', ['order'=>$data,'status'=>$status,'con'=>json_encode($con)]);
+    }
+    
+    /**
+     * 生成订单（生成订单信息=>根据订单id生成订单商品=>删除相关购物车商品=>减库存）	
+     */
+    public function actionMakeorder(){
+    	
+    	if(Yii::$app->request->post()){
+    		
+    		$this->refresh();
+    
+    		// 接收参数
+    		$cart_id = trim(Yii::$app->request->post('cart_id'),',');
+    		$address_id = intval(Yii::$app->request->post('address_id'));
+    		$message = trim(Yii::$app->request->post('message'));
+    		
+    		if(empty($cart_id)){
+    			$msg['message'] = '订单提交失败，可能原因：<br><li>商品已下架</li><li>商品库存不足</li>';
+    			$msg['error'] = 1;
+    				$msg['link'] = [
+    					['title'=>'返回购物车','href'=>'index.php?r=cart/index'],
+    				];
+    	    	return $this->redirect(['/site/message', 'msg'=>$msg]);
+    		}
+    		if($address_id<1){
+    			$msg['message'] = '请选择一个收货地址~！';
+    			$msg['error'] = 1;
+    				$msg['link'] = [
+    					['title'=>'返回','href'=>Yii::$app->request->referrer],
+    				];
+    			return $this->redirect(['/site/message', 'msg'=>$msg]);
+    		}
+    		$model = new Cart();
+    		$data = $model->get_cat_info($cart_id);
+    		
+    		if($data){
+    			// 取出用户收货地址
+    			$model = new UserAddress();
+    			$data['other']['address'] = serialize($model->get_default_address($address_id));
+    			// 生成订单信息和订单商品
+    			$data['other']['message'] = $message;
+    			
+    			$order = new OrderInfo();
+    			if($order_id = $order->make_order($data)){
+    				
+    				$msg['message'] = '订单已提交成功~！';
+    				$msg['link'] = [
+    					['title'=>'查看订单列表','href'=>'index.php?r=order/index'],
+    					['title'=>'查看订单详情','href'=>'index.php?r=order/detail&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    		}
+    		$msg['message'] = '订单提交失败，可能原因：<br><li>商品已下架</li><li>商品库存不足</li>';
+    		$msg['error'] = 1;
+    				$msg['link'] = [
+    					['title'=>'返回购物车','href'=>'index.php?r=cart/index'],
+    				];
+    	    return $this->redirect(['/site/message', 'msg'=>$msg]);
+    	}
+
+    }
+    
+    
+    /**
+     * 订单详情
+     * @param unknown $id
+     * @return Ambigous <string, string>
+     */
+    public function actionDetail($id){
+    	
+    	$id = intval($id);
+    	if($id>0){
+    		$model = new OrderInfo();
+    		$data = $model->get_order_info($id);
+
+    		return $this->render('detail', ['order'=>$data]);
+    	}
+    }
+    
+    /**
+     * 评价商品
+     * @param unknown $id
+     * @return Ambigous <string, string>
+     */
+    public function actionComment($id){
+    	
+    	$id = intval($id);
+    	if($id>0){
+    		$model = new OrderInfo();
+    		$data = $model->get_order_info($id);
+    	
+    		return $this->render('comment', ['order'=>$data]);
+    	}
+    }
+    
+    /**
+     * 插入评论
+     * @return boolean|\yii\web\Response
+     */
+    public function actionAddcomment(){
+    	$score = yii::$app->request->post('score');
+    	$goods_id = yii::$app->request->post('goods_id');
+    	$content = yii::$app->request->post('content');
+    	$order_id = yii::$app->request->post('order_id');
+    
+    	if($goods_id[0]>0 && $order_id >0){
+    		$value = [];
+    		foreach ($goods_id as $key=>$val){
+    			if($val < 1)
+    				return false;
+    			if($score[$key] < 1){
+    				$msg['message'] = '请选择评分';
+    				$msg['error'] = 1;
+    				$msg['link'] = [
+    						['title'=>'返回继续评价','href'=>'index.php?r=order/comment&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    			if(empty($content[$key])){
+    				$msg['message'] = '请填写评价内容';
+    				$msg['error'] = 1;
+    				$msg['link'] = [
+    						['title'=>'返回继续评价','href'=>'index.php?r=order/comment&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    			
+    			$value[$key]['goods_id'] = $goods_id[$key];
+    			$value[$key]['comment_content'] = $content[$key];
+    			$value[$key]['comment_score'] = $score[$key];
+    			$value[$key]['comment_time'] = time();
+    			$value[$key]['user_id'] = $_SESSION['frontend']['user_id'];
+    		}
+    		foreach ($value as $v){	
+    			if(empty($v))
+    				continue;
+    			$model = new Comment();
+    			$model->goods_id = $v['goods_id'];
+    			$model->comment_content = $v['comment_content'];
+    			$model->comment_score = $v['comment_score'];
+    			$model->comment_time = $v['comment_time'];
+    			$model->user_id = $v['user_id'];
+    			$model->save();
+    		}
+    		// 修改订单状态为 已评价
+    		OrderInfo::update_order_status($order_id, COMMENTED);
+    		
+    		$msg['message'] = '评价成功';
+    				$msg['link'] = [
+    						['title'=>'返回订单列表','href'=>'index.php?r=order/index'],
+    				];
+    		return $this->redirect(['/site/message', 'msg'=>$msg,'goFrom'=>true]);
+    	}
+    	
+    }
+    
+    /**
+     * 退款页面
+     * @param unknown $id
+     * @return \yii\web\Response|Ambigous <string, string>
+     */
+    public function actionRefund($id){
+    	$id = intval($id);
+    	if($id > 0){
+    		 $model = new Refund();
+    		 $model->order_id = $id;
+    		 if ($model->load(Yii::$app->request->post()) && $model->save()) {
+    		 	// 修改订单状态
+    		 	$om = OrderInfo::findOne($id);
+    		 	$om->refund_id = $model->primaryKey;
+    		 	$om->order_status = RETURNED;
+    		 	$om->update(false);
+    		 	
+    		 	$msg['message'] = '您的退款申请已提交成功，商家会尽快处理~！';
+    		 	$msg['link'] = [
+    		 			['title'=>'返回订单列表','href'=>'index.php?r=order/index'],
+    		 	];
+    		 	return $this->redirect(['/site/message', 'msg'=>$msg]);
+    		}
+    		
+    		return $this->render('refund', [
+    				'model' => $model,
+    				'order_id' => $id,
+    				'errors' => $model->getErrors(),
+    		]);
+    	}
+    }
+    
+    // 确认收货
+    public function actionDofinish($id){
+    	 $id = intval($id);
+    	if($id > 0){
+    		
+    		$model = new OrderInfo();
+    		 
+    		$order = OrderInfo::findOne($id);
+    		$order->order_status = FINISHED;
+    		$order->confirm_time = time();
+    		$order->update(false);
+    		
+    		return $this->redirect(Yii::$app->request->referrer);
+    	}
+    }
+    
+    /**
+     * 退款订单
+     */
+    public function actionReder(){
+    	
+    	$model = new OrderInfo();
+    	
+    	$data = $model->get_order_list(RETURNED);
+    	
+    	return $this->render('reder', ['order'=>$data]);
+    }
+
+    protected function findModel($id)
+    {
+    	if (($model = Cart::findOne($id)) !== null) {
+    		return $model;
+    	} else {
+    		throw new NotFoundHttpException('The requested page does not exist.');
+    	}
+    }
+
+}

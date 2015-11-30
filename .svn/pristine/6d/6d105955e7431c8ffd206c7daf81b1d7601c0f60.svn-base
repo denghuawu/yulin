@@ -1,0 +1,106 @@
+<?php
+namespace frontend\controllers;
+use Yii;
+use yii\web\Controller;
+use frontend\models\User;
+
+class LoginController extends Controller
+{
+   /*
+   *登陆首页
+   */
+   public function actionIndex(){
+   	$imgname=$this->actionImg();
+   	return $this->render('index',array('imgName'=>$imgname));
+   }
+
+   /*
+   *登陆
+   */
+   public function actionLogin(){
+   		//接受参数，校验参数的合法性
+		$request=\Yii::$app->request;
+		$data=$request->post();
+		//验证验证码
+		if (empty($data['verifi']) || (strtolower($data['verifi'])!=$_SESSION['verify'])) {
+	        	return $this->Ask_message('验证码错误！');
+	    }else{
+	        	unset($_SESSION['verify']);
+	    }
+	    //验证用户名
+	    if (empty($data['username']) || empty($data['password'])) {
+        	return $this->Ask_message('用户名或密码为空！');
+        }
+        $data['password']=md5($data['password']);
+	    $userObj=new user;
+	    $userObj->login($data);
+		if (empty($_SESSION['frontend']['user_id'])) {
+			return $this->Ask_message('密码不正确！');
+		}
+		return $this->redirect(['/index/index']);
+	}
+
+
+   	/*
+		*错误提示
+		*/
+		public function Ask_message($str){
+			$msg['message'] = $str;
+	                $msg['error'] = 1;
+	                $msg['link'] = [
+	                ['title'=>'重新登陆','href'=>'index.php?r=login/index'],
+	            ];
+	            return $this->redirect(['/site/message', 'msg'=>$msg]);
+		}
+  	 /*
+	 * param:$width
+	 * param:$height
+	 * param:$fontSize
+	 * param:$charNum
+	 * param:$fontPath
+	 * param:$verifyType 1----纯数字  2 ---- 字母   3---shu字和字母
+	 * */
+    public function actionImg($verifyType=1,$width=150,$height=50,$fontSize=30,$charNum=4){
+    	//创建画布
+		$i=imagecreatetruecolor($width, $height);
+		//分配颜色
+		$white=imagecolorallocate($i, 255, 255, 255);
+		//填充颜色
+		imagefill($i,0,0,$white);
+		//产生字符库
+		if($verifyType==3){
+			$str=join("",array_merge(range(0,9),range('a','z'),range('A',"Z")));
+		}else if($verifyType==2){
+			$str=join("",array_merge(range('a','z'),range('A',"Z")));
+		}else if($verifyType==1){
+			$str=join("",array_merge(range(0,9)));
+		}
+		//打乱，
+		//随机获取 $charNum 个
+		$newStr=substr(str_shuffle($str),0,$charNum);
+		//内容放到session
+		$_SESSION['verify']=strtolower($newStr);
+		//写字，颜色随机 角度随机
+		for($j=0;$j<$charNum;$j++){
+			$y=$height-5;
+			$x=10+($fontSize+3)*$j;
+			$color=imagecolorallocate($i, mt_rand(0,255), mt_rand(0,255), mt_rand(0,255));
+			$char=substr($newStr,$j,1);
+			imagefttext($i,$fontSize,mt_rand(-15,15),$x,$y,$color,"../../fonts/SIMYOU.TTF",$char);
+		}
+		//干扰点
+		for($j=0;$j<100;$j++){
+			$color=imagecolorallocate($i, mt_rand(0,255), mt_rand(0,255), mt_rand(0,255));
+			imagesetpixel($i, mt_rand(0,$width), mt_rand(0,$height), $color);
+		}
+		//干扰线
+		for($j=0;$j<0;$j++){
+			$color=imagecolorallocate($i, mt_rand(0,255), mt_rand(0,255), mt_rand(0,255));
+			imageline($i,0,mt_rand(0,$height),$width,mt_rand(0,$height),$color);
+		}
+		$name='img';
+		imagepng($i,"./{$name}.png");
+		return "./{$name}.png";
+		//输出图片
+	}
+}

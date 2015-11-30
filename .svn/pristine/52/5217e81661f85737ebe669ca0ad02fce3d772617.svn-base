@@ -1,0 +1,113 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
+/* @var $this yii\web\View */
+/* @var $model backend\models\Employee */
+/* @var $form yii\widgets\ActiveForm */
+?>
+
+<div class="employee-form">
+
+    <?php $form = ActiveForm::begin(); ?>
+
+    <?= $form->field($model, 'em_sn')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'em_name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'mobile_phone')->textInput() ?>
+
+    <?= $form->field($model, 'id_card')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'birthday')->textInput() ?>
+
+    <?= $form->field($model, 'marriage')->dropDownList([ '0', '1', '2', ], ['prompt' => '']) ?>
+
+    <?= $form->field($model, 'sex')->dropDownList([ '0', '1', ], ['prompt' => '']) ?>
+
+    <?= $form->field($model, 'ss_number')->textInput() ?>
+
+    <?= $form->field($model, 'native_place')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'domicile')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'card_no')->textInput() ?>
+
+    <?= $form->field($model, 'nation')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'admin_id')->textInput() ?>
+
+    <?= $form->field($model, 'used_name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'political_status')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'height')->textInput() ?>
+
+    <?= $form->field($model, 'weight')->textInput() ?>
+
+    <?= $form->field($model, 'self_introduction')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'qq')->textInput() ?>
+
+    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'emergency_contact')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'emergency_phone')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'now_address')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'home_phone')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'position_status')->textInput() ?>
+
+    <?= $form->field($model, 'em_type')->textInput() ?>
+
+    <?= $form->field($model, 'entry_time')->textInput() ?>
+
+    <?= $form->field($model, 'leave_time')->textInput() ?>
+
+    <?= $form->field($model, 'has_probation')->dropDownList([ '0', '1', ], ['prompt' => '']) ?>
+
+    <?= $form->field($model, 'probation_time_start')->textInput() ?>
+
+    <?= $form->field($model, 'probation_time_end')->textInput() ?>
+
+    <?= $form->field($model, 'regular_time')->textInput() ?>
+
+    <?= $form->field($model, 'engage_time_start')->textInput() ?>
+
+    <?= $form->field($model, 'engage_time_end')->textInput() ?>
+
+    <?= $form->field($model, 'depart_id')->textInput() ?>
+
+    <?= $form->field($model, 'job_id')->textInput() ?>
+
+    <?= $form->field($model, 'salary')->textInput() ?>
+
+    <?= $form->field($model, 'tp_type')->textInput() ?>
+
+    <?= $form->field($model, 'join_work_time')->textInput() ?>
+
+    <?= $form->field($model, 'graduate_school')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'graduate_time')->textInput() ?>
+
+    <?= $form->field($model, 'major')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'education_level')->textInput() ?>
+
+    <?= $form->field($model, 'pro_certificate')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'education_exp')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'work_exp')->textarea(['rows' => 6]) ?>
+
+    <div class="form-group">
+        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+
+</div>

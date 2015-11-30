@@ -1,0 +1,292 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+use yii\db\ActiveRecord;
+use frontend\models\Category;
+use backend\models\Brand;
+use frontend\models\Comment;
+use backend\models\OrderGoods;
+
+
+/**
+ * This is the model class for table "{{%brand}}".
+ *
+ * @property integer $brand_id
+ * @property integer $parent_id
+ * @property string $brand_name
+ * @property string $brand_logo
+ * @property string $brand_desc
+ * @property integer $sort_order
+ * @property integer $is_show
+ */
+class Goods extends ActiveRecord
+{
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%goods}}';
+    }
+    /**
+     * 根据分类ID取出属于该分类的所有商品
+     */
+    
+    public function getByCidGoodsAll($cate_id){
+        $sql='SELECT cat_id cid,goods_id id,goods_name name,goods_price price,goods_number num,goods_img img,goods_unit unit FROM yl_goods WHERE cat_id=:id and is_updown= 1 and goods_number>=1';
+        $data= Goods::findBySql($sql,array(':id'=>$cate_id))->asArray()->all();
+        return $data;
+    }
+    /**
+     * 获取指定商品ID的详细信息（商品基本信息）
+     * @param int $goods_id
+     * @return multitype:
+     */
+    public function get_goods_info($goods_id){
+        
+        $res = Goods::find()->where(['goods_id'=>$goods_id])->asArray()->one();
+        
+        // 检查商品数量,如果小于1，则下架
+        $this->updown_goods($res);
+        
+        // 反序列化商品属性
+        $res['goods_attr'] = unserialize($res['goods_attr']);
+        
+        // 取出月销售笔数
+        //$res['goods_sell'] = $this->count_sell($goods_id);
+        // 好评   （好评数/总评价数）
+        //$res['comment_score'] = $this->count_comment($goods_id);
+        
+        // 格式化商品轮播图
+        if($res['goods_img']){
+            $res['goods_gallery'] = $res['goods_img'].';'.$res['goods_gallery']; // 加上商品图片
+            $res['goods_gallery'] = explode(';', $res['goods_gallery']);        
+        
+            if(strlen(join('',$res['goods_gallery'])) < 4){
+            $res['goods_gallery'] = null;
+            }
+        }else{
+            $res['goods_gallery'] = false;
+        }
+        return $res;
+    }
+
+     /**
+     * 按条件查询商品
+     */
+    public function getBySeo($seo){
+        return Goods::findBySql('SELECT cat_id cid,goods_id id,goods_name name,goods_price price,goods_number num,goods_img img,goods_unit unit FROM yl_goods WHERE goods_name LIKE :name AND is_updown= 1 ',array(':name'=>'%'.$seo.'%'))->asArray()->all();
+    }
+    
+	/**
+	 * 关联分类表
+	 * @return ActiveQuery
+	 */
+    public function getCategory(){
+    	return $this->hasMany(Category::className(), ['cat_id' => 'cat_id']);
+    }
+    
+    /**
+     * 关联品牌表
+     * @return ActiveQuery
+     */
+    public function getBrand(){
+    	// 第一个参数为要关联的子表模型类名，
+    	// 第二个参数指定 通过子表的customer_id，关联主表的id字段
+    	return $this->hasMany(Brand::className(), ['brand_id' => 'brand_id']);
+    }
+    
+    /**
+     * 取出符合条件的商品，按指定条件排序
+     * @param array $data 数据数组
+     */
+    public function get_goods_by_condition($data){
+    	
+    	$where = ' g.goods_name IS NOT NULL AND g.is_updown=1 ';
+    	$order = ' ORDER BY g.goods_sell DESC';
+    	
+    	/* if ($data['cat_id'] > 0)
+    	{
+    		$where .=  "AND g.cat_id= ".$data['brand_id'];
+    	} */
+    	
+    	if ($data['brand_id'] > 0)
+    	{
+    		$where .=  "AND g.brand_id= ".$data['brand_id'];
+    	}
+    	
+    	if ($data['is_hot'] > 0)
+    	{
+    		$where .=  "AND g.is_hot= 1";
+    	}
+    	
+    	if ($data['is_new'] > 0)
+    	{
+    		$where .=  "AND g.is_new= 1";
+    	}
+    	
+    	if ($data['is_recommend'] > 0)
+    	{
+    		$where .=  "AND g.is_recommend= 1";
+    	}
+    	
+    	if ($data['price_min'] > 0)
+    	{
+    		$where .= " AND g.goods_price >= ".$data['price_min'];
+    	}
+    	
+    	if ($data['price_max'] > 0)
+    	{
+    		$where .= " AND g.goods_price <=  ".$data['price_max'];
+    	}
+    	
+    	if (!empty($data['cat_childen']))
+    	{
+    		$where .= " AND g.cat_id IN ( ".join(',',$data['cat_childen']).')';
+    	}
+    	if ($data['price'] > 0)
+    	{	
+    		$sort = $data['price'] =='1' ? 'ASC' : 'DESC';
+    		$order = '  ORDER BY  g.goods_price '.$sort;
+    	}
+    	if ($data['sell'] > 0)
+    	{	
+    		$sort = $data['sell'] =='1' ? 'ASC' : 'DESC';
+    		$order = '  ORDER BY  g.goods_sell '.$sort;
+    	}
+    	$order = $order ? $order :'';
+    	
+    	if($data['keyword']){
+    		$keyword = $data['keyword'];
+    		$where .= " AND (g.goods_name LIKE '%{$keyword}%' OR c.cat_name LIKE '%{$keyword}%' OR b.brand_name LIKE '%{$keyword}%')";
+    	}
+    	
+    	// 分页 
+    	$pager = get_pager($this->goods_record($where),$data['page'],8);
+    	$limit = ' LIMIT '.$pager['start'].','.$pager['size'];
+    	
+    	// 三表查询，cm_goods=cm_category=cm_brand
+    	$sql = "SELECT g.goods_id, g.goods_name,g.goods_number,g.is_updown, g.goods_price, g.goods_img, g.goods_sell, c.cat_id, c.cat_name, b.brand_id, b.brand_name
+    			 FROM {{%goods}} AS g LEFT JOIN {{%category}} AS c ON g.cat_id=c.cat_id LEFT JOIN {{%brand}} AS b ON g.brand_id=b.brand_id
+    			WHERE ".$where.$order.$limit;
+    	$result = Goods::findBySql($sql)->asArray()->all();
+
+    	// 取出品牌和分类
+    	if(!empty($result)){
+    		$brand_list = [];
+    		$cat_list = [];
+    		foreach ($result as $key=>$val){
+    			// 检查商品数量,如果小于1，则下架
+    			if($this->updown_goods($val)){
+    				unset($result[$key]);
+    			}
+    			
+    			// 取出总销量
+    			$result[$key]['goods_sell'] = OrderGoods::find()->where(['goods_id'=>$val['goods_id']])->count();
+    			
+    			$brand_list[$val['brand_id']] = $val['brand_name'];
+    			$cat_list[$val['cat_id']] 	= $val['cat_name'];
+    		}
+    		$result['brand_list'] = array_unique($brand_list);
+    		$result['cat_list']   = array_unique($cat_list);
+    		$result['page_count'] = $pager['page_count'];
+    	}
+    	return $result;
+    }
+    
+    
+    
+    /**
+     * 返回指定商品的库存
+     * @param unknown $goods_id
+     */
+    public function checkRepertory($goods_id){
+    	
+    	return (new \yii\db\Query())
+    	->select('goods_number')
+    	->from('cm_goods')
+    	->where('goods_id=:goods_id',[':goods_id'=>$goods_id])
+    	->one();
+    }
+    
+    /**
+     * 检查商品数量,如果小于1，则下架
+     */
+    public function updown_goods($msg){
+    	if($msg){
+    		if($msg['goods_number'] < 1 && $msg['is_updown']=='1'){
+    			$model = Goods::findOne($msg['goods_id']);
+    			$model->is_updown = 0;
+    			$model->update(false);
+    			
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    /**
+     * 计算好评率
+     */
+    public function count_comment($id){
+    	$all_comment = Comment::find()->where(['goods_id'=>$id])->count();
+    	$goods_comment = Comment::find()->where(['goods_id'=>$id, 'comment_score'=>1])->count();
+    	
+    	if($all_comment>0 && $goods_comment>0){
+    		
+    		return $goods_comment/$all_comment;
+    	}
+    	
+    	return 0;
+    }
+    
+    /**
+     * 计算月销售量
+     * @param unknown $id
+     */
+    public function count_sell($id){
+    	$today = date('Y-m-d',time());
+    	list($y,$m,$d) = explode('-', $today);
+    	$start = mktime(0,0,0,$m,0,$y);
+    	
+    	$sql = "SELECT sum(og.goods_number) AS count FROM {{%order_goods}} AS og,{{%order_info}} AS oi WHERE og.goods_id={$id} AND oi.add_time>={$start}";
+    	
+    	return self::findBySql($sql)->asArray()->one()['count'];
+    }
+
+    /**
+     * 取出商品记录
+     * @param unknown $data
+     */
+    public function goods_record($where){
+
+    	$sql = "SELECT g.goods_id 
+    			 FROM {{%goods}} AS g LEFT JOIN {{%category}} AS c ON g.cat_id=c.cat_id LEFT JOIN {{%brand}} AS b ON g.brand_id=b.brand_id
+    			WHERE ".$where;
+    	return Goods::findBySql($sql)->count();
+    }
+    
+    /**
+     * 检查库存为0的，仍然处于上架状态的
+     * @return boolean
+     */
+    public function check_updown(){
+    	$res = self::find()->where(['is_updown'=>1,'goods_number'=>0])->asArray()->all();
+    	$id_str = null;
+    	foreach ($res as $val){
+    		$id_str .= $val['goods_id'].',';
+    	}
+    	
+    	$id_str = rtrim($id_str, ',');
+    	
+    	if($id_str){
+    		self::updateAll(['is_updown'=>0], "goods_id IN ({$id_str})");
+    	}
+    	
+    	return true;
+    }
+
+}

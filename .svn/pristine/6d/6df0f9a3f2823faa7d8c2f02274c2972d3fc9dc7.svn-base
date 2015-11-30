@@ -1,0 +1,400 @@
+<?php
+
+namespace frontend\controllers;
+ 
+use Yii;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use frontend\models\Cart;
+use frontend\models\Goods;
+use frontend\models\OrderInfo;
+use frontend\models\OrderGoods;
+use frontend\models\UserAddress; 
+use frontend\models\Comment; 
+use frontend\models\Refund;
+use frontend\models\DebangShipping;  
+
+ 
+/**
+ * UserController implements the CRUD actions for User model.
+ */
+class OrderController extends BaseController
+{
+
+    /**
+     * 用户订单详情
+     * @return mixed
+     */
+    public function actionIndex(){	
+         //校验参数的合法性
+        $request=Yii::$app->request;
+        $status=$request->get('id');
+        $id=intval($status);
+        $data['var']=$id;
+        if ($id<0) {
+          $this->order_messgae('程序出错了，找不到你要的订单');
+        }else if ($id==0) {
+          $id=null;
+        }else{
+          $id=$id;
+        }
+        $page = $_REQUEST['page']>1 ? $_REQUEST['page'] : 1;
+    	$model = new OrderInfo();
+        //根据请求找出相应的订单
+        $data['data'] = $model->user_oreder($id);
+        if(!is_array($data['data'])) {
+             return $this->render('index',$data['error']='没有相应的订单');
+        }
+        //根据订单找出相应的订单商品信息
+        foreach ($data['data'] as $key => $value) {
+            $OrderGObj=new OrderInfo;
+            $goods=$OrderGObj->user_get_goods($value['oid']);
+            if (!is_array($goods)) {
+                $this->order_messgae('订单商品为空！');
+            }
+            //查询出商品的属性
+            foreach ($goods as $k => $v) {
+                $gObj=new goods;
+                $goods[$k]=$gObj->user_getInfo($v['gid'])[0];
+                $goods[$k]['number']=$v['num'];
+            }
+            $data['data'][$key]['goodsInfo']=$goods;
+         }
+         //var_dump($data);
+         //exit();
+         return $this->render('index',$data);
+    }
+
+    public function order_messgae($str){
+        $msg['message'] = $str;
+                $msg['error'] = 1;
+                $msg['link'] = [
+                ['title'=>'返回首页','href'=>'index.php?r=index/index'],
+            ];
+            return $this->redirect(['/site/message', 'msg'=>$msg]);
+    }
+
+
+
+
+     /**
+     * 确认订单   
+     */
+    public function actionVerifyorder(){
+        //校验参数的合法性
+        $request=Yii::$app->request;
+        $oId=$request->get();
+        if (!isset($oId['orderid'])) {
+            $this->order_messgae('程序出错了，找不到你要的订单');
+        }
+        $oid=intval($oId['orderid']);
+        //读取当前用户的收获地址、及相关用户信息
+        $userObj=new UserAddress;
+        //取出默认收获地址
+        $data['userDefalut']=$userObj->get_default_address();
+        //取出所有收货地址
+        $data['userInfo']=$userObj->get_user_address();
+        //var_dump($data);
+        //exit();
+        //获取订单当中的商品信息
+        $OrderGObj=new OrderInfo;
+        $data['goodInfo']=$OrderGObj->get_order_info($oid);
+        //计算该订单的总重量
+        if ($data['goodInfo']) {
+            $zongZ=0;
+            $mon=0;
+           foreach($data['goodInfo'] as $key => $value) {
+            $zongZ=$zongZ+$value['zhoL'];
+            $mon=$mon+($value['num']*$value['price']);
+           }
+        }
+        //计算快递费用
+            //获取收货地址物流、快递基数
+            if (is_array($data['userDefalut'])) {
+                //获取德邦物流基数
+                $dbwl=new DebangShipping;
+                //获取精准卡航
+                $debang=$dbwl->getCar($data['userDefalut']['pid'],$data['userDefalut']['cid']);
+                //一票起运的最大重量
+                foreach ($debang as $key => $value) {
+                    //判断货运的模式
+                    if ($value['shipping_type']==1) {
+                        $menoy=$zongZ * $value['heavy_goods'];
+                        if ($menoy <= $value['lowest_price']) {
+                            $data['db_jingzhun']=round($value['lowest_price']);
+                        }else{
+                            $data['db_jingzhun']=round($menoy);
+                        }
+                    }else if($value['shipping_type']==1){
+                       $menoy=$zongZ * $value['heavy_goods'];
+                        if ($menoy <= $value['lowest_price']) {
+                            $data['db_kayun']=round($value['lowest_price']);
+                        }else{
+                            $data['db_kayun']=round($menoy);
+                        }
+                    }
+                }
+            }
+
+        $data['sum_money']= $mon + $data['db_jingzhun'];
+        return $this->render('verifyorser',$data);
+    }
+
+    /**
+     *  地区基数查询  
+     *  $id= 用户收货地址表id 
+     */
+    public function actionGetBase(){
+        $request=Yii::$app->request;
+        $id=$request->get('id');
+        //取出收货地区信息
+        $userObj=new UserAddress;
+        $redion=$userObj->getRegion($id);
+        //德邦物流
+        if (!empty($redion)) {
+            foreach ($redion as $value){
+                //获取德邦物流基数
+                $dbwl=new DebangShipping;
+                //获取精准卡航
+                $debang=$dbwl->getCar($value['province'],$value['city']);
+            }
+        }
+        if (empty($debang)) {
+            return json_encode(array('error'=>'暂无信息'));
+        }
+        foreach ($debang as $key => $value) {
+            if ($value['shipping_type']==1){
+                $re[]=array('express_name'=>'德邦卡航','min_price'=>$value['lowest_price'],'lowest_price'=>$value['heavy_goods'],'xu_z'=>$value['heavy_goods']);
+            }
+            if ($value['shipping_type']==2) {
+               $re[]=array('express_name'=>'德邦汽运','min_price'=>$value['lowest_price'],'lowest_price'=>$value['heavy_goods'],'xu_z'=>$value['heavy_goods']);
+            }
+        }
+        $newDebang=json_encode(array('data'=>$re));
+        return $newDebang;
+        
+    }
+
+    
+    /**
+     * 生成订单（生成订单信息=>根据订单id生成订单商品=>删除相关购物车商品=>减库存）	
+     */
+    public function actionMakeorder(){
+        
+            
+    		
+    		$this->refresh();
+    
+    		// 接收参数
+    		$cart_id = trim(Yii::$app->request->post('good_id'),',');
+    		$address_id = intval(Yii::$app->request->post('address_id'));
+    		$message = trim(Yii::$app->request->post('message'));
+    		
+    		if(empty($cart_id)){
+    			$msg['message'] = '订单提交失败，可能原因：<br><li>商品已下架</li><li>商品库存不足</li>';
+    			$msg['error'] = 1;
+    				$msg['link'] = [
+    					['title'=>'返回购物车','href'=>'index.php?r=cart/index'],
+    				];
+    	    	return $this->redirect(['/site/message', 'msg'=>$msg]);
+    		}
+    		if($address_id<1){
+    			$msg['message'] = '请选择一个收货地址~！';
+    			$msg['error'] = 1;
+    				$msg['link'] = [
+    					['title'=>'返回','href'=>Yii::$app->request->referrer],
+    				];
+    			return $this->redirect(['/site/message', 'msg'=>$msg]);
+    		}
+    		$model = new Cart();
+    		$data = $model->get_cat_info($cart_id);
+    		
+    		if($data){
+    			// 取出用户收货地址
+    			$model = new UserAddress();
+    			$data['other']['address'] = serialize($model->get_default_address($address_id));
+    			// 生成订单信息和订单商品
+    			$data['other']['message'] = $message;
+    			
+    			$order = new OrderInfo();
+    			if($order_id = $order->make_order($data)){
+    				return $this->redirect('/../../ext/Wxpay/example/jsapi.php?order_id='.$order_id);
+    				/* $msg['message'] = '订单已提交成功~！';
+    				$msg['link'] = [
+    					['title'=>'查看订单列表','href'=>'index.php?r=order/index'],
+    					['title'=>'查看订单详情','href'=>'index.php?r=order/detail&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]); */
+    			}
+    		}
+    		$msg['message'] = '订单提交失败，可能原因：<br><li>商品已下架</li><li>商品库存不足</li>';
+    		$msg['error'] = 1;
+    				$msg['link'] = [
+    					['title'=>'返回购物车','href'=>'index.php?r=cart/index'],
+    				];
+    	    return $this->redirect(['/site/message', 'msg'=>$msg]);
+    	}
+       
+    
+    /**
+     * 订单详情
+     * @param unknown $id
+     * @return Ambigous <string, string>
+     */
+    public function actionDetail($id){
+    	$id = intval($id);
+    	if($id>0){
+    		$model = new OrderInfo();
+    		$data = $model->get_order_info($id);
+
+    		return $this->render('detail', ['order'=>$data]);
+    	}
+    }
+    
+    /**
+     * 评价商品
+     * @param unknown $id
+     * @return Ambigous <string, string>
+     */
+    public function actionComment($id){
+    	
+    	$id = intval($id);
+    	if($id>0){
+    		$model = new OrderInfo();
+    		$data = $model->get_order_info($id);
+    	
+    		return $this->render('comment', ['order'=>$data]);
+    	}
+    }
+    
+    /**
+     * 插入评论
+     * @return boolean|\yii\web\Response
+     */
+    public function actionAddcomment(){
+    	$score = yii::$app->request->post('score');
+    	$goods_id = yii::$app->request->post('goods_id');
+    	$content = yii::$app->request->post('content');
+    	$order_id = yii::$app->request->post('order_id');
+    
+    	if($goods_id[0]>0 && $order_id >0){
+    		$value = [];
+    		foreach ($goods_id as $key=>$val){
+    			if($val < 1)
+    				return false;
+    			if($score[$key] < 1){
+    				$msg['message'] = '请选择评分';
+    				$msg['error'] = 1;
+    				$msg['link'] = [
+    						['title'=>'返回继续评价','href'=>'index.php?r=order/comment&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    			if(empty($content[$key])){
+    				$msg['message'] = '请填写评价内容';
+    				$msg['error'] = 1;
+    				$msg['link'] = [
+    						['title'=>'返回继续评价','href'=>'index.php?r=order/comment&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    			
+    			$value[$key]['goods_id'] = $goods_id[$key];
+    			$value[$key]['comment_content'] = $content[$key];
+    			$value[$key]['comment_score'] = $score[$key];
+    			$value[$key]['comment_time'] = time();
+    			$value[$key]['user_id'] = $_SESSION['frontend']['user_id'];
+    		}
+    		foreach ($value as $v){	
+    			if(empty($v))
+    				continue;
+    			$model = new Comment();
+    			$model->goods_id = $v['goods_id'];
+    			$model->comment_content = $v['comment_content'];
+    			$model->comment_score = $v['comment_score'];
+    			$model->comment_time = $v['comment_time'];
+    			$model->user_id = $v['user_id'];
+    			$model->save();
+    		}
+    		// 修改订单状态为 已评价
+    		OrderInfo::update_order_status($order_id, COMMENTED);
+    		
+    		$msg['message'] = '评价成功';
+    				$msg['link'] = [
+    						['title'=>'返回订单列表','href'=>'index.php?r=order/index'],
+    				];
+    		return $this->redirect(['/site/message', 'msg'=>$msg,'goFrom'=>true]);
+    	}
+    	
+    }
+    
+    /**
+     * 退款页面
+     * @param unknown $id
+     * @return \yii\web\Response|Ambigous <string, string>
+     */
+    public function actionRefund($id){
+    	$id = intval($id);
+    	if($id > 0){
+    		 $model = new Refund();
+    		 $model->order_id = $id;
+    		 if ($model->load(Yii::$app->request->post()) && $model->save()) {
+    		 	// 修改订单状态
+    		 	$om = OrderInfo::findOne($id);
+    		 	$om->refund_id = $model->primaryKey;
+    		 	$om->order_status = RETURNED;
+    		 	$om->update(false);
+    		 	
+    		 	$msg['message'] = '您的退款申请已提交成功，商家会尽快处理~！';
+    		 	$msg['link'] = [
+    		 			['title'=>'返回订单列表','href'=>'index.php?r=order/index'],
+    		 	];
+    		 	return $this->redirect(['/site/message', 'msg'=>$msg]);
+    		}
+    		
+    		return $this->render('refund', [
+    				'model' => $model,
+    				'order_id' => $id,
+    				'errors' => $model->getErrors(),
+    		]);
+    	}
+    }
+    
+    // 确认收货
+    public function actionDofinish($id){
+    	 $id = intval($id);
+    	if($id > 0){
+    		
+    		$model = new OrderInfo();
+    		 
+    		$order = OrderInfo::findOne($id);
+    		$order->order_status = FINISHED;
+    		$order->confirm_time = time();
+    		$order->update(false);
+    		
+    		return $this->redirect(Yii::$app->request->referrer);
+    	}
+    }
+    
+    /**
+     * 退款订单
+     */
+    public function actionReder(){
+    	
+    	$model = new OrderInfo();
+    	
+    	$data = $model->get_order_list(RETURNED);
+    	
+    	return $this->render('reder', ['order'=>$data]);
+    }
+
+    protected function findModel($id)
+    {
+    	if (($model = Cart::findOne($id)) !== null) {
+    		return $model;
+    	} else {
+    		throw new NotFoundHttpException('The requested page does not exist.');
+    	}
+    }
+
+}

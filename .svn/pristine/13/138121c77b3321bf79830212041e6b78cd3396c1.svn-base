@@ -1,0 +1,166 @@
+<?php
+
+namespace frontend\controllers;
+
+use Yii;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use frontend\models\Cart;
+use frontend\models\Goods;
+use frontend\models\UserAddress;
+use frontend\models\frontend\models;
+
+/**
+ * UserController implements the CRUD actions for User model.
+ */
+class CartController extends BaseController
+{
+
+    /**
+     * 购物车首页
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+    	$cart = new Cart();
+        //取出当前会员购物车里的商品
+    	$data ['cart']= $cart->get_cat_info();
+        //对输出信息进行校验
+        if (!empty($data ['cart'])){
+            $newData['error']=200;
+            $sum=0.00;
+           foreach ($data['cart'] as $key => $value) {
+                //添加的数量
+                $re=floatval($data['cart'][$key]['num']);
+                if (!empty($re)) {
+                  $arr[$key]['num']= $re;
+                }else{
+                  $arr[$key]['num']=1;
+                }
+                //商品价格
+                $re=floatval($data['cart'][$key]['price']);
+                if (!empty($re)) {
+                  $arr[$key]['price']= $re;
+                }else{
+                    //价格出错了，暂不显示
+                    $arr[$key]['price']=0;
+                }
+                //商品ID
+                $re=floatval($data['cart'][$key]['gid']);
+                if (!empty($re)) {
+                  $arr[$key]['gid']= $re;
+                }else{
+                    //商品ID，暂不显示
+                    $arr[$key]['gid']=0;
+                }
+                //检测图片是否存在不存在设置为默认图片
+                if (!empty($data['cart'][$key]['img'])) {
+                    $file='../../common/upload/goods/'.$data['cart'][$key]['img'];
+                    //判断图片是否存在
+                    if (file_exists($file)){
+                        $arr[$key]['img']=$data['cart'][$key]['img'];
+                    }else{
+                        $arr[$key]['img']='cart_dafult.png';
+                    }
+                }
+                //商品名称
+                $arr[$key]['name']=!empty($data['cart'][$key]['gname'])?mb_substr($data['cart'][$key]['gname'], 0,38,'UTF-8'):'';
+                //购物车商品合计总价
+                $sum += $arr[$key]['price'] * $arr[$key]['num'];
+            } 
+            $newData['cart']=$arr;
+            $newData['sum']=$sum;
+        }else{
+            //购物车暂无添加的商品
+            $newData['error']=404;
+            $newData['sum']=0;
+        }
+        return $this->render('index', $newData);
+    }
+    
+    /**
+     * ajax 添加商品到购物车
+     * @param int $goods_id
+     * @param int $num
+     */
+    public function actionAddcart($flag=null){
+        $request=\Yii::$app->request;
+        $goods_id=is_numeric($request->get('id'))?$request->get('id'):0;
+        $num=is_numeric($request->get('num'))?$request->get('id'):0;
+        if($goods_id > 0 && $num > 0 && $_SESSION['frontend']['user_id'] >0){
+    		$cart = new Cart();
+    		$res =  $cart->add_cart($goods_id, $num);
+    		
+    		if(isset($flag)){
+    			if($res['error']){
+    				$msg['message'] = $res['error'];
+    				$msg['error'] = 1;
+    				$msg['link'] = [
+    						['title'=>'返回','href'=>Yii::$app->request->referrer],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    			
+    			return $this->redirect(['index', 'id'=>$res['id']]);
+    		}
+    		
+    		echo json_encode($res);
+    		exit;
+    	}
+    	
+    	echo json_encode(['code'=>0, 'error'=>'添加购物车失败']);
+    	exit;
+    }
+    
+    /**
+     * 删除购物车商品
+     * @param unknown $cart_id
+     */
+    public function actionDelcart($cart_id){
+    	$cart_id = intval($cart_id);
+    	if($cart_id > 0){
+    		if($this->findModel($cart_id)->delete() > 0){
+    			echo 1;
+    			exit;
+    		}
+    	}
+    	
+    	echo '';
+    	exit;
+    }
+    
+    /**
+     * 订单提交页面
+     */
+    public function actionSuborder($cart_id){
+    	
+    	if(!empty($cart_id)){
+    		
+    		// 取出用户收货地址
+    		$model = new UserAddress();
+    		$user_address = $model->get_user_address();
+    		$address = $model->get_default_address();
+    		
+    		// 取出购物车信息
+    		$cart_id = rtrim($cart_id,',');
+    		$model = new Cart();
+    		$data = $model->get_cat_info($cart_id);
+    		
+    		return $this->render('submit', ['cart' => $data, 'address'=>$address,'user_address'=>$user_address]);
+    		
+    	}else{
+
+    		return $this->redirect(['/index/index','cart_id'=>$cart_id]);
+    	}
+    }
+    
+    protected function findModel($id)
+    {
+    	if (($model = Cart::findOne($id)) !== null) {
+    		return $model;
+    	} else {
+    		throw new NotFoundHttpException('The requested page does not exist.');
+    	}
+    }
+
+}

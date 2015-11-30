@@ -1,0 +1,94 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+use yii\db\ActiveRecord;
+use frontend\models\Goods;
+
+
+/**
+ * This is the model class for table "{{%brand}}".
+ *
+ * @property integer $brand_id
+ * @property integer $parent_id
+ * @property string $brand_name
+ * @property string $brand_logo
+ * @property string $brand_desc
+ * @property integer $sort_order
+ * @property integer $is_show
+ */
+class Cart extends ActiveRecord
+{
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%cart}}';
+    }
+    
+    /**
+     * 当前会员的购物车商品
+     * @return unknown
+     */
+    public function get_cat_info($cart_id=NULL){
+    	
+    	//$cart_con = !empty($cart_id) ? ' AND c.cart_id IN ('.$cart_id.')' : '';
+    	
+    	/*$sql = "SELECT c.cart_id,c.goods_number AS buy_number,c.add_time,g.goods_id,g.goods_price,g.goods_name,g.goods_img,
+    			g.goods_number,g.is_updown,g.cat_id,g.brand_id,b.brand_name
+    			FROM yl_cart AS c LEFT JOIN yl_goods AS g ON c.goods_id=g.goods_id LEFT JOIN yl_brand AS b ON g.brand_id=b.brand_id 
+    			WHERE c.user_id=".$_SESSION['frontend']['user_id'].$cart_con." ORDER BY c.add_time DESC";*/
+
+        $sql='SELECT c.cart_id cid,c.goods_id gid,c.goods_number num,c.is_shipping is_pp,g.goods_price price,g.goods_name gname,g.goods_img img FROM yl_cart c,yl_goods g WHERE user_id=27 AND c.goods_id=g.goods_id ORDER BY c.add_time DESC';
+        $res = cart::findBySql($sql)->asArray()->all();	
+        return $res;
+    }
+    
+	/**
+	 * 添加商品到购物车
+	 * @return ActiveQuery
+	 */
+    public function add_cart($goods_id,$num){
+    	
+    	/* 检查库存 */
+    	$goodsModel = new Goods();
+    	$goods = $goodsModel->checkRepertory($goods_id);
+    	if($num > $goods['goods_number']){
+    		return ['error'=>'库存不足', 'code'=>0, 'goods_number'=>$goods['goods_number']];	
+    	}
+    	
+    	/* 检查该会员的购物车是否已有此商品 */
+    	$cart = (new \yii\db\Query())
+    	->select('goods_number,cart_id')
+    	->from('cm_cart')
+    	->where('goods_id=:goods_id AND user_id=:user_id',[':goods_id'=>$goods_id,':user_id'=>$_SESSION['frontend']['user_id']])
+    	->one();
+    	
+    	if($cart && $cart['cart_id']>0){
+    		// 累加数量
+    		$model = self::findOne($cart['cart_id']);
+    		$model->goods_number = $num;
+    		$count = $model->save(); 
+    		$cart_id = $cart['cart_id'];
+    	}else{
+    		// 添加新纪录
+    		$model = new Cart();
+    		$model->goods_id = $goods_id;
+    		$model->goods_number = $num;
+    		$model->user_id = $_SESSION['frontend']['user_id'];
+    		$model->add_time = time();
+    		$count = $model->save(); 
+    		$cart_id = $model->primaryKey;
+    	}
+    	
+    	
+    	if($count > 0){
+    		return ['code'=>1,'error'=>'','id'=>$cart_id];	
+    	}
+    	return ['code'=>0, 'error'=>'添加购物车失败'];
+    }
+
+}

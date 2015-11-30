@@ -1,0 +1,50 @@
+<?php
+
+namespace backend\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "{{%department}}".
+ *
+ * @property integer $id
+ * @property string $depart_name
+ * @property integer $parent_id
+ * @property integer $head_id
+ * @property integer $sort
+ */
+class Department extends \yii\db\ActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%department}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['parent_id', 'head_id', 'sort'], 'integer'],
+            [['depart_name'], 'string', 'max' => 255],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'depart_name' => 'Depart Name',
+            'parent_id' => 'Parent ID',
+            'head_id' => 'Head ID',
+            'sort' => 'Sort',
+        ];
+    }
+}

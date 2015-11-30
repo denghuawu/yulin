@@ -1,0 +1,540 @@
+<?php
+
+namespace frontend\controllers;
+ 
+use Yii;
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use frontend\models\Cart;
+use frontend\models\Goods;
+use frontend\models\OrderInfo;
+use frontend\models\OrderGoods;
+use frontend\models\UserAddress; 
+use frontend\models\Comment; 
+use frontend\models\Refund;
+use frontend\models\DebangShipping;
+use frontend\models\ShunfengShipping;  
+
+ 
+/**
+ * UserController implements the CRUD actions for User model.
+ */
+class OrderController extends BaseController{
+    public $layout;
+    /**
+     * 用户订单详情
+     * @return mixed
+     */
+    public function actionIndex(){	
+         //校验参数的合法性
+        $request=Yii::$app->request;
+        $status=$request->get('id');
+        $id=intval($status);
+        $data['var']=$id;
+        if ($id<0 && empty($id)) {
+          $this->order_messgae('程序出错了，找不到你要的订单');
+        }else if ($id==0) {
+          $id=null;
+        }else{
+          $id=$id;
+        }
+        $page = $_REQUEST['page']>1 ? $_REQUEST['page'] : 1;
+    	$model = new OrderInfo();
+        //根据请求找出相应的订单
+        $data['data'] = $model->user_oreder($id);
+
+        if(!is_array($data['data'])) {
+             return $this->render('index',$data['error']='没有相应的订单');
+        }
+        //根据订单找出相应的订单商品信息
+        foreach ($data['data'] as $key => $value) {
+            $OrderGObj=new OrderInfo;
+            $goods=$OrderGObj->user_get_goods($value['oid']);
+            if (!is_array($goods)) {
+                $this->order_messgae('订单商品为空！');
+            }
+            //查询出商品的属性
+            foreach ($goods as $k => $v) {
+                $gObj=new goods;
+                $goods[$k]=$gObj->user_getInfo($v['gid'])[0];
+                $goods[$k]['number']=$v['num'];
+            }
+            //校验商品输出信息
+            foreach ($goods as $ke => $va) {
+                if (!empty($goods[$ke]['img'])) {
+                    $file='../../common/upload/goods/'.$goods[$ke]['img'];
+                    //判断图片是否存在
+                    if (file_exists($file)){
+                        $goods[$ke]['img']=$va['img'];
+                    }else{
+                        $goods[$ke]['img']='good_info_dafult.png';
+                    }
+                }else{
+                    $goods[$ke]['img']='good_info_dafult.png';
+                }
+            }
+            $data['data'][$key]['goodsInfo']=$goods;
+         }
+         //var_dump($data[data]);
+         $this->layout="header";
+         return $this->render('index',$data);
+    }
+
+    /*
+    * 错误提示
+    */
+
+    public function order_messgae($str){
+        $msg['message'] = $str;
+                $msg['error'] = 1;
+                $msg['link'] = [
+                ['title'=>'返回首页','href'=>'index.php?r=index/index'],
+            ];
+            return $this->redirect(['/site/message', 'msg'=>$msg]);
+    }
+
+
+
+
+     /**
+     * 订单(首页)   
+     */
+    public function actionVerifyorder(){
+        //校验参数的合法性
+        $request=Yii::$app->request;
+        $oId=$request->get();
+        if (!isset($oId['orderid'])) {
+            $this->order_messgae('程序出错了，找不到你要的订单');
+        }
+        $oid=intval($oId['orderid']);
+        //读取当前用户的收获地址、及相关用户信息
+        $userObj=new UserAddress;
+        //取出默认收获地址
+        $userDefalut=$userObj->get_default_address();
+        if (empty($userDefalut['pid']) || empty($userDefalut['cid']) || empty($userDefalut['did']) || empty($userDefalut['province']) || empty($userDefalut['city']) || empty($userDefalut['district'])){
+            $_SESSION['orderid']=$oid;
+            return $this->redirect(['/address/orderadd']);
+        }else{
+            unset($_SESSION['orderid']);
+           $data['userDefalut']=$userDefalut; 
+        }
+          
+        //取出所有收货地址
+        $data['userInfo']=$userObj->get_user_address();
+
+        //获取订单当中的商品信息
+        $OrderGObj=new OrderInfo;
+        $data['goodInfo']=$OrderGObj->get_order_info($oid);
+        //计算该订单的总重量
+        if ($data['goodInfo']){
+            $zongZ=0;
+            $mon=0;
+           foreach($data['goodInfo'] as $key => $value) {
+                $zongZ=$zongZ+$value['zhoL'];
+                $mon=$mon+($value['num']*$value['price']);
+
+                if (!empty($data['goodInfo'][$key]['img'])) {
+                    $file='../../common/upload/goods/'.$data['goodInfo'][$key]['img'];
+                    //判断图片是否存在
+                    if (file_exists($file)){
+                        $data['goodInfo'][$key]['img']=$value['img'];
+                    }else{
+                        $data['goodInfo'][$key]['img']='good_info_dafult.png';
+                    }
+                }else{
+                    $data['goodInfo'][$key]['img']='good_info_dafult.png';
+                }
+            }
+        }
+        //订单总价
+       $str=strstr(($mon + $data['db_jingzhun']), '.');
+        if ($str===false) {
+            $data['sum_money']= ($mon + $data['db_jingzhun']).'.00';
+        }else{
+            $data['sum_money']= ($mon + $data['db_jingzhun']);
+        }
+        $dbwl=json_decode($this->actionGetBase($data['userDefalut']['address_id']),true);
+        $str="";
+        if (!empty($dbwl['data']) && empty($dawl['error'])) {
+              foreach ($dbwl['data'] as $value) {
+                $str.=',{';
+                if (!empty($value) && is_array($value)) {
+                    foreach ($value as $k => $v) {
+                        if ($k=='express_id') {
+                            $str.='"'.$k.'":'.$v.',';
+                        }else if($k=='xu_z'){
+                            $str.='"'.$k.'":"'.$v.'"';
+                        }else{
+                           $str.='"'.$k.'":"'.$v.'",'; 
+                        }
+                    }
+                }
+                $str.='}';
+            };
+            $data['dbwl']=substr($str,1);
+        }else{
+            $data['dbwl']=json_encode(array('error'=>'请更换收货地址！'));
+        }
+        $this->layout="header";
+        return $this->render('verifyorser',$data);
+    }
+
+    /**
+     *  地区基数查询  
+     *  $id= 用户收货地址表id 
+     */
+    public function actionGetBase($id=null){
+        if ($id==null) {
+           $request=Yii::$app->request;
+           $id=$request->get('id'); 
+        }else{
+            $id=$id;
+        }
+        //取出收货地区信息
+        $userObj=new UserAddress;
+        $redion=$userObj->getRegion($id);
+        //德邦物流
+        if (!empty($redion)) {
+            foreach ($redion as $value){
+                //获取德邦物流基数
+                $dbwl=new DebangShipping;
+                $debang=$dbwl->getCar($value['province'],$value['city']);
+                //获取顺丰快递基数
+                $sfwl=new ShunfengShipping;
+                $shunfeng=$sfwl->getCar($value['province'],$value['city']);
+            }
+        }
+        if (empty($debang) && empty($shunfeng)) {
+            return json_encode(array('error'=>'该地区暂无快递支持'));
+        }
+        //德邦
+        unset($re);
+        foreach ($debang as $key => $value) {
+            if ($value['shipping_type']==DBKH){
+                $re[]=array('express_id'=>DBKH,'express_name'=>'德邦卡航','min_price'=>$value['lowest_price'],'shou_z'=>$value['heavy_goods'],'xu_z'=>$value['heavy_goods']);
+            }else if($value['shipping_type']==DBQY){
+                $re[]=array('express_id'=>DBQY,'express_name'=>'德邦汽运','min_price'=>$value['lowest_price'],'shou_z'=>$value['heavy_goods'],'xu_z'=>$value['heavy_goods']);
+            }
+        }
+        //顺丰
+        foreach ($shunfeng as $key => $value) {
+            if ($value['shipping_type']==SFKJ){
+               $re[]=array('express_id'=>SFKJ,'express_name'=>'顺丰标准快件','min_price'=>$value['lowest_price'],'shou_z'=>$value['heavy_goods'],'xu_z'=>$value['heavy_goods']);
+            }
+        }
+        $newDebang=json_encode(array('data'=>$re));
+        return $newDebang;
+        
+    }
+
+    /**
+     *  接收提交订单
+     *  
+     */
+
+    public function actionGetOrder(){
+        //校验参数的合法性
+        $request=Yii::$app->request;
+        $post=$request->post();
+        //var_dump($post);
+        $arr['oid']=intval($post['order_id']);//订单ID
+        $arr['address_id']=intval($post['address_id']);//收货地址ID
+        $arr['express_id']=intval($post['express_id']);//快递方式
+        $arr['bill']=intval($post['bill']);//发票选项
+        //购买的商品及数量
+        if (!empty($post['num']) && !empty($post['goodsid'])) {
+           foreach ($post['num'] as $key => $value) {
+                $post['goodsid'][$key]=intval($post['goodsid'][$key]);
+                $post['num'][$key]=intval($post['num'][$key]);
+                if (($post['goodsid'][$key]>0) || ($post['num'][$key]>0)) {
+                    $gidValue=$post['goodsid'][$key];
+                    $numValue=$post['num'][$key];
+                    $goods[]=array('gid'=>$gidValue,'num'=>$numValue);
+                }else{
+                   $this->order_messgae('提交失败！'); 
+                }
+            } 
+            $arr['goods']=$goods;
+        }else{
+           $this->order_messgae('提交失败！'); 
+        }
+        if (($arr['oid']<=0) || ($arr['address_id']<=0) || ($arr['express_id']<=0) || ($arr['bill']<=0)) {
+            $this->order_messgae('提交失败！'); 
+        }
+        //查询订单当中的信息
+        $OrderGObj=new OrderInfo;
+        $goods=$OrderGObj->get_order_info($arr['oid']);
+        if (!empty($goods)) {
+             //最后确认购买商品的数量
+            foreach ($goods as $key => $value) {
+                if ($value['gid']==$arr['goods'][$key]['gid']) {
+                    $goods[$key]['former']=$goods[$key]['num'];//更新前的数量
+                    $goods[$key]['num']=$arr['goods'][$key]['num'];//购买商品的数量
+                    $goods[$key]['zhoL']=$goods[$key]['num'] * $goods[$key]['fee'];//购买该商品的质量
+                    $goods[$key]['sum_money']=$arr['goods'][$key]['num'] * $goods[$key]['price'];//这个商品的总价格（不包含快递费）
+                }
+            }
+        }else{
+            $this->order_messgae('提交失败！'); 
+        }
+        //查询收货地区快递基数
+        $dbwl=json_decode($this->actionGetBase($arr['address_id']),true);
+        //初始化订单信息
+        if (is_array($dbwl['data']) && empty($dbwl['error'])){
+            foreach ($dbwl['data'] as $key => $value) {
+                if ($arr['express_id']==$dbwl['data'][$key]['express_id']){
+                    $wl=$dbwl['data'][$key];
+                }
+            }
+           $OrderInfo=$this->oderStat($goods,$wl);
+           $OrderInfo['UserAddress']=$this->getAddress($arr['address_id']);
+           $OrderInfo['oid']=$arr['oid'];
+        }else if(!empty($dbwl['error'])){
+          $OrderInfo=$this->oderStat($goods,array('error'=>'地区无快递信息'));
+          //查询出详细收货地址 
+          $OrderInfo['UserAddress']=$this->getAddress($arr['address_id']);
+          $OrderInfo['oid']=$arr['oid'];
+        }
+
+        //判断是否开具发票
+        if ($arr['bill']==4) { //选择要开发票
+            $arr['rise']=$post['rise'];//发票抬头
+        }else if($arr['bill']==1){
+            //不开具发票
+        }
+        //更新订单表信息
+        $re=$OrderGObj->oder_update($OrderInfo);
+        //更新订单商品信息、减去相应商品库存
+        $oderGoodsObj=new OrderGoods;
+        $res=$oderGoodsObj->orderGoodsUp($goods);
+
+        return $this->redirect(['/payweixin/unify', 'id'=>$arr['oid']]);
+    }
+
+    /*
+    *计算当前订单快递、总价、购买商品总数
+    * array $dbwl =>物流计价信息
+    * array $goods =>订单商品信息
+    */
+    public function oderStat($goods,$wl){
+        if (empty($wl['error'])) {
+           //计算订单当中的快递费用、订单总价
+            $arr['goodsNumber']=0;//商品的总数
+            $zongZL=0;//订单总重
+             $arr['sum_money']=0;//商品总价格
+            foreach ($goods as $key => $value) {
+                $arr['goodsNumber']+=$value['num'];//订单中商品的总数
+                $zongZL+=$value['zhoL'];
+                $arr['sum_money']+=$value['sum_money'];//该笔订单中商品总价格（不含快递费）
+            }
+            $arr['zongZL']=ceil($zongZL);//全订单总质量
+
+            //快递计价算法
+            //（全部重量-1）*续重价格+首重价格
+            $wl_money1=($arr['zongZL'] -1) * $wl['xu_z'] + $wl['shou_z'];
+            $wl_money=ceil($wl_money1);
+            if ($wl_money <= $wl['min_price']) {
+                $wl_money=$wl['min_price'];//最低起运
+            }else{
+                $wl_money=ceil($wl_money1);
+            }
+            $arr['wl_money']=$wl_money;//快递费用 
+            $arr['express_name']=$wl['express_name'];//快递名称
+        }else{
+            //计算订单当中的快递费用、订单总价
+            $goodsNumber=0;//商品的总数
+            $zongZL=0;//订单总重
+            $sum_money=0;//商品总价格
+            foreach ($goods as $key => $value) {
+                $arr['goodsNumber']+=$value['num'];//订单中商品的总数
+                $zongZL+=$value['zhoL'];
+                $arr['sum_money']+=$value['sum_money'];//该笔订单中商品总价格（不含快递费）
+            }
+            $arr['zongZL']=ceil($zongZL);//全订单总质量
+            $arr['wl_money']=0;
+            $arr['express_name']='到付';//快递
+        }
+        $arr['orderSumMoney']=$arr['sum_money'] + $arr['wl_money'];//订单总价
+        return $arr;
+    }
+    /*
+    *查寻出详细的收货地址
+    */
+    public function getAddress($address_id){
+        $userObj=new UserAddress;
+        $addressInfo=$userObj->get_default_address($address_id);
+        if (!empty($addressInfo)) {
+               $UserAddress=$addressInfo['province'].$addressInfo['city'].$addressInfo['district'].$addressInfo['address'];
+        }
+        return $UserAddress;
+    }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////         
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * 订单详情
+     * @param unknown $id
+     * @return Ambigous <string, string>
+     */
+    public function actionDetail($id){
+    	$id = intval($id);
+    	if($id>0){
+    		$model = new OrderInfo();
+    		$data = $model->get_order_info($id);
+
+    		return $this->render('detail', ['order'=>$data]);
+    	}
+    }
+    
+    /**
+     * 评价商品
+     * @param unknown $id
+     * @return Ambigous <string, string>
+     */
+    public function actionComment($id){
+    	
+    	$id = intval($id);
+    	if($id>0){
+    		$model = new OrderInfo();
+    		$data = $model->get_order_info($id);
+    	
+    		return $this->render('comment', ['order'=>$data]);
+    	}
+    }
+    
+    /**
+     * 插入评论
+     * @return boolean|\yii\web\Response
+     */
+    public function actionAddcomment(){
+    	$score = yii::$app->request->post('score');
+    	$goods_id = yii::$app->request->post('goods_id');
+    	$content = yii::$app->request->post('content');
+    	$order_id = yii::$app->request->post('order_id');
+    
+    	if($goods_id[0]>0 && $order_id >0){
+    		$value = [];
+    		foreach ($goods_id as $key=>$val){
+    			if($val < 1)
+    				return false;
+    			if($score[$key] < 1){
+    				$msg['message'] = '请选择评分';
+    				$msg['error'] = 1;
+    				$msg['link'] = [
+    						['title'=>'返回继续评价','href'=>'index.php?r=order/comment&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    			if(empty($content[$key])){
+    				$msg['message'] = '请填写评价内容';
+    				$msg['error'] = 1;
+    				$msg['link'] = [
+    						['title'=>'返回继续评价','href'=>'index.php?r=order/comment&id='.$order_id],
+    				];
+    				return $this->redirect(['/site/message', 'msg'=>$msg]);
+    			}
+    			
+    			$value[$key]['goods_id'] = $goods_id[$key];
+    			$value[$key]['comment_content'] = $content[$key];
+    			$value[$key]['comment_score'] = $score[$key];
+    			$value[$key]['comment_time'] = time();
+    			$value[$key]['user_id'] = $_SESSION['frontend']['user_id'];
+    		}
+    		foreach ($value as $v){	
+    			if(empty($v))
+    				continue;
+    			$model = new Comment();
+    			$model->goods_id = $v['goods_id'];
+    			$model->comment_content = $v['comment_content'];
+    			$model->comment_score = $v['comment_score'];
+    			$model->comment_time = $v['comment_time'];
+    			$model->user_id = $v['user_id'];
+    			$model->save();
+    		}
+    		// 修改订单状态为 已评价
+    		OrderInfo::update_order_status($order_id, COMMENTED);
+    		
+    		$msg['message'] = '评价成功';
+    				$msg['link'] = [
+    						['title'=>'返回订单列表','href'=>'index.php?r=order/index'],
+    				];
+    		return $this->redirect(['/site/message', 'msg'=>$msg,'goFrom'=>true]);
+    	}
+    	
+    }
+    
+    /**
+     * 退款页面
+     * @param unknown $id
+     * @return \yii\web\Response|Ambigous <string, string>
+     */
+    public function actionRefund($id){
+    	$id = intval($id);
+    	if($id > 0){
+    		 $model = new Refund();
+    		 $model->order_id = $id;
+    		 if ($model->load(Yii::$app->request->post()) && $model->save()) {
+    		 	// 修改订单状态
+    		 	$om = OrderInfo::findOne($id);
+    		 	$om->refund_id = $model->primaryKey;
+    		 	$om->order_status = RETURNED;
+    		 	$om->update(false);
+    		 	
+    		 	$msg['message'] = '您的退款申请已提交成功，商家会尽快处理~！';
+    		 	$msg['link'] = [
+    		 			['title'=>'返回订单列表','href'=>'index.php?r=order/index'],
+    		 	];
+    		 	return $this->redirect(['/site/message', 'msg'=>$msg]);
+    		}
+    		
+    		return $this->render('refund', [
+    				'model' => $model,
+    				'order_id' => $id,
+    				'errors' => $model->getErrors(),
+    		]);
+    	}
+    }
+    
+    // 确认收货
+    public function actionDofinish($id){
+    	 $id = intval($id);
+    	if($id > 0){
+    		
+    		$model = new OrderInfo();
+    		 
+    		$order = OrderInfo::findOne($id);
+    		$order->order_status = FINISHED;
+    		$order->confirm_time = time();
+    		$order->update(false);
+    		
+    		return $this->redirect(Yii::$app->request->referrer);
+    	}
+    }
+    
+    /**
+     * 退款订单
+     */
+    public function actionReder(){
+    	
+    	$model = new OrderInfo();
+    	
+    	$data = $model->get_order_list(RETURNED);
+    	
+    	return $this->render('reder', ['order'=>$data]);
+    }
+
+    protected function findModel($id)
+    {
+    	if (($model = Cart::findOne($id)) !== null) {
+    		return $model;
+    	} else {
+    		throw new NotFoundHttpException('The requested page does not exist.');
+    	}
+    }
+
+}

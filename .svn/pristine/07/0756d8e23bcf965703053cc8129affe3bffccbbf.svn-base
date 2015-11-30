@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Pragma" Content="No-cach">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="width=device-width,initial-scale=0.5,maximum-scale=0.5,minimum-scale=0.5,user-scalable=no">
+	<meta name="MobileOptimized" content="320">
+	<meta http-equiv="cleartype" content="on">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta charset="UTF-8">
+	<title>注册</title>
+	<link rel="stylesheet" type="text/css" href="./yulin_home/css/style.css">
+	<script type="text/javascript" src="./yulin_home/js/jquery.js"></script>
+	<script type="text/javascript" src="./yulin_home/js/public.js"></script>
+</head>
+<body>
+	<div class="nav_top"><div class="nav_top_con clearfix"><a href="javascript:history.go(-1);" class="re_left"></a>注册</div></div>
+	<div class="wrap">
+		<div class="register fs30 pb70">
+			<form class="register_con">
+				<p class="mt70"><input type="text" placeholder='手机号码' maxlength="11" onkeyup="value=value.replace(/[^\d]/g,'')"  onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" ></p>
+				<p><input type="password" placeholder='请输入密码'></p>
+				<p class="code clearfix"><input type="text" placeholder='请输入验证码'><input type="button" value="获取验证码"></p>
+				<p class="mt30"><input type="submit" value="注册"></p>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

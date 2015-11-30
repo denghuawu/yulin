@@ -1,0 +1,86 @@
+<?php
+use yii\helpers\Url;
+?>
+
+	<div class="nav_top clearfix"><span class="re_left"></span>确认订单</div>
+	<div class="wrap">
+		<div class="order">
+			<div class="site_l clearfix fs30 dn">
+				<div class="site_l_top">选择地址</div>
+				<div class="f_l"></div>
+				<div class="f_r">
+				
+				<?php foreach ($user_address as $val){ // 选择收货地址 ?>
+					<div class="site_list <?= $val['is_default']=='1' ? 'now' :''; ?>" aid="<?= $val['address_id'] ?>">
+						<p class="clearfix">
+							<span class="f_l"><?= $val['consignee'] ?></span>
+							<span class="f_r"><?= $val['mobile'] ?></span>
+						</p>
+						<p class="f7"><?= $val['province'] ?> <?= $val['city'] ?> <?= $val['district'] ?> <?= $val['address'] ?></p>
+					</div>
+				<?php } ?>
+				<a href="<?= Url::to(['address/create']) ?>"><div class="default_site" ><div>添加新地址</div></div></a>
+				
+				</div>
+			</div>
+		
+			<div class="site fs30">
+				<div class="l f_l"></div>
+				<div class="i f_l">
+
+					<p class="clearfix">
+						<span class="f_l">收货人 ：<?= $address['consignee'] ?></span>
+						<span class="f_r"><?= $address['mobile'] ?></span>
+					</p>
+					<p>收货地址 ：<?= $address['province'] ?> <?= $address['city'] ?> <?= $address['district'] ?> <?= $address['address'] ?></p>
+
+				</div>
+				<div class="r f_r"><a></a></div>
+			</div>
+			
+			<div class="order_l fs28">
+				<?php foreach ($cart as $val){ 
+						if($val['goods_id'] > 0){
+				?>
+					<div>
+						<div class="n pm10">品牌名称 ： <span class="fwb"><?= $val['brand_name'] ?></span></div>
+						<div class="spa1"></div>
+						<div class="clearfix i pm10">
+							<p class="f_l p"><img src="/common/upload/goods/<?= $val['goods_img'] ?$val['goods_img'] : 'default.png';  ?>" alt=""></p>
+							<p class="f_l ml20 n"><?= $val['goods_name'] ?></p>
+							<p class="f_r f1 price">
+								<span class="ff">￥</span><?= $val['goods_price'] ?><br /><span class="f7">x<?= $val['buy_number'] ?></span>
+							</p>
+						</div>
+					</div>
+				<?php }} ?>
+
+			</div>
+			<div class="sp10"></div>
+			<form action="<?= Url::to(['order/makeorder']) ?>" method="post">
+				<div class="order_foot fs30">
+					<p class="leave">
+						<textarea name="message" placeholder="给商家留言"></textarea>
+					</p>
+					<p class="clearfix">
+						<span class="f_l f7">商品金额</span>
+						<span class="f_r f11">
+						<span class="ff">￥</span><?= $cart['other']['goods_amount'] ?></span>
+					</p>
+					<p class="clearfix">
+						<span class="f_l f7">快递</span>
+						<span class="f_r f11">
+						<span class="ff">+￥</span><?= $cart['other']['shipping_fee'] ?></span>
+					</p>
+				</div>
+				<div class="order_fix fs30 clearfix">
+					<span class="total f1">合计：<?= $cart['other']['total'] ?></span>
+					<input type='hidden' name='cart_id' value="<?= $cart['other']['cart_id'] ?>"/>
+					<input type='hidden' name='address_id' value="<?= $address['address_id'] ?>"/>
+					<input type='submit' name='submit' class="accounts_btn f_r" value='提交订单'/>
+					
+				</div>	
+			</form>
+		</div>
+	</div>
+	

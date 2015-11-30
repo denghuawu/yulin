@@ -1,0 +1,29 @@
+<?php
+namespace frontend\controllers;
+
+use Yii;
+use yii\web\Controller;
+use common\models\Shop;
+ 
+/**
+ * Base controller
+ */
+class BaseController extends Controller
+{
+	
+	public function init(){
+		
+		/*if(!isset($_SESSION['cfg'])){
+			// 取出商城配置
+			$_SESSION['cfg'] = Shop::get_shop();
+		}
+		
+		// 开启session
+		if(!isset($_SESSION['frontend']['user_id']) && $_SESSION['frontend']['user_id']<1){
+			
+			Yii::$app->session->setFlash('failed', '请先登录~！');
+			
+			return $this->redirect(['/site/login']);
+		}*/
+	}
+}

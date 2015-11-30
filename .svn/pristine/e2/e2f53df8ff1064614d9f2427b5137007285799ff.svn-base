@@ -1,0 +1,102 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+use yii\db\ActiveRecord;
+use common\models\Region;
+use common\models\common\models;
+
+/**
+ * This is the model class for table "{{%brand}}".
+ *
+ * @property integer $brand_id
+ * @property integer $parent_id
+ * @property string $brand_name
+ * @property string $brand_logo
+ * @property string $brand_desc
+ * @property integer $sort_order
+ * @property integer $is_show
+ */
+class UserAddress extends ActiveRecord
+{
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%user_address}}';
+    }
+    
+    public function scenarios(){
+    	return [
+    			'create' => ['address','province','city','district','user_id','mobile','consignee','is_default'],
+    			'update' => ['address','province','city','district','user_id','mobile','consignee']
+    	];
+    }
+    
+    public function rules(){
+    	return [
+    			
+    		[['address','province','city','district','mobile','consignee'], 'required', 'on'=>['create','update']],
+    		[['user_id'], 'default', 'value'=>$_SESSION['frontend']['user_id'], 'on'=>['create','update']],
+    		[['mobile','address'],'trim','on'=>['create','update']],
+    		[['is_default'],'default','value'=>1, 'on'=>['create']],
+    		[['mobile'],'match','pattern'=>'/^1[0-9]{10}$/','message'=>'请输入正确的手机号码','on'=>['create','update']],
+    		
+    	];
+    }
+    
+    public function attributeLabels(){
+    	return [
+    			'address' => '详细地址',
+    			'province' => '省',
+    			'city' => '区',
+    			'district' => '区',
+    			'mobile' => '手机号码',
+    			'consignee' => '收货人'
+    	];
+    }
+    
+    /**
+     * 取出当前会员默认的收货地址
+     */
+    public function get_default_address($id=null){
+    	if($id>0){
+    		$res = self::find()->where(['address_id' => $id, 'user_id'=>$_SESSION['frontend']['user_id']])->asArray()->one();
+    	}else{
+    		$res = self::find()->where(['is_default' => 1, 'user_id'=>$_SESSION['frontend']['user_id']])->asArray()->one();
+    	}
+    	
+    	$res['pid'] = $res['province'];
+    	$res['cid'] = $res['city'];
+    	$res['did'] = $res['district'];
+
+    	$res['province'] = Region::region_name($res['province']);
+    	$res['city'] = Region::region_name('',$res['city']);
+    	$res['district'] = Region::region_name('','',$res['district']);
+    	
+    	return $res;
+    }
+    
+    /**
+     *取出当前会员所有收货地址
+     */
+    public function get_user_address(){
+    	
+    	$res = self::find()->where(['user_id'=>$_SESSION['frontend']['user_id']])->asArray()->all();
+    	$model = new Region();
+    	foreach($res as &$val){	
+    		$val['province'] = Region::region_name($val['province']);
+    		$val['city'] = Region::region_name('',$val['city']);
+    		$val['district'] = Region::region_name('','',$val['district']);
+    	}
+  
+    	return $res;
+    }
+    
+    
+    
+    
+}

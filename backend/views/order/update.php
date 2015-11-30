@@ -1,0 +1,196 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use backend\models\User;
+use yii\helpers\Url;
+/* @var $this yii\web\View */
+/* @var $searchModel backend\models\OrderSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = '订单列表';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
+ <?= $this->render('../layouts/common'); ?>
+<style type="text/css">
+    .f1{color: red;}
+    .table-vertical img{width:100px;max-height:100px;}
+    .table-vertical th{text-align: center;}
+    .table-vertical tbody tr td{width: 16.66%;}
+    .kuaidi th{text-align: center;}
+    .kuaidi td{width: 16.66%;}
+   	.table-vertical tr>td.txr{text-align:right;}
+   	.table tr>td.txl{text-align:left;padding-left:200px;}
+   	.revamp div{overflow:hidden;}
+   	.revamp div.sub{width:400px;text-align:center;}
+   	.fl{float:left;width:200px;text-align:right;}
+   	.fr{float:left;}
+</style>
+<div class="order-index">
+
+<table class="table table-bordered table-vertical "><thead>
+<tr><th colspan="5">订单详情</th></thead>
+<tbody>
+<tr>
+<td>ID</td><td>商品</td>
+<td>价格</td><td>购买数量</td>
+<td>商品总额</td>
+
+</tr>
+	<?php foreach ($order['order_goods'] as $val){ ?>
+		<tr>
+		    <td><?= $val['goods_id'] ?></td>
+		    <td><img src="/common/upload/goods/<?= $val['goods_img']?$val['goods_img']:'default.png'; ?>" alt=""><?= $val['goods_name'] ?></td>
+		    <td><?= $val['goods_price'] ?></td>
+		    <td><?= $val['goods_number'] ?></td>
+		    <td><?= $val['goods_amount'] ?></td>
+		</tr>
+	
+	<?php	} ?>
+
+<tr class="total f1">
+    <td colspan="5" class="txr">
+    	快递：<?= $order['shipping_fee'] ?>
+    	<br/>
+    	总价：<?= $order['order_amount'] ?>
+    	<br/>
+    	订单状态：<?= $order['status']['name'] ?>
+    </td>
+</tr>
+
+</tbody></table>
+
+<table class="table table-bordered kuaidi"><thead>
+	<tr><th colspan="6">物流信息</th></thead>
+	<tbody>
+	<tr>
+	    <td>收货人:</td><td><?= $order['address']['consignee'] ?></td>
+	    <td>收货地址 :</td>
+	    <td><?= $order['address']['address'] ?></td>
+	    <td>收货人号码:</td>
+	    <td><?= $order['address']['mobile'] ?></td>
+	</tr>
+	<?php if($order['express']['data']){ ?>
+	<tr>
+		<td colspan="6" class="txl">
+				<p><?= $order['express']['expTextName'] ?></p>
+				<p>快递单号 : <span><?= $order['express']['mailNo'] ?></span> </p>
+			<?php   foreach($order['express']['data'] as $val){ ?>
+				<div>
+					<div class="clearfix">
+						<div class="ico f_l"><span></span></div>
+						<div class="c f_l">
+							<div class='t'><?= $val['context'] ?></div>
+							<div class="time"><?= $val['time'] ?></div>
+						</div>
+						
+					</div>
+					<div class="spa1"></div>
+				</div>
+				<br />
+			<?php } ?>
+		</td>
+	</tr>
+	<?php } ?>
+	</tbody>
+</table>
+
+<?php if($order['order_status'] == FINISHED && $order['refund']['refund_status'] ==  SUCCESS_REFUND){ // 显示退款信息 ?>
+	<table class="table table-bordered kuaidi"><thead>
+		<tr><th colspan="10">退款信息</th></thead>
+		<tbody>
+		<tr>
+		    <td>退款类型:</td><td><?= $order['refund_']['refund_type']=='1' ? '退款' : '退货' ?></td>
+		    <td>退款原因 :</td>
+		    <td><?= $order['refund']['refund_reason'] ?></td>
+		    <td>退款描述:</td>
+		    <td><?= $order['refund']['refund_desc'] ?></td>
+		    <td>退款金额:</td>
+		    <td><?= $order['refund']['refund_money'] ?></td>
+		    <td>转账流水号:</td>
+		    <td><?= $order['refund']['trade_no'] ?></td>
+		</tr>
+
+		</tbody>
+	</table>
+<?php } ?>
+
+	<?php if($order['order_status'] == SHIPPED && $order['shipping_id'] < 1){  ?>
+		<form action="<?= Url::to(['order/update','id'=>$order['order_id']]) ?>" method='post' class="revamp">
+			<div>
+				<p class="fl">快递公司: </p>
+				<p class="fr">
+					<select name="company">
+							<option value="">请选择</option>
+							<option value="顺丰快递-shunfeng">顺丰快递</option>
+							<option value="德邦物流-debang">德邦物流</option>
+							<option value="申通快递-shentong">申通快递</option>
+							<option value="圆通快递-yuantong">圆通快递</option>
+							<option value="汇通快递-huitong">汇通快递</option>
+							<option value="EMS快递-ems">EMS快递</option>
+							<option value="韵达快递-yunda">韵达</option>
+							<option value="中通快递-zhongtong">中通快递</option>
+							<option value="联昊通快递-lianhao">联昊通快递</option>
+							<option value="天天快递-tiantian">天天快递</option>
+							<option value="0">无需物流</option>
+						</select>
+				</p>
+			</div>
+			<div>
+				<p class="fl">快递单号: </p><p class="fr"><input type="text" value="" name="express"></p>
+			</div>
+			<div class="sub">
+				<input type="submit" value="提交">
+			</div>	
+		</form>
+	<?php } ?>
+	
+	<?php if($order['order_status'] == RETURNED && $order['refund']['refund_status'] ==  AGREE_REFUND){ // 处理退款 ?>
+		<form action="<?= Url::to(['order/refund']) ?>" method='post' class="revamp">
+			<div>
+				<p class="fl">退款金额:</p><p class="fl"><input type="text" value="" name="refund_money"></p>
+			</div>
+			<div>
+				<p class="fl">微信转账流水号:</p><p class="fl"><input type="text" value="" name="trade_no"></p>
+			</div>
+			<input type='hidden' name='id' value="<?= $order['order_id'] ?>">
+			<input type='hidden' name='refund_id' value="<?= $order['refund']['refund_id'] ?>">
+			<div class="sub">
+				<input type="submit" value="提交">
+			</div>	
+		</form>
+	<?php } ?>
+	
+	
+	<form action="<?= Url::to(['order/change']) ?>" method='post'>
+		<div>
+			<p class="fl">修改订单状态:</p>
+			<p class="fl">
+				<select name="status">
+					<option value="">请选择</option>
+					<option value="<?= UNPAYED ?>">未付款</option>
+					<option value="<?= PAYED ?>">已付款</option>
+					<option value="<?= SHIPPED ?>">发货</option>
+					<option value="<?= FINISHED ?>">已收货</option>
+					<option value="<?= RETURNED ?>">退货退款</option>
+					<option value="<?= CANCEL ?>">取消订单</option>
+					<option value="<?= FAILED ?>">交易失败</option>
+				</select>
+			</p>
+			<input type='hidden' name='id' value="<?= $order['order_id'] ?>">
+			<p class="fl"><input type='submit' value='提交'></p>
+		</div>
+	</form>
+
+
+</div>
+
+<?php if(yii::$app->session->getFlash('failed')):?>
+    <div style='color:red'>
+    <script>
+		alert("<?= yii::$app->session->getFlash('failed'); ?>");
+    </script>
+        <?php  yii::$app->session->setFlash('failed',null); ?>
+    </div>
+<?php endif; ?>

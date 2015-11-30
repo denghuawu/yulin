@@ -1,0 +1,231 @@
+<?php
+
+namespace backend\models;
+ 
+use Yii;
+use backend\models\Department; 
+use backend\models\Job; 
+
+/**
+ * This is the model class for table "{{%employee}}".
+ *
+ * @property string $id
+ * @property string $em_sn
+ * @property string $em_name
+ * @property integer $mobile_phone
+ * @property string $id_card
+ * @property integer $birthday
+ * @property string $marriage
+ * @property string $sex
+ * @property integer $ss_number
+ * @property string $native_place
+ * @property string $domicile
+ * @property integer $card_no
+ * @property string $nation
+ * @property integer $admin_id
+ * @property string $used_name
+ * @property string $political_status
+ * @property double $height
+ * @property double $weight
+ * @property string $self_introduction
+ * @property integer $qq
+ * @property string $email
+ * @property string $emergency_contact
+ * @property string $emergency_phone
+ * @property string $now_address
+ * @property string $home_phone
+ * @property integer $position_status
+ * @property integer $em_type
+ * @property integer $entry_time
+ * @property integer $leave_time
+ * @property string $has_probation
+ * @property integer $probation_time_start
+ * @property integer $probation_time_end
+ * @property integer $regular_time
+ * @property integer $engage_time_start
+ * @property integer $engage_time_end
+ * @property integer $depart_id
+ * @property integer $job_id
+ * @property double $salary
+ * @property integer $tp_type
+ * @property integer $join_work_time
+ * @property string $graduate_school
+ * @property integer $graduate_time
+ * @property string $major
+ * @property integer $education_level
+ * @property string $pro_certificate
+ * @property string $education_exp
+ * @property string $work_exp
+ */
+class Employee extends \yii\db\ActiveRecord
+{
+	public $depart_name;
+	public $job_name;
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%employee}}';
+    }
+    
+    public function scenarios()
+    {	
+    	return [
+    			'create' => ['mobile_phone', 'birthday', 'ss_number', 'card_no', 'admin_id', 'qq', 'position_status', 'em_type',
+    					 'entry_time', 'leave_time', 'probation_time_start', 'probation_time_end', 'regular_time', 'engage_time_start',
+    					 'engage_time_end', 'depart_id', 'job_id', 'tp_type', 'join_work_time', 'graduate_time', 'education_level',
+    					'marriage', 'sex', 'self_introduction', 'has_probation', 'education_exp', 'work_exp','height', 'weight',
+    					 'salary','em_sn', 'em_name', 'native_place', 'domicile', 'nation', 'used_name', 'email',
+    					 'emergency_contact', 'now_address', 'graduate_school', 'major', 'pro_certificate','id_card','political_status',
+    					'emergency_phone', 'home_phone'
+    					 ],
+    			'update' => ['mobile_phone', 'birthday', 'ss_number', 'card_no', 'admin_id', 'qq', 'position_status', 'em_type',
+    					 'entry_time', 'leave_time', 'probation_time_start', 'probation_time_end', 'regular_time', 'engage_time_start',
+    					 'engage_time_end', 'depart_id', 'job_id', 'tp_type', 'join_work_time', 'graduate_time', 'education_level',
+    					'marriage', 'sex', 'self_introduction', 'has_probation', 'education_exp', 'work_exp','height', 'weight',
+    					 'salary','em_sn', 'em_name', 'native_place', 'domicile', 'nation', 'used_name', 'email',
+    					 'emergency_contact', 'now_address', 'graduate_school', 'major', 'pro_certificate','id_card','political_status',
+    					'emergency_phone', 'home_phone'
+    					 ],
+    	];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {	
+        return [
+            [['mobile_phone','card_no', 'admin_id', 'qq', 'position_status', 'em_type', 'depart_id', 'job_id', 'tp_type','education_level'], 'integer','on'=>['create','update']],
+            [['marriage', 'sex', 'self_introduction', 'has_probation', 'education_exp', 'work_exp'], 'string','on'=>['create','update']],
+            [['height', 'weight', 'salary'], 'number','on'=>['create','update']],
+        	['em_sn', 'default', 'value'=>$this->makeEmployeeSn(),'on'=>['create','update']],
+            [['mobile_phone','em_name','em_sn'], 'required','on'=>['create','update']],
+            [[ 'em_name', 'native_place', 'domicile', 'nation', 'used_name', 'emergency_contact', 'now_address', 'graduate_school', 'major', 'pro_certificate'], 'string', 'max' => 255,'on'=>['create','update']],
+            [['id_card'], 'string', 'max' => 20,'on'=>['create','update']],
+        	['email', 'email','on'=>['create','update']],
+        	[['mobile_phone'],'match','pattern'=>'/^1[0-9]{10}$/','message'=>'请输入正确的手机号码','on'=>['create','update']],
+            [['political_status'], 'string', 'max' => 26,'on'=>['create','update']],
+            [['emergency_phone', 'home_phone'], 'string', 'max' => 50,'on'=>['create','update']],
+        	['em_sn','checkUniqueSn','on'=>['create','update']],
+
+        ];
+    }
+    
+    /**
+     * 检查员工编号的唯一性
+     * @return boolean
+     */
+    public function checkUniqueSn(){
+    	if($this->isNewRecord){
+    		if(self::find()->where("em_sn='{$this->em_sn}'")->exists()){
+    			$this->addError('em_sn','员工编号已存在');
+    			return false;
+    		}
+    	}else{
+    		if(self::find()->where("em_sn='{$this->em_sn}' AND id!={$this->id}")->exists()){
+    			$this->addError('em_sn','员工编号已存在');
+    			return false;
+    		}	
+    	}
+    	return true;
+    }
+
+    /**
+     * 生成员工编号（生成规则：E+入职年月日+员工总数++）
+     */
+    public function makeEmployeeSn(){
+    	if(empty($this->em_sn)){
+    		// 员工总数
+    		$em_count = self::find()->count()+1;
+    		$date = date('Ymd',time());
+    		return 'E'.$date.$em_count;
+    	}
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'em_sn' => '员工编号',
+            'em_name' => '员工姓名',
+            'mobile_phone' => '手机号码',
+            'id_card' => '身份证号码',
+            'birthday' => '生日',
+            'marriage' => '婚姻状况(0未婚1已婚2离异)',
+            'sex' => '性别（1男）',
+            'ss_number' => '社保号',
+            'native_place' => '籍贯',
+            'domicile' => '户籍所在地',
+            'card_no' => '银行卡号',
+            'nation' => '民族',
+            'admin_id' => '关联后台管理账号',
+            'used_name' => '曾用名',
+            'political_status' => '政治状态',
+            'height' => '身高',
+            'weight' => '体重',
+            'self_introduction' => '自我介绍',
+            'qq' => 'qq',
+            'email' => '邮箱',
+            'emergency_contact' => '紧急联系人',
+            'emergency_phone' => '紧急联系电话',
+            'now_address' => '现住址',
+            'home_phone' => '家庭电话',
+            'position_status' => '在职状态',
+            'em_type' => '员工类型',
+            'entry_time' => '入职时间',
+            'leave_time' => '离职时间',
+            'has_probation' => '有无试用期（1有）',
+            'probation_time_start' => '开始试用期',
+            'probation_time_end' => '结束试用期',
+            'regular_time' => '转正时间',
+            'engage_time_start' => '开始聘用时间',
+            'engage_time_end' => '结束聘用时间',
+            'depart_id' => '所属部门id',
+            'job_id' => '职位id',
+            'salary' => '薪水',
+            'tp_type' => '人才类型',
+            'join_work_time' => '参加工作时间',
+            'graduate_school' => '毕业院校',
+            'graduate_time' => '毕业时间',
+            'major' => '专业',
+            'education_level' => '学历',
+            'pro_certificate' => '职业资格证书',
+            'education_exp' => '教育经历',
+            'work_exp' => '工作经历',
+        ];
+    }
+    
+    public function getDepartment(){
+    	/**
+    	 * 第一个参数为要关联的字表模型类名称，
+    	 *第二个参数指定 通过子表的 customer_id 去关联主表的 id 字段
+    	 */
+    	return $this->hasMany(Department::className(), ['id' => 'depart_id']);
+    }
+    public function getJob(){
+    	/**
+    	 * 第一个参数为要关联的字表模型类名称，
+    	 *第二个参数指定 通过子表的 customer_id 去关联主表的 id 字段
+    	 */
+    	return $this->hasMany(Job::className(), ['id' => 'job_id']);
+    }
+    
+    /**
+     * 根据部门id统计部门员工人数
+     */
+    public static function count_employee_by_depart($ids){
+    	return self::find()->where('depart_id IN('.$ids.')')->count();
+    }
+    
+    /**
+     * 根据职位id统计职位员工人数
+     */
+    public static function count_employee_by_job($id){
+    	return self::find()->where('job_id IN('.$id.')')->count();
+    }
+}

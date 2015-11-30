@@ -1,0 +1,46 @@
+<?php
+
+use yii\helpers\Html;
+use yii\grid\GridView;
+use backend\models\FieldOption;
+
+/* @var $this yii\web\View */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+
+$this->title = 'Field Options';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<?= $this->render('../layouts/common'); ?>
+<div class="field-option-index">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+
+    <p>
+        <?= Html::a('Create Field Option', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'id',
+            'option_code',
+            'option_name',
+            'option_value',
+        	[
+        		'attribute'=>'parent_id',
+        		'label' => '选项类别',
+        		'value' => function($m){
+        			if($m->parent_id < 1){
+        				return ;
+        			}
+        			return FieldOption::find()->where('id='.$m->parent_id)->one()->option_name;	
+   					 }
+    		],
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
+</div>

@@ -1,0 +1,29 @@
+<?php
+
+namespace frontend\controllers;
+
+use Yii;
+use yii\web\Controller;
+use frontend\models\History;
+
+class HistoryController extends BaseController{
+	
+	public function actionIndex(){
+		
+		$model = new History();
+		
+		$data = $model->get_history_info();
+		
+		return $this->render('index', ['scan' => $data]);
+	}
+
+	
+	public function actionEmpty(){
+		
+		$model = new History();
+		
+		$model->deleteAll(['user_id' => $_SESSION['frontend']['user_id']]);
+		
+		return $this->redirect(['index']);
+	}
+}

@@ -1,0 +1,133 @@
+<?php
+
+namespace frontend\controllers;
+
+use Yii;
+use yii\web\Controller;
+use frontend\models\UserAddress;
+use common\models\Region;
+use yii\helpers\Html;
+use frontend\models\frontend\models;
+
+class AddressController extends BaseController{
+	
+	/**
+	 * 地址列表
+	 * @return Ambigous <string, string>
+	 */
+	public function actionIndex(){
+		
+		$model = new UserAddress();
+		$data = $model->get_user_address();
+
+		return $this->render('index',['address'=>$data]);
+	}
+	
+	/**
+	 * 新建收货地址
+	 */
+	public function actionCreate(){
+		
+		$model = new UserAddress();
+		$model->setScenario('create');
+		
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			$this->refresh();
+			
+			$address = new UserAddress();
+			$address->updateAll(['is_default'=>0],'address_id!='.$model->address_id);
+			
+			return $this->redirect(['index', 'goFrom'=>true]);
+		}else{
+			return $this->render('create', [
+					'model' => $model,
+					'errors' => $model->errors,
+			]);
+		}
+		
+	}
+	
+	/**
+	 * 更新收货地址
+	 */
+	public function actionUpdate($id){
+		
+		$model = $this->findModel($id);
+		
+		if(!$model){
+			return $this->redirect(['/index/index']);
+		}
+		
+		$address = $model->get_default_address($id);
+		$model->setScenario('update');
+		
+		if ($model->load(Yii::$app->request->post()) && $model->save()) {
+			
+			$this->refresh();
+			
+			return $this->redirect(['index','goFrom'=>true]);
+			
+		}else{
+			return $this->render('update', [
+					'model' => $model,
+					'address' => $address,
+					'errors' => $model->errors,
+			]);
+		}
+	}
+	
+	public function actionSetdefault($id){
+		$id = intval($id);
+		if($id>0){
+			$address = new UserAddress();
+			$address->updateAll(['is_default'=>0],['user_id'=>$_SESSION['frontend']['user_id']]);
+			
+			$model = $this->findModel($id);
+			
+			if(!$model){
+				return $this->redirect(['/index/index']);
+			}
+			
+			$model->is_default = 1;
+			$model->update(false);
+			
+			return $this->redirect(['index']);
+		}
+	}
+
+	/**
+	 * 删除收货地址
+	 * @param unknown $id
+	 * @return boolean
+	 */
+	public function actionDelete($id){
+		
+		$id = intval($id);
+		if($id>0){
+			$model = $this->findModel($id);
+			$model->delete();
+
+		}
+		return $this->redirect(['index']);
+	}
+	
+	// 地区联动
+	public function actionRegion($parent_id)
+	{
+	
+		$model = Region::region_list($parent_id);
+	
+		foreach($model as $value=>$name)
+		{
+			echo Html::tag('option',Html::encode($name),array('value'=>$value));
+		}
+		exit;
+	}
+	
+	protected function findModel($id)
+	{
+		if (($model = UserAddress::findOne($id)) !== null) {
+			return $model;
+		}
+	}
+}

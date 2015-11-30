@@ -1,0 +1,91 @@
+<?php
+namespace frontend\controllers;
+
+use Yii;
+use common\org\Wechat;
+use yii\web\Controller;
+use frontend\models\User;
+
+
+
+/**
+ * Site controller
+ */
+class WeixinController extends Controller
+{
+
+	/**
+	 * 生成自定义菜单
+	 */
+    public function actionMenu(){
+    	makeMenu();
+    	echo 'it is over!';
+    }
+
+    /**
+     * 微信登录
+     * @param string $url
+     * @param string $param
+     * @return \yii\web\Response
+     */
+	public function actionLogin($url=null,$param=null){
+		
+		$url = isset($url) ? $url : '/index/index';
+		
+		if($_SESSION['frontend']['user_id']>0){
+			return $this->redirect(['/index/index']);
+		}
+	
+		define('CODE', $_GET['code']);
+		
+		// 使用code换取access_token
+		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=".APPID."&secret=".SECRET."&code=".CODE."&grant_type=authorization_code";
+	
+		$jsonStr = https_request($url);
+		$jsonStr = json_decode($jsonStr, true);
+		
+		// 获取用户信息
+		$url = "https://api.weixin.qq.com/sns/userinfo?access_token=".$jsonStr['access_token']."&openid=".$jsonStr['openid']."&lang=zh_CN";
+		$userStr = https_request($url);
+		$userStr = json_decode($userStr, true);
+		
+		if(!empty($userStr)){
+			
+			// 如果不存在，则注册
+			$user_id = User::find()->where(['weixin_id'=>$userStr['openid']])->one()->user_id;
+			if(!$user_id){
+				$user = new User();
+				$user->sex = $userStr['sex'];
+				$user->weixin_id = $userStr['openid'];
+				$user->reg_time = time();
+				$user->user_name = trim($userStr['nickname']);
+				$user->figure = $userStr['headimgurl'];
+				$user->address = $userStr['province'].$userStr['city'];
+				$user->save(false);
+				$user_id = $user->primaryKey;
+			}else{
+				// 已注册，则更新用户信息
+				$user = User::findOne($user_id);
+				$user->sex = $userStr['sex'];
+				$user->weixin_id = $userStr['openid'];
+				$user->reg_time = time();
+				$user->user_name = trim($userStr['nickname']);
+				$user->figure = $userStr['headimgurl'];
+				$user->address = $userStr['province'].$userStr['city'];
+				$user->update(false);
+			}
+			// 取出用户信息，存入session（登录）
+			$userInfo = User::find()->where('user_id='.$user_id)->one();
+			$session = Yii::$app->session;
+			$session->open();
+			$_SESSION['frontend']['user_id'] = $userInfo->user_id;
+			$_SESSION['frontend']['weixin_id'] = $userInfo->weixin_id;
+			$_SESSION['frontend']['user_name'] = $userInfo->user_name;
+			$_SESSION['frontend']['figure'] = $userInfo->figure;
+		}
+		// 跳转
+		return $this->redirect(['/index/index']);
+		
+	}
+
+}

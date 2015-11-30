@@ -1,0 +1,26 @@
+<div class="nav_top clearfix"><span class="re_left"></span>大茶源注册</div>
+	<div class="wrap">
+		<div class="register fs30 pb70">
+			<form class="register_con" action='index.php?r=site/signup' method='post'>
+				<p class="mt70 required"><input type="text" placeholder='手机号码' name='User[mobile_phone]' id='user-mobile_phone' length="11" onkeyup="value=value.replace(/[^\d]/g,'')"  onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))" ></p>
+				<p><input type="password" placeholder='请输入密码' name='User[password]' id='user-password'></p>
+				<p><input type="password" name="User[confirm_password]" id='user-confirm_password' placeholder='请输入确认密码'></p>
+				<p class="code clearfix"><input type="text" value='123456' name='User[validated_code]' id='user-validated_code' placeholder='请输入验证码'><input type="button" value="点击获取验证码"></p>
+				<p class="mt30"><input type="submit" value="注册"></p>
+			</form>
+		</div>
+	</div>
+	
+
+    <div style='color:red'>
+	<!-- 错误信息的输出 -->
+		<?php
+			if($errors){
+				foreach ($errors as $val){
+					foreach($val as $v){
+						echo '&nbsp;'.$v.'<br/>';
+					}
+				}
+			}
+		?>
+    </div>

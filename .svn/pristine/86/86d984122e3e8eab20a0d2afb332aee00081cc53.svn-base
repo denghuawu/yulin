@@ -1,0 +1,237 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "{{%users}}".
+ *
+ * @property string $user_id
+ * @property string $email
+ * @property string $user_name
+ * @property string $figure
+ * @property string $password
+ * @property integer $sex
+ * @property string $user_money
+ * @property string $address_id
+ * @property string $reg_time
+ * @property string $last_login
+ * @property integer $user_rank
+ * @property integer $parent_id
+ * @property string $mobile_phone
+ * @property string $real_name
+ * @property string $weixin
+ * @property integer $country
+ * @property integer $province
+ * @property integer $city
+ * @property integer $district
+ * @property integer $is_validated
+ */
+class User extends \yii\db\ActiveRecord
+{
+    public $validated_code;
+	public $confirm_password;
+	public $new_password;
+	
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%users}}';
+    }
+    /**
+     * 个人中心首页
+     */
+    public static function userInfo($user_id)
+    {
+        $sql='SELECT user_name name,figure img FROM yl_users WHERE user_id=:uid limit 0,1';
+        $data= User::findBySql($sql,array(':uid'=>$user_id))->asArray()->all();
+        return $data;
+    }
+
+    
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 登录处理（注册后自动登录也用到此方法）
+     * @param obj $m    模型
+     * @return boolean
+     */
+    public function login($data){
+        $user = (new \yii\db\Query())
+        ->select('user_id, user_name,mobile_phone,is_validated,user_rank,figure')
+        ->from('yl_users')
+        ->where('user_name=:u AND password=:p',[':u'=>$data['username'],':p'=>$data['password']])
+        ->one();
+
+        // 缓存用户信息
+        $session = Yii::$app->session;
+        $session->open();
+        $_SESSION['frontend']['user_id'] = $user['user_id'];
+        $_SESSION['frontend']['user_name'] = $user['user_name'];
+        $_SESSION['frontend']['mobile_phone'] = $user['mobile_phone'];
+        $_SESSION['frontend']['user_rank'] = $user['user_rank'];
+        $_SESSION['frontend']['is_validated'] = $user['is_validated'];
+        $_SESSION['frontend']['figure'] = $user['figure'];
+        return true;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+    
+    public function scenarios(){
+    	return [
+    			'signup' => ['mobile_phone', 'password','confirm_password','last_login','reg_time','user_rank','validated_code'],
+    			'update' => ['password'],
+    			'login' => ['password','last_login', 'mobile_phone'],
+    			'mod_name' => ['user_name'],
+    			'mod_pass' => ['password','confirm_password','new_password'],
+    	];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['mobile_phone'], 'required', 'message'=>'手机号码不能为空', 'on'=>['login','signup']],
+            [['mobile_phone'], 'required', 'message'=>'手机号码不能为空', 'on'=>['login','signup']],
+        	[['mobile_phone'], 'unique','message'=>'手机号码已存在','on'=>['signup']],
+        	[['mobile_phone'],'match','pattern'=>'/^1[0-9]{10}$/','message'=>'请输入正确的手机号码','on'=>['signup','update']],
+            [['password'], 'required', 'message'=>'密码不能为空', 'on'=>['login','signup','mod_pass']],
+            [['new_password'], 'required', 'message'=>'新密码不能为空', 'on'=>['mod_pass']],
+            [['user_name'], 'required',  'on'=>['mod_name']],
+            [['user_name'], 'unique',  'on'=>['mod_name']],
+            [['password'], 'string', 'min'=>6,'max' => 32, 'message'=>'6-32个字符，可使用数字和字母组成', 'on'=>['update','signup']],
+            [['user_rank'], 'default', 'value'=> 1, 'on'=>['signup']],
+        	[['last_login'],'default', 'value'=>time(), 'on'=>['signup','login']],
+        	[['confirm_password'], 'compare', 'compareAttribute'=>'password','message'=>'密码和确认密码不一致！','on'=>['signup']],
+        		
+        	[['user_name'], 'string', 'min'=>2, 'max'=>20, 'on'=>['mod_name']],
+        	[['confirm_password'], 'compare', 'compareAttribute'=>'new_password','message'=>'新密码和确认密码不一致！','on'=>['mod_pass']],
+        	[['password'],'validatePassword','on'=>['login']],
+        	[['password'],'validatePassword2','on'=>['mod_pass']],
+        	[['validated_code'], 'validCode', 'on'=>['signup']],
+        ];
+    }
+    
+    public function validCode(){
+    	if($this->validated_code != 123456){
+    		$this->addError('validated_code', '验证码不正确');
+    		return false;
+    	}
+    	
+    	return true;
+    }
+    
+    // 验证码用户名和密码的正确性
+    public function validatePassword()
+    {
+    	// 如果前面没有错误
+    	if(!$this->hasErrors()){
+    		$user = (new \yii\db\Query())
+    		->select('user_id')
+    		->from('yl_users')
+    		->where('mobile_phone=:mobile_phone AND password=:password',[':mobile_phone'=>$this->mobile_phone,':password'=>md5($this->password)])
+    		->exists();
+
+    		if (!$user) {
+    			$this->addError('password','用户名或者密码错误~！');
+    			return false;
+    		}
+    		return true;
+    	}
+    }
+    // 验证码用户名和密码的正确性
+    public function validatePassword2()
+    {
+    	// 如果前面没有错误
+    	if(!$this->hasErrors()){
+    		$user = (new \yii\db\Query())
+    		->select('user_id')
+    		->from('yl_users')
+    		->where('mobile_phone=:mobile_phone AND password=:password',[':mobile_phone'=>$_SESSION['frontend']['mobile_phone'],':password'=>md5($this->password)])
+    		->exists();
+
+    		if (!$user) {
+    			$this->addError('password','密码错误~！');
+    			return false;
+    		}
+    		return true;
+    	}
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'user_id' => 'User ID',
+            'email' => 'Email',
+            'user_name' => '昵称',
+            'figure' => 'Figure',
+            'password' => '密码',
+            'sex' => 'Sex',
+            'user_money' => 'User Money',
+            'address_id' => 'Address ID',
+            'reg_time' => 'Reg Time',
+            'last_login' => 'Last Login',
+            'user_rank' => 'User Rank',
+            'parent_id' => 'Parent ID',
+            'mobile_phone' => 'Mobile Phone',
+            'real_name' => 'Real Name',
+            'weixin' => 'Weixin',
+            'country' => 'Country',
+            'province' => 'Province',
+            'city' => 'City',
+            'district' => 'District',
+            'is_validated' => 'Is Validated',
+            'confirm_password' => '确认密码',
+            'new_password' => '新密码',
+        ];
+    }
+    
+    /**
+     * 数据插入前处理
+     * @param unknown $insert
+     * @return boolean
+     */
+    public function beforeSave($insert)
+    {
+    	if(parent::beforeSave($insert)){
+    		if($this->isNewRecord){
+    			$this->password = md5($this->password);
+    			$this->reg_time = time();
+    		}
+    		return true;
+    	}
+    		return false;
+    }
+    
+    
+    
+    /**
+     * 用户信息
+     */
+    public function user_info($id){
+    	return self::findOne($id);
+    }
+    
+    /**
+     * 用户信息
+     */
+    public function wx_user_info($open_id){
+    	return self::find()->where(['weixin_id'=>$open_id])->one();
+    }
+}

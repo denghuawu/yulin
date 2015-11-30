@@ -1,0 +1,135 @@
+<?php
+
+namespace frontend\models;
+
+use Yii;
+use yii\db\ActiveRecord;
+use common\models\Region;
+use common\models\common\models;
+
+/**
+ * This is the model class for table "{{%brand}}".
+ *
+ * @property integer $brand_id
+ * @property integer $parent_id
+ * @property string $brand_name
+ * @property string $brand_logo
+ * @property string $brand_desc
+ * @property integer $sort_order
+ * @property integer $is_show
+ */
+class UserAddress extends ActiveRecord
+{
+
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return '{{%user_address}}';
+    }
+    
+    public function scenarios(){
+    	return [
+    			'create' => ['address','province','city','district','user_id','mobile','consignee','is_default'],
+    			'update' => ['address','province','city','district','user_id','mobile','consignee']
+    	];
+    }
+    
+    public function rules(){
+    	return [
+    			
+    		[['address','province','city','district','mobile'], 'required', 'on'=>['create','update']],
+    		[['user_id'], 'default', 'value'=>$_SESSION['frontend']['user_id'], 'on'=>['create','update']],
+    		[['mobile','address'],'trim','on'=>['create','update']],
+    		[['is_default'],'default','value'=>1, 'on'=>['create']],
+    		[['mobile'],'match','pattern'=>'/^1[0-9]{10}$/','message'=>'请输入正确的手机号码','on'=>['create','update']],
+    		
+    	];
+    }
+    
+    public function attributeLabels(){
+    	return [
+    			'address' => '详细地址',
+    			'province' => '省',
+    			'city' => '区',
+    			'district' => '区',
+    			'mobile' => '手机号码',
+    			'consignee' => '收货人'
+    	];
+    }
+    
+    /**
+     * 取出当前会员默认的收货地址
+     */
+    public function get_default_address($id=null){
+    	if($id>0){
+    		$res = self::find()->where(['address_id' => $id, 'user_id'=>$_SESSION['frontend']['user_id']])->asArray()->one();
+    	}else{
+    		$res = self::find()->where(['is_default' => 1, 'user_id'=>$_SESSION['frontend']['user_id']])->asArray()->one();
+    	}
+        $res['pid'] = $res['province'];//省市区
+    	$res['cid'] = $res['city'];//市
+    	$res['did'] = $res['district'];//区
+        
+
+    	$res['province'] = Region::region_name($res['province']);
+    	$res['city'] = Region::region_name('',$res['city']);
+    	$res['district'] = Region::region_name('','',$res['district']);
+    	
+    	return $res;
+    }
+    
+    /**
+     *取出当前会员所有收货地址
+     */
+    public function get_user_address(){
+    	
+    	$res = self::find()->where(['user_id'=>$_SESSION['frontend']['user_id']])->asArray()->all();
+    	$model = new Region();
+    	foreach($res as &$val){	
+    		$val['province'] = Region::region_name($val['province']);
+    		$val['city'] = Region::region_name('',$val['city']);
+    		$val['district'] = Region::region_name('','',$val['district']);
+    	}
+  
+    	return $res;
+    }
+    /**
+     *更新会员的收货地址
+     */
+    public function up_user($arr){
+        $connection=Yii::$app->db;
+        $sql = "UPDATE yl_user_address SET address_name=:n,province=:p,city=:c,district=:d,mobile=:t,address=:a WHERE address_id=:id";
+        $command = $connection->createCommand($sql);
+        $command->bindParam(":n",$arr['n']);
+        $command->bindParam(":id",$arr['id']);
+        $command->bindParam(":p",$arr['province']);
+        $command->bindParam(":c",$arr['city']);
+        $command->bindParam(":d",$arr['district']);
+        $command->bindParam(":t",$arr['tel']);
+        $command->bindParam(":a",$arr['site']);
+        $re=$command->execute();
+        return $re;
+    }
+    /**
+     *增加会员的收货地址
+     */
+    public function add_user($arr){
+        $connection=Yii::$app->db;
+        $sql = "insert yl_user_address(address_name,province,city,district,mobile,address) values(:n,:p,:c,:d,:t,:a)";
+        $command = $connection->createCommand()->insert('yl_user_address',['address_name'=>$arr['n'],'province'=>$arr['province'],'city'=>$arr['city'],'district'=>$arr['district'],'mobile'=>$arr['tel'],'address'=>$arr['site'],'user_id'=>$_SESSION['frontend']['user_id']]);
+       $re=$command->execute();
+       return $re;
+    }
+    /**
+     *取出会员收货地区信息
+     */
+    public function getRegion($id){
+        $connection=Yii::$app->db;
+        $sql = "SELECT province,city,district from yl_user_address WHERE address_id=:id and user_id=:u";
+        $data= UserAddress::findBySql($sql,array(':id'=>$id,':u'=>$_SESSION['frontend']['user_id']))->asArray()->all();
+        return $data;
+     }
+
+}

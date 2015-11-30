@@ -1,0 +1,31 @@
+body,h1,h2,h3,h4,h5,p,dl,dd,ul,ol,form,input,textarea,th,td,select ,table,a,img{ margin:0; padding:0; }
+em { font-style:normal; }
+li { list-style:none; }
+a { text-decoration:none; }
+img { border:none; vertical-align:top; }
+table {border-collapse: separate;border-spacing: 0;} 
+th, td {text-align: left;font-weight: normal;} 
+input,textarea { outline:none; }
+textarea { resize:none; overflow:auto; }
+.f_l{float: left;}
+.f_r{float: right;}
+.cr{color: red;}
+.cg{color:green;}
+.dib{display: inline-block;}
+.clearfix{ /* 为了照顾ie6浏览器*/zoom:1;}
+.clearfix:after{content:"";display:block;visibility:hidden;clear:both;height:0;}
+body{-webkit-tap-highlight-color: rgba(0,0,0,0);}
+body,html{height: 100%;font-size: 20px;font-family: "微软雅黑";width: 100%;background: #f7f3e7;}
+input,select,option{font-size: 1em;}
+input[type="submit"], input[type="reset"], input[type="button"], button { -webkit-appearance: none; /*去掉苹果的默认UI来渲染按钮*/}
+a{color: #000;}
+/*字体大小  40 35 30 25 20*/
+.re_left{width: 40px;height: 40px;background: url(../images/plcg.png) -2px -1333px no-repeat;display: inline-block;vertical-align: middle;position: absolute;left: 57px;top:0;bottom: 0;margin:auto;}
+.head{position: fixed;top: 0;height: 90px;background: #f80;width: 100%;text-align: center;line-height: 90px;background-color: #b8d201;color: #fff;font-size: 2em;}
+
+.wrap{padding-top: 90px;background: #fff;}
+.login{padding:0 100px;}
+.login .login_con{font-size:1.75em;margin-bottom:10px;}
+.login .login_con span{padding:0 20px;}
+.login .login_con input{padding-left: 20px;width: 60%;}
+.login .con input{}

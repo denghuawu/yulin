@@ -1,0 +1,84 @@
+<?php 
+use common\models\Region;
+use yii\helpers\Url;
+?>
+	
+		<div class="nav_top clearfix" style="position:absolute;"><span class="re_left"></span>修改收货地址<span class="n_t_r">保存</span></div>
+		<div class="wrap">
+			<div class="addsite fs30 pm40">
+				<form action="<?= Url::to(['address/update', 'id'=>$model->address_id]) ?>"  method="post" id="add">				
+					<div><input type="text" placeholder="收货人姓名" name="UserAddress[consignee]" value="<?= $address['consignee'] ?>"></div>
+					
+					<div><input type="text" placeholder="手机号码" name="UserAddress[mobile]" value="<?= $address['mobile'] ?>"></div>
+					<div><select name="UserAddress[province]" id="province">
+							<?php foreach (Region::region_list(0) as $key=>$val){ ?>
+								<option value="<?= $key; ?>" <?= $address['pid'] == $key ? 'selected' : '' ?>> <?= $val; ?> </option>
+							<?php } ?>
+						</select></div>
+					<div><select name="UserAddress[city]" id="city">
+							<option value="<?= $address['cid'] ?>"><?= Region::region_name('',$address['cid']); ?></option>
+						</select></div>
+					<div><select name="UserAddress[district]" id="district">
+							<option value="<?= $address['did'] ?>"> <?= Region::region_name('','',$address['did']) ?> </option>
+						</select></div>
+					<div><textarea placeholder="详细地址" name="UserAddress[address]" ><?= $address['address'] ?></textarea></div>
+				</form>
+			</div>
+			<div class="revampsite fs30 pl30 f1" site_id='' onclick="locat(this)" hre="<?= Url::to(['address/delete', 'id'=>$model->address_id]) ?>">
+			<!-- <div class="revampsite fs30 pl30 f1" site_id='' onclick="loca_alert(this,'您确定删除这个收货地址？')" hre='index.html'> -->
+				删除此收货地址
+			</div>
+			<div class="default_site fs30" onclick="locat(this)" hre="<?= Url::to(['address/setdefault', 'id'=>$model->address_id]) ?>">设置默认地址</div>
+		</div>
+	
+		<div style='color:red'>
+	<!-- 错误信息的输出 -->
+		<?php
+			if($errors){
+				foreach ($errors as $val){
+					foreach($val as $v){
+						echo '&nbsp;'.$v.'<br/>';
+					}
+				}
+			}
+		?>
+    </div>
+    
+    
+    <script>
+	$("#province").change(function(){
+		if(this.value == ''){
+			$("#district,#city").empty();
+			$("#district,#city").append('<option value="">请选择</option>');
+			return;
+		}
+		var parent_id = this.value;
+		$.post(
+			'index.php?r=address/region&parent_id='+parent_id,
+			function($m){
+				if($m){
+					$('#city').empty();
+					$('#city').append('<option value="">请选择</option>');
+					$('#city').append($m);
+				}
+			})
+	})
+	
+	$("#city").change(function(){
+		if(this.value == ''){
+			$("#district").empty();
+			$('#district').append('<option value="">请选择</option>');
+			return;}
+		var parent_id = this.value;
+		$.post(
+			'index.php?r=address/region&parent_id='+parent_id,
+			function($m){
+				if($m){
+					$('#district').empty();
+					$('#district').append($m);
+				}
+				
+			})
+	})
+	
+</script>

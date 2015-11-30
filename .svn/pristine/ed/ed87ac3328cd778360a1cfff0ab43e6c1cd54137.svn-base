@@ -1,0 +1,81 @@
+<?php
+
+namespace backend\models;
+
+use Yii;
+use yii\base\Model;
+use yii\data\ActiveDataProvider;
+use backend\models\Goods;
+
+/**
+ * GoodsSearch represents the model behind the search form about `backend\models\Goods`.
+ */
+class GoodsSearch extends Goods
+{
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['goods_id', 'goods_year', 'cat_id', 'brand_id', 'goods_number', 'is_new', 'is_recommend', 'is_hot', 'free_shipping'], 'integer'],
+            [['goods_price', 'shipping_fee'], 'number'],
+            [['goods_name', 'goods_desc', 'goods_img', 'goods_unit', 'goods_attr'], 'safe'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        // bypass scenarios() implementation in the parent class
+        return Model::scenarios();
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $query = Goods::find();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere([
+            'goods_id' => $this->goods_id,
+            'goods_price' => $this->goods_price,
+            'goods_year' => $this->goods_year,
+            'cat_id' => $this->cat_id,
+            'brand_id' => $this->brand_id,
+            'goods_number' => $this->goods_number,
+            'is_new' => $this->is_new,
+            'is_recommend' => $this->is_recommend,
+            'is_hot' => $this->is_hot,
+            'shipping_fee' => $this->shipping_fee,
+            'free_shipping' => $this->free_shipping,
+        ]);
+
+        $query->andFilterWhere(['like', 'goods_name', $this->goods_name])
+            ->andFilterWhere(['like', 'goods_desc', $this->goods_desc])
+            ->andFilterWhere(['like', 'goods_img', $this->goods_img])
+            ->andFilterWhere(['like', 'goods_unit', $this->goods_unit])
+            ->andFilterWhere(['like', 'goods_attr', $this->goods_attr]);
+
+        return $dataProvider;
+    }
+}
