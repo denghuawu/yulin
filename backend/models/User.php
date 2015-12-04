@@ -44,15 +44,15 @@ class User extends \yii\db\ActiveRecord
     public function scenarios()
     {
     	return [			
-    			'create' => ['user_name','password','confirm_password','real_name','birthday',
-    						'sex','user_money','reg_time','last_login','user_rank','admin_id',
+    			'create' => ['user_name','real_name','birthday','password',
+    						'sex','user_money','reg_time','user_rank','admin_id',
     						'mobile_phone','email','qq','is_validated','detail_address',
-    						'province','city','native_place','user_type','shop_name','bank_card','id_card'],
+    						'province','city','district','native_place','user_type','shop_name','bank_card','id_card'],
     			
-    			'update' => ['user_name','password','confirm_password','real_name','birthday',
-    						'sex','user_money','reg_time','last_login','user_rank','admin_id',
-    						'mobile_phone','email','qq','is_validated','detail_address',
-    						'province','city','native_place','user_type','shop_name','bank_card','id_card'],
+    			'update' => ['real_name','birthday',
+    						'sex','user_money','reg_time','user_rank','admin_id',
+    						'mobile_phone','email','qq','detail_address',
+    						'province','city','district','native_place','user_type','shop_name','bank_card','id_card'],
     	];
     }
 
@@ -62,19 +62,17 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-        	[['user_name','real_name', 'email','native_place','detail_address'], 'trim','on'=>['create','update']],
-            [['mobile_phone','password','user_name','province','city','admin_id','real_name'], 'required','on'=>['create','update']],
-            [['sex', 'user_rank', 'admin_id','user_type'], 'integer','on'=>['create','update']],
-            [['user_money'], 'number','on'=>['create','update']],
-        	[['password'], 'string', 'min'=>6,'max' => 32,'on'=>['create','update']],
-        	[['user_name'], 'string','min'=>2,'max' => 20, 'message'=>'用户名必须是2-20个由数字或者字母组成','on'=>['create','update']],
-            [['user_name'], 'unique','message'=>'用户名已存在','on'=>['create','update']],
-            [['mobile_phone'], 'unique','message'=>'手机号码已存在','on'=>['create','update']],
-        	[['mobile_phone'],'match','pattern'=>'/^1[0-9]{10}$/','message'=>'请输入正确的手机号码','on'=>['create','update']],
-            [['sex'], 'default', 'value'=>'1','on'=>['create','update']],
-        	[['confirm_password'], 'compare', 'compareAttribute'=>'password','on'=>['create','update']],
-        	[['user_money'], 'default', 'value'=>'0','on'=>['create','update']],
+        	[['real_name', 'email','native_place','detail_address'], 'trim','on'=>['create','update']],
+            [['mobile_phone','real_name'], 'required','on'=>['create','update']],
+            [['sex', 'user_rank', 'admin_id','user_type','id_card'], 'integer','on'=>['create','update']],
+        	['email','email', 'on'=>'create'],
+        	[['mobile_phone'],'match','pattern'=>'/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/','message'=>'请输入正确的手机号码','on'=>['create','update']],
+        	['id_card','match','pattern'=>'/(^\d{15}$)|(^\d{17}([0-9]|X)$)/','message'=>'请输入正确的身份证号码', 'on'=>'create'],
+        	[['sex'], 'default', 'value'=>'1','on'=>['create','update']],
+        	[['user_money','is_validated','user_money'], 'default', 'value'=>'0','on'=>['create']],
         	[['reg_time'], 'default', 'value'=>time(),'on'=>['create']],
+        	['user_name', 'default', 'value' => $this->make_username(), 'on'=>'create'],
+        	['password', 'default', 'value' => md5(123456), 'on'=>'create'],
         ];
     }
 
@@ -106,13 +104,25 @@ class User extends \yii\db\ActiveRecord
         	'id_card' => '身份证号',
         ];
     }
+    
+    /**
+     * 生成唯一用户名
+     * @return string
+     */
+    public function make_username(){
+    	
+    	//基于以微秒计的当前时间，生成一个唯一的 ID.
+    	$uid = uniqid(microtime(true));
+    	// 去后八位
+    	return substr($uid,strlen($uid)-8,8);
+    }
 
 	/**
      * 数据插入前处理
      * @param unknown $insert
      * @return boolean
      */
-    public function beforeSave($insert)
+    /* public function beforeSave($insert)
     {	
     	if(parent::beforeSave($insert)){
     		if($this->isNewRecord){
@@ -137,8 +147,7 @@ class User extends \yii\db\ActiveRecord
     	}else{
     		return false;
     	}
-    }
-
+    }  */
 
     // 为多表查询定义关联关系
     public function getRank()

@@ -49,8 +49,8 @@ class UserController extends BaseController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
         // 取出地区
-        $data['region_list'] = $searchModel->user_region($_REQUEST['UserSearch']['province_id']);
-       
+        //$data['region_list'] = $searchModel->user_region($_REQUEST['UserSearch']['province_id']);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -85,9 +85,7 @@ class UserController extends BaseController
             return $this->redirect(['index']);
         }
         
-        
         return $this->redirect(['index','msg'=>$model->getErrors()]);
-        
     }
 
     /**

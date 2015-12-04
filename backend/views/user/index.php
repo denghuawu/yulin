@@ -1,356 +1,554 @@
 <?php
 use yii\helpers\Url;
+use common\models\Region;
 ?>
-	<style type="text/css">
-		.container{max-width: 1920px;width: 100%!important;display:block;}
-		.bui-dialog{border-radius: 0;border:10px solid #262626;}
-		.bui-dialog .bui-stdmod-header,.bui-dialog .bui-stdmod-footer{background: linear-gradient(#FEFEFE,#EDEDE7);background: -ms-linear-gradient(#FEFEFE,#EDEDE7);background: -webkit-linear-gradient(#FEFEFE,#EDEDE7);}
-		.bui-dialog .bui-stdmod-header{height: 28px;}
-		.guishuren_btn{width: 40px;height: 28px;text-align: center;}
-		.order_information td{text-align: center;}
-		td.tit{text-align: left;}
-		table{text-align: center;}
-		.bui-grid-table .bui-grid-hd{text-align: center;}
-		.bui-dialog .bui-stdmod-header{height: 34px;line-height: 34px;}
-		.bui-dialog .bui-stdmod-body{margin: 0;}
-		.bui-dialog .bui-stdmod-footer{margin: 0;height: 48px;line-height: 48px;}
-		.bui-dialog a.bui-ext-close{top:9px;}
-		/* 搜索 */
-		.search{width: 357px;height: 26px;background: pink;border: 1px solid #d3d3d3;}
-		.search input{width:298px;height: 24px;border: none;}
-		/* 添加联系人 */
-		.toolbar{width:834px;height: 34px;border: 1px solid #cccccc;background: linear-gradient(#fefefe,#eeeeea);background: -ms-linear-gradient(#fefefe,#eeeeea);background: -webkit-linear-gradient(#fefefe,#eeeeea);border-bottom: none;}
-		.linkman_btn{border: none;background: none;color: #016b96;} 
-		.toolbar .linkman_f{margin-left: 50px;}
+<style type="text/css">
+.container {
+	max-width: 1920px;
+	width: 100% !important;
+	display: block;
+}
 
+.bui-dialog {
+	border-radius: 0;
+	border: 10px solid #262626;
+}
 
-		/* 查看客户资料 */
-		input.dislodge{border: none;}
-		.xixi{margin-top: 50px;}
-		.red{color: #f55853;}
-		.all{margin-top: 12px;}
-		.in_add{color: #fb7f67;padding: 0 5px;}
+.bui-dialog .bui-stdmod-header, .bui-dialog .bui-stdmod-footer {
+	background: linear-gradient(#FEFEFE, #EDEDE7);
+	background: -ms-linear-gradient(#FEFEFE, #EDEDE7);
+	background: -webkit-linear-gradient(#FEFEFE, #EDEDE7);
+}
 
-	</style>
+.bui-dialog .bui-stdmod-header {
+	height: 28px;
+}
 
+.guishuren_btn {
+	width: 40px;
+	height: 28px;
+	text-align: center;
+}
 
-		<div class="container">
-			<div id="grid1"></div>
-			<div id="content1" class="hide">
-			<form action="" id="form1" name="form1" class="form-horizontal">
-			         	<!-- 用户名 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">姓名：</label>
-		           				<div class="controls">
-		             				 <input type="text" name="userName" id="userName" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">性别：</label>
-		           				<div class="controls">
-		             				<input type="text" name="sex" id="sex" class="dislodge">
-		           				 </div>
-		         			 </div>
-			          	</div>
-			          	<!-- 客户类型 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">客户类型：</label>
-		           				<div class="controls">
-		             				<input type="text" name="client_type" id="client_type" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span12">
-		            			<label class="control-label">归属人：</label>
-		           				<div class="controls">
-		             				<input type="text" id="guishuren" name="guishuren" class="dislodge">
-		             				
-		           				 </div>
-		         			 </div>
-			          	</div>
-			          	<!-- 出生日期 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">出生日期：</label>
-		           				<div class="controls">
-		             				<input type="text" name="birthday" id="birthday" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">银行卡号：</label>
-		           				<div class="controls">
-		             				<input type="text" name="cardNo" id="cardNo" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 
-			          	</div>
-			          	<!-- 省份证号 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">身份证号：</label>
-		           				<div class="controls">
-		             				<input type="text" name="id_number" id="id_number" class="dislodge">
-		           				 </div>
+.order_information td {
+	text-align: center;
+}
 
-		         			 </div>
-		         			 <div class="control-group span12">
-		            			<label class="control-label">收货地址</label>
-		           				<div class="controls">
-		             				<input type="text" name="address" id="address" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			
-			          	</div>
-			          	<!-- 籍贯 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">籍贯：</label>
-		           				<div class="controls">
-		             				<input type="text" name="native_place" id="native_place" class="dislodge">
-		           				 </div>
+td.tit {
+	text-align: left;
+}
 
-		         			 </div>
-		         			  <div class="control-group span12">
-		            			
-		         			 </div>
-		         			 
-			          	</div>
-						<!-- 手机号码 -->
-						<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">联系手机：</label>
-		           				<div class="controls">   
-		             				<input type="text" name="phone_num" id="native_place" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">店铺名称：</label>
-		           				<div class="controls">
-		             				<input type="text" name="store" id="store" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 
-			          	</div>
-			          	<!-- qq -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">QQ ：</label>
-		           				<div class="controls">
-		             				<input type="text" name="qq" id="qq" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">Email：</label>
-		           				<div class="controls">
-		             				<input type="text" name="store" id="store" class="dislodge">
-		           				 </div>
-		         			 </div>
-		         			 
-			          	</div>
-			         </form>
+table {
+	text-align: center;
+}
+
+.bui-grid-table .bui-grid-hd {
+	text-align: center;
+}
+
+.bui-dialog .bui-stdmod-header {
+	height: 34px;
+	line-height: 34px;
+}
+
+.bui-dialog .bui-stdmod-body {
+	margin: 0;
+}
+
+.bui-dialog .bui-stdmod-footer {
+	margin: 0;
+	height: 48px;
+	line-height: 48px;
+}
+
+.bui-dialog a.bui-ext-close {
+	top: 9px;
+}
+/* 搜索 */
+.search {
+	width: 357px;
+	height: 26px;
+	background: pink;
+	border: 1px solid #d3d3d3;
+}
+
+.search input {
+	width: 298px;
+	height: 24px;
+	border: none;
+}
+/* 添加联系人 */
+.toolbar {
+	width: 834px;
+	height: 34px;
+	border: 1px solid #cccccc;
+	background: linear-gradient(#fefefe, #eeeeea);
+	background: -ms-linear-gradient(#fefefe, #eeeeea);
+	background: -webkit-linear-gradient(#fefefe, #eeeeea);
+	border-bottom: none;
+}
+
+.linkman_btn {
+	border: none;
+	background: none;
+	color: #016b96;
+}
+
+.toolbar .linkman_f {
+	margin-left: 50px;
+}
+
+/* 查看客户资料 */
+input.dislodge {
+	border: none;
+}
+
+.xixi {
+	margin-top: 50px;
+}
+
+.red {
+	color: #f55853;
+}
+
+.all {
+	margin-top: 12px;
+}
+
+.in_add {
+	color: #fb7f67;
+	padding: 0 5px;
+}
+</style>
+
+<div class="container">
+	<div id="grid1"></div>
+	<div id="content1" class="hide">
+		<form action="" id="form1" name="form1" class="form-horizontal">
+			<!-- 用户名 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">姓名：</label>
+					<div class="controls">
+						<input type="text" name="userName" id="userName" class="dislodge">
+					</div>
+				</div>
+				<div class="control-group span8">
+					<label class="control-label">性别：</label>
+					<div class="controls">
+						<input type="text" name="sex" id="sex" class="dislodge">
+					</div>
+				</div>
 			</div>
-			<div id="content2" class="hide">
-			
-			<div id="tab"></div>
-		        <div id="panel" class="" style="padding:10px;">
-		       		 <!-- 客户信息 -->
-		          	<div>
-		          		<form action="" id="form1" name="form1" class="form-horizontal">
-			         	<!-- 用户名 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label red"><s>*</s>姓名：</label>
-		           				<div class="controls">
-		             				 <input type="text" name="userName" id="userName">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">性别：</label>
-		           				<div class="controls">
-		             				<input id="sex1" name="sex" type="radio" value="1" checked>男
-		        					<input id="sex2" name="sex" type="radio" value="2">女
-		           				 </div>
-		         			 </div>
-			          	</div>
-			          	<!-- 客户类型 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">客户类型：</label>
-		           				<div class="controls">
-		             				<select name="client_type" id="client_type">
-		             					<option value="one">一</option>
-		             					<option value="two">二</option>
-		             				</select>
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span12">
-		            			<label class="control-label">归属人：</label>
-		           				<div class="controls">
-		             				<input type="text" id="guishuren" name="guishuren">
-		             				<button class="guishuren_btn">···</button>
-		           				 </div>
-		         			 </div>
-			          	</div>
-			          	<!-- 出生日期 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">出生日期：</label>
-		           				<div class="controls">
-		             				<input type="text" name="birthday" id="birthday" class="calendar">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">银行卡号：</label>
-		           				<div class="controls">
-		             				<input type="text" name="cardNo" id="cardNo">
-		           				 </div>
-		         			 </div>
-		         			 
-			          	</div>
-			          	<!-- 省份证号 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">身份证号：</label>
-		           				<div class="controls">
-		             				<input type="text" name="id_number" id="id_number">
-		           				 </div>
+			<!-- 客户类型 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">客户类型：</label>
+					<div class="controls">
+						<input type="text" name="client_type" id="client_type"
+							class="dislodge">
+					</div>
+				</div>
+				<div class="control-group span12">
+					<label class="control-label">归属人：</label>
+					<div class="controls">
+						<input type="text" id="guishuren" name="guishuren"
+							class="dislodge">
 
-		         			 </div>
-		         			 <div class="control-group span12">
-		            			<label class="control-label">收货地址</label>
-		           				<div class="controls bui-form-group-select" data-type="city">
-		             				<select name="city" id="city">
-		             					<option class="input-small" value="citys">请选择省</option>
-
-		             				</select>
-		             				<select class="input-small"><option>区</option>请选择市</select>
-		             				<select class="input-small"><option>区</option>请选择区</select>
-
-		           				 </div>
-		         			 </div>
-		         			
-			          	</div>
-			          	<!-- 籍贯 -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">籍贯：</label>
-		           				<div class="controls">
-		             				<input type="text" name="native_place" id="native_place">
-		           				 </div>
-
-		         			 </div>
-		         			  <div class="control-group span12">
-		            			<label class="control-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-		           				<div class="controls">
-		             				<input type="text" id="address" name="address" data-tip="{text:'请填写详细街道地址'}">
-
-		           				 </div>
-		         			 </div>
-		         			 
-			          	</div>
-						<!-- 手机号码 -->
-						<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label red">联系手机：</label>
-		           				<div class="controls">
-		             				<input type="text" name="phone_num" id="native_place">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">店铺名称：</label>
-		           				<div class="controls">
-		             				<input type="text" name="store" id="store">
-		           				 </div>
-		         			 </div>
-		         			 
-			          	</div>
-			          	<!-- qq -->
-			          	<div class="row">
-			          		<div class="control-group span8">
-		            			<label class="control-label">QQ ：</label>
-		           				<div class="controls">
-		             				<input type="text" name="qq" id="qq">
-		           				 </div>
-		         			 </div>
-		         			 <div class="control-group span8">
-		            			<label class="control-label">Email：</label>
-		           				<div class="controls">
-		             				<input type="text" name="store" id="store">
-		           				 </div>
-		         			 </div>
-		         			 
-			          	</div>
-			         </form>
-			        </div>
-		         	 <!-- 订单信息 -->
-		         	 <div>
-		          		<ul class="toolbar">
-							<li style="margin-left:10px;">
-								团队成员
-							</li>
-							<li class="linkman_f"><button type="button" class="linkman_btn" id="member_btn">+添加成员</button></li>
-							<li></li>
-						</ul>
-			          	<div id="grid2">
-		          			
-		        		</div>
-		        		<ul class="toolbar xixi">
-		          			<li  style="margin-left:10px;">人数统计（单位：人）</li>
-		          		</ul>
-		        		<div id="grid7"></div>
-		        		<div class="all">共：<span class="in_add">28</span>人</div>
-		          	</div>
-		          	<!-- 联系人 -->
-		          	<div>
-						<ul class="toolbar">
-							<li style="margin-left:10px;">
-								联系人
-							</li>
-							<li class="linkman_f"><button type="button" class="linkman_btn" id="linkman_btn"><iclass="add_icon">+</i> 添加联系人</button></li>
-							<li></li>
-						</ul>
-			          	<div id="grid4"></div>
-
-		        	</div>
-		    </div>
-			
-			
+					</div>
+				</div>
 			</div>
-			<div id="content3" class="hide"><form action="">密码：<input type="password"></form>/div>
+			<!-- 出生日期 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">出生日期：</label>
+					<div class="controls">
+						<input type="text" id="birthday" name="birthday" class="dislodge">
+					</div>
+				</div>
+				<div class="control-group span12">
+					<label class="control-label">收货地址：</label>
+					<div class="controls">
+						<input type="text" id="guishuren" name="guishuren"
+							class="dislodge">
 
+					</div>
+				</div>
+			</div>
+			<!-- 省份证号 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">身份证号：</label>
+					<div class="controls">
+						<input type="text" name="id_number" id="id_number"
+							class="dislodge">
+					</div>
+				</div>
+				<div class="control-group span12"></div>
+			</div>
+			<!-- 籍贯 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">籍贯：</label>
+					<div class="controls">
+						<input type="text" name="native_place" id="native_place"
+							class="dislodge">
+					</div>
+				</div>
+				<div class="control-group span8">
+					<label class="control-label">店铺名称：</label>
+					<div class="controls">
+						<input type="text" name="store" id="store" class="dislodge">
+					</div>
+				</div>
+			</div>
+			<!-- 手机号码 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">手机号码：</label>
+					<div class="controls">
+						<input type="text" name="phone_num" id="native_place"
+							class="dislodge">
+					</div>
+				</div>
+				<div class="control-group span8">
+					<label class="control-label">Email：</label>
+					<div class="controls">
+						<input type="text" name="store" id="store" class="dislodge">
+					</div>
+				</div>
+			</div>
+			<!-- qq -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">QQ ：</label>
+					<div class="controls">
+						<input type="text" name="qq" id="qq" class="dislodge">
+					</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
+	<!-- 编辑客户资料 -->
+	<div id="content2" class="hide">
+
+		<div id="tab"></div>
+		<div id="panel" class="" style="padding: 10px;">
+			<!-- 客户信息 -->
+			<div>
+				<form action="" id="form1" name="form1" class="form-horizontal">
+					<!-- 用户名 -->
+					<div class="row">
+						<div class="control-group span8">
+							<label class="control-label red"><s>*</s>姓名：</label>
+							<div class="controls">
+								<input type="text" name="userName" id="userName">
+							</div>
+						</div>
+						<div class="control-group span8">
+							<label class="control-label">性别：</label>
+							<div class="controls">
+								<input id="sex1" name="sex" type="radio" value="1" checked>男 <input
+									id="sex2" name="sex" type="radio" value="2">女
+							</div>
+						</div>
+					</div>
+					<!-- 客户类型 -->
+					<div class="row">
+						<div class="control-group span8">
+							<label class="control-label">客户类型：</label>
+							<div class="controls">
+								<select name="client_type" id="client_type">
+									<option value="one">一</option>
+									<option value="two">二</option>
+								</select>
+							</div>
+						</div>
+						<div class="control-group span12">
+							<label class="control-label">归属人：</label>
+							<div class="controls">
+								<input type="text" id="guishuren" name="guishuren">
+								<button class="guishuren_btn">···</button>
+							</div>
+						</div>
+					</div>
+					<!-- 出生日期 -->
+					<div class="row">
+						<div class="control-group span8">
+							<label class="control-label">出生日期：</label>
+							<div class="controls">
+								<input type="text" name="birthday" id="birthday"
+									class="calendar">
+							</div>
+						</div>
+						<div class="control-group span12">
+							<label class="control-label">收货地址</label>
+							<div class="controls">
+								<select name="city" id="city">
+									<option class="input-small" value="citys">请选择省</option>
+
+								</select> <select class="input-small"><option>区</option>请选择市
+								</select> <select class="input-small"><option>区</option>请选择区
+								</select>
+
+							</div>
+						</div>
+					</div>
+					<!-- 省份证号 -->
+					<div class="row">
+						<div class="control-group span8">
+							<label class="control-label">身份证号：</label>
+							<div class="controls">
+								<input type="text" name="id_number" id="id_number">
+							</div>
+						</div>
+						<div class="control-group span12">
+							<label class="control-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+							<div class="controls">
+								<input type="text" id="address" name="address"
+									data-tip="{text:'请填写详细街道地址'}">
+
+							</div>
+						</div>
+					</div>
+					<!-- 籍贯 -->
+					<div class="row">
+						<div class="control-group span8">
+							<label class="control-label">籍贯：</label>
+							<div class="controls">
+								<input type="text" name="native_place" id="native_place">
+							</div>
+						</div>
+						<div class="control-group span8">
+							<label class="control-label">店铺名称：</label>
+							<div class="controls">
+								<input type="text" name="store" id="store">
+							</div>
+						</div>
+					</div>
+					<!-- 手机号码 -->
+					<div class="row">
+						<div class="control-group span8">
+							<label class="control-label red">手机号码：</label>
+							<div class="controls">
+								<input type="text" name="phone_num" id="native_place">
+							</div>
+						</div>
+						<div class="control-group span8">
+							<label class="control-label">Email：</label>
+							<div class="controls">
+								<input type="text" name="store" id="store">
+							</div>
+						</div>
+					</div>
+					<!-- qq -->
+					<div class="row">
+						<div class="control-group span8">
+							<label class="control-label">QQ ：</label>
+							<div class="controls">
+								<input type="text" name="qq" id="qq">
+							</div>
+						</div>
+
+					</div>
+				</form>
+			</div>
+			<!-- 订单信息 -->
+			<div>
+				<ul class="toolbar">
+					<li style="margin-left: 10px;">订单信息</li>
+				</ul>
+				<div id="grid2"></div>
+				<ul class="toolbar xixi">
+					<li style="margin-left: 10px;">订单总计</li>
+				</ul>
+				<div id="grid7"></div>
+			</div>
+			<!-- 联系人 -->
+			<div>
+				<ul class="toolbar">
+					<li style="margin-left: 10px;">联系人</li>
+					<li class="linkman_f"><button type="button" class="linkman_btn"
+							id="linkman_btn">+添加联系人</button></li>
+					<li></li>
+				</ul>
+				<div id="grid4"></div>
+			</div>
 		</div>
-		
+	</div>
+	<!-- 新增客户资料 -->
+	<div id="content9" class="hide">
+
+
+		<form action="" id="form1" name="form1" class="form-horizontal">
+			<!-- 用户名 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label red"><s>*</s>姓名：</label>
+					<div class="controls">
+						<input type="text" name="User[real_name]" id="userName">
+					</div>
+				</div>
+				<div class="control-group span8">
+					<label class="control-label">性别：</label>
+					<div class="controls">
+						<input id="sex1" name="User[sex]" type="radio" value="1" checked>男 <input
+							id="sex2" name="sex" type="radio" value="2">女
+					</div>
+				</div>
+			</div>
+			<!-- 客户类型 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">客户类型：</label>
+					<div class="controls">
+						<select name="User[user_rank]" id="client_type">
+							<option value="one">一</option>
+							<option value="two">二</option>
+						</select>
+					</div>
+				</div>
+				<div class="control-group span12">
+					<label class="control-label">归属人：</label>
+					<div class="controls">
+						<input type="text" id="guishuren" name="User[admin_id]">
+						<button class="guishuren_btn">···</button>
+					</div>
+				</div>
+			</div>
+			<!-- 出生日期 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">出生日期：</label>
+					<div class="controls">
+						<input type="text" name="User[birthday]" id="birthday" class="calendar">
+					</div>
+				</div>
+				<div class="control-group span12">
+					<label class="control-label">店铺所在地</label>
+					<div class="controls">
+						<select onchange="getRegion('select#city')" name="User[province]" id='province'>
+							<option class="input-small" value="">请选择</option>
+							<?php foreach(Region::region_list(0) as $pid=>$pname){ ?>
+							<option class="input-small" value="<?= $pid ?>"><?= $pname ?></option>
+							<?php } ?>
+						</select>
+						
+						<select class="input-small" name='User[city]' id='city' onchange="getRegion('select#district')">
+							<option>请选择</option>
+						</select>
+						
+						<select class="input-small" name="User[district]" id='district'>
+							<option>请选择</option>
+						</select>
+
+					</div>
+				</div>
+			</div>
+			<!-- 省份证号 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">身份证号：</label>
+					<div class="controls">
+						<input type="text" name="User[id_card]" id="id_number">
+					</div>
+				</div>
+				<div class="control-group span12">
+					<label class="control-label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+					<div class="controls">
+						<input type="text" id="User[detail_address]" name="address"
+							data-tip="{text:'请填写详细街道地址'}">
+
+					</div>
+				</div>
+			</div>
+			<!-- 籍贯 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">籍贯：</label>
+					<div class="controls">
+						<input type="text" name="User[native_place]" id="native_place">
+					</div>
+				</div>
+				<div class="control-group span8">
+					<label class="control-label">店铺名称：</label>
+					<div class="controls">
+						<input type="text" name="User[shop_name]" id="store">
+					</div>
+				</div>
+			</div>
+			<!-- 手机号码 -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label red">手机号码：</label>
+					<div class="controls">
+						<input type="text" name="User[mobile_phone]" id="native_place">
+					</div>
+				</div>
+				<div class="control-group span8">
+					<label class="control-label">Email：</label>
+					<div class="controls">
+						<input type="text" name="User[email]" id="store">
+					</div>
+				</div>
+			</div>
+			<!-- qq -->
+			<div class="row">
+				<div class="control-group span8">
+					<label class="control-label">QQ ：</label>
+					<div class="controls">
+						<input type="text" name="User[qq]" id="qq">
+					</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
+	<div id="content3" class="hide">
+		<form action="">
+			密码：<input type="password">
+		</form>
+		/div>
+	</div>
+
+	<script type="text/javascript">
+		function getRegion(tag){
+			rid = $("#province  option:selected").val();
+			$.post("index.php?r=region/getlink&parent_id="+rid,function(data){
+                $(tag).html(data);
+            });
+		}
+	</script>
+
 	<script type="text/javascript">
         BUI.use(['bui/grid','bui/data','bui/tab','bui/mask'],function(Grid,Data,Tab){
             var Grid = Grid,
          	Store = Data.Store,
-         	enumObj = {"1" : "选项一","2" : "选项二","3" : "选项三"},
+         	
          	sex={"1":"男","2":"女"},
           	columns = [
-            	{title : '姓名', dataIndex :'a',editor:{xtype:'text'}},
-	            {title : '客户类型', dataIndex :'b',editor:{xtype:'text'}},
-	            {title : '性别', dataIndex :'c',editor : {xtype :'select',items : sex},renderer : Grid.Format.enumRenderer(sex)},
-	            {title : '地区', dataIndex :'d',editor:{xtype:'text'}},
-	            {title : '地址', dataIndex :'e',editor:{xtype:'text'}},
-	            {title : '联系手机', dataIndex :'f',editor:{xtype:'number'}},
-	            {title : '订单', dataIndex :'g',editor:{xtype:'text'}},
-	            {title : '归属人', dataIndex :'h',editor:{xtype:'text'}},
+            	{title : '姓名', dataIndex :'a'},
+	            {title : '客户类型', dataIndex :'b'},
+	            {title : '性别', dataIndex :'c'},
+	            {title : '地区', dataIndex :'d'},
+	            {title : '地址', dataIndex :'e'},
+	            {title : '联系手机', dataIndex :'f'},
+	            {title : '订单', dataIndex :'g'},
+	            {title : '归属人', dataIndex :'h'},
 	            {title : '操作', dataIndex :'i',renderer : function(){
 	              return '<span class="grid-command btn-check">查看</span><span class="grid-command btn-edit">编辑</span><span class="grid-command btn-del">删除</span>';
 	          }
 	            }
           	],
           	columns1=[
-          		{title:'级别',dataIndex:'a',editor : {xtype : 'text'}},
-          		{title:'分组',dataIndex:'b',editor : {xtype : 'text'}},
-          		{title:'序号',dataIndex:'c',editor : {xtype : 'text'}},
-          		{title:'姓名',dataIndex:'d',editor : {xtype : 'text'}},
-          		{title:'联系手机',dataIndex:'e',editor : {xtype : 'text'}},
-          		{title:'所在地区',dataIndex:'f',editor : {xtype : 'text'}},
-          		{title:'操作',dataIndex:'g',renderer:function(){ 
-          			 return '&nbsp;&nbsp;<span class="grid-command btn-memberedits  icon-pencil"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="grid-command btn-removeMember  icon-remove"></span>'
-          		}}
+          		{title:'订单号',dataIndex:'a'},
+          		{title:'商品名称',dataIndex:'b'},
+          		{title:'单价',dataIndex:'c'},
+          		{title:'数量',dataIndex:'d'},
+          		{title:'单位',dataIndex:'e'},
+          		{title:'总价',dataIndex:'f'},
+          		{title:'状态',dataIndex:'g'}
           	],
           	columns2=[ 
           		{title:'姓名',dataIndex:'a',editor : {xtype : 'text'}},
@@ -360,20 +558,21 @@ use yii\helpers\Url;
           		{title:'手机号码',dataIndex:'e',editor : {xtype : 'number'}},
           		{title:'QQ',dataIndex:'f',editor : {xtype : 'number'}},
           		{title:'操作',dataIndex:'g',renderer:function(){ 
-          			 return '&nbsp;&nbsp;<span class="grid-command btn-edits  icon-pencil"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="grid-command btn-remove  icon-remove"></span>'
+          			 return '<span class="grid-command btn-edits  icon-pencil"></span><span class="grid-command btn-remove  icon-remove"></span>'
           		}}
           	],
           	columns3=[ 
-          		{title:'雨林馆',dataIndex:'a',width:150},
-          		{title:'特级分销商',dataIndex:'b',width:150},
-          		{title:'一级分销商',dataIndex:'c',width:150},
-          		{title:'二级分销商',dataIndex:'d',width:150},
-          		{title:'三级分销商',dataIndex:'e',width:150}
-          	],          	
-        	data = [{a:'123'},{a:'c个人股dd',c:'2013-03-13'},{a:'1333',b:2222,d:2,e:'1,2'}],
-        	data1 = [{a:'1641'},{a:'c方法dd',c:'2013-03-13'},{a:'1333',b:2222,d:2,e:'1,2'}],
-        	data2 = [{a:'144523'},{a:'c更换退货dd',c:'2013-03-13'},{a:'1333',b:2222,d:2,e:'1,2'}],
-        	data3 = [{a:'124513'},{a:'cdd',c:'2013-03-13'},{a:'1333',b:2222,d:2,e:'1,2'}];
+          		{title:'订单总数',dataIndex:'a',width:150},
+          		{title:'订单总价',dataIndex:'b',width:150},
+          		{title:'已成功',dataIndex:'c',width:150},
+          		{title:'进行中',dataIndex:'d',width:150},
+          		{title:'已关闭',dataIndex:'e',width:150}
+          	],
+          	
+        	data = [{a:'123'},{a:'c个人股dd',c:'2013-03-13'},{a:'1333',b:2222,d:2,e:'1,2'}];
+        	data1 = [{a:'1641'},{a:'c方法dd',c:'2013-03-13'},{a:'1333',b:2222,d:2,e:'1,2'}];
+        	data2 = [{a:'144523'},{a:'c更换退货dd',c:'2013-03-13'},{a:'1333',b:2222,d:2,e:'1,2'}];
+        	data3 = [{a:'124513'}];
 
  			var store = new Store({
 				data : data,
@@ -407,7 +606,7 @@ use yii\helpers\Url;
 	                 
 	                }
 	              }
-		              
+	             
 	            }
 	         }),
           	//编辑客户资料
@@ -416,6 +615,23 @@ use yii\helpers\Url;
 	            triggerCls : 'btn-edit',
 	            editor : {
 	              title : '编辑客户资料',
+	              width : 898,
+	              focusable : false,
+	              listeners : {
+	              show : function(){
+	              var form = this.get('form');
+	                  
+	                 
+	                }
+	              }
+		              
+	            }
+	         }),
+          	//新增客户资料
+          	editing10 = new Grid.Plugins.DialogEditing({
+	            contentId : 'content9', 
+	            editor : {
+	              title : '新增客户资料',
 	              width : 898,
 	              focusable : false,
 	              listeners : {
@@ -438,7 +654,7 @@ use yii\helpers\Url;
 		          autoRender: true,
 		         children:[
 			            {title:'客户信息',value:'1',selected : true},//选中
-			            {title:'团队信息',value:'2'},
+			            {title:'订单信息',value:'2'},
 			            {title:'联系人',value:'3'}
 			           
 		        ]
@@ -457,7 +673,7 @@ use yii\helpers\Url;
 			  disabled : 'disabled'
 			},
 			store : store,
-			plugins : [Grid.Plugins.CheckSelection,editing,editing1,editing2],	// 插件形式引入多选表格
+			plugins : [Grid.Plugins.CheckSelection,editing,editing1,editing2,editing10],	// 插件形式引入多选表格
 			tbar:{
 				items : [{
 					btnCls : 'button button-small',
@@ -477,13 +693,7 @@ use yii\helpers\Url;
 			
 		  });
 		grid.render();
-		//团队信息添加编辑
-		var editing9 = new Grid.Plugins.RowEditing({
-          triggerCls : 'btn-memberedits',
-          triggerSelected : false
- 
-        });
-		//团队信息表格
+		//订单信息表格
 		grid2=new Grid.Grid({ 
 
 			render:"#grid2",
@@ -493,7 +703,6 @@ use yii\helpers\Url;
 			  selected : 'selected',
 			  disabled : 'disabled'
 			},
-			plugins : [editing9],// 插件形式引入多选表格
 			store : store1
 		});
 		grid2.render();
@@ -509,7 +718,7 @@ use yii\helpers\Url;
 			store : store3
 		});
 		grid7.render();
-		//联系人添加编辑
+		//可编辑
 		var editing6 = new Grid.Plugins.RowEditing({
           triggerCls : 'btn-edits',
           triggerSelected : false
@@ -535,7 +744,6 @@ use yii\helpers\Url;
 
 		grid4.render();
 		
-		
 		//联系人、添加可以直接编辑
 		$("#linkman_btn").on('click',function(){ 
 			linkmanEditor();
@@ -544,15 +752,6 @@ use yii\helpers\Url;
           var newData1 = {c : 0};
           store2.addAt(newData1,0);
           editing6.edit(newData1,'a'); 
-        };
-        //团队信息、添加可以直接编辑
-        $("#member_btn").on('click',function(){ 
-			memberEditor();
-		});
-		function memberEditor(){
-          var newData4 = {c : 0};
-          store1.addAt(newData4,0);
-          editing9.edit(newData4,'a'); 
         };
 		
 		//点击删除操作
@@ -581,9 +780,9 @@ use yii\helpers\Url;
 		
         //添加记录
         function addFunction(){
+         
           var newData = {b : 0};
-          store.addAt(newData,0);
-          editing.edit(newData,'a'); //添加记录后，直接编辑
+          editing10.add(newData,'a'); //添加记录后，直接编辑
         };
         //删除选中的记录
         function delFunction(){
@@ -614,35 +813,8 @@ use yii\helpers\Url;
 		    store2.remove(item1);
 		  },'question');
         };
-        //团队、点击删除操作 
-		grid2.on('itemclick',function(ev){ 
-			var sender = $(ev.domTarget),
-			itemE2 = $(ev.element),
-			item1 = ev.item;
-			if(sender.hasClass('btn-removeMember')){ 
-				delMember(item1,itemE2);
-			};
-
-
-		});
-        //团队信息删除选中的记录
-        function delMember(item1,itemE2){
-           BUI.Message.Confirm('确认删除记录？',function(){
-		    var input = itemE2.find('input'),
-		      name = itemE2.attr('name');
-		      console.log(name);
-		    if(name){
-		      form.getField(name).remove();
-		    }
-
-		    store1.remove(item1);
-		  },'question');
-        };
        
 
       });
-
-
-
 
     </script>

@@ -9,7 +9,7 @@
 	<link href="assets/css/main_i.css" rel="stylesheet" type="text/css">
 	
 	<!-- <link href="assets/css/yii-main.css" rel="stylesheet" type="text/css" /> -->
-	<script type="text/javascript" src="assets/js/jquery-1.8.1.min.js"></script>
+	<script type="text/javascript" src="./assets/js/jquery-1.8.1.min.js"></script>
 	<script type="text/javascript" src="./assets/js/bui.js"></script>
 	<script type="text/javascript" src="./assets/js/config-min.js"></script>
 	<!-- end -->
